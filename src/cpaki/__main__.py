@@ -29,22 +29,6 @@ __license__ = "mit"
 _logger = logging.getLogger(__name__)
 
 
-def fib(n):
-    """Fibonacci example function
-
-    Args:
-      n (int): integer
-
-    Returns:
-      int: n-th Fibonacci number
-    """
-    assert n > 0
-    a, b = 1, 1
-    for i in range(n-1):
-        a, b = b, a+b
-    return a
-
-
 def parse_args(args):
     """Parse command line parameters
 
@@ -55,16 +39,13 @@ def parse_args(args):
       :obj:`argparse.Namespace`: command line parameters namespace
     """
     parser = argparse.ArgumentParser(
-        description="Just a Fibonnaci demonstration")
+        description="C-PAC utility")
+
     parser.add_argument(
         '--version',
         action='version',
         version='cpaki {ver}'.format(ver=__version__))
-    parser.add_argument(
-        dest="n",
-        help="n-th Fibonacci number",
-        type=int,
-        metavar="INT")
+
     parser.add_argument(
         '-v',
         '--verbose',
@@ -72,6 +53,7 @@ def parse_args(args):
         help="set loglevel to INFO",
         action='store_const',
         const=logging.INFO)
+
     parser.add_argument(
         '-vv',
         '--very-verbose',
@@ -79,6 +61,7 @@ def parse_args(args):
         help="set loglevel to DEBUG",
         action='store_const',
         const=logging.DEBUG)
+
     return parser.parse_args(args)
 
 
@@ -101,8 +84,10 @@ def main(args):
     """
     args = parse_args(args)
     setup_logging(args.loglevel)
-    _logger.debug("Starting crazy calculations...")
-    print("The {}-th Fibonacci number is {}".format(args.n, fib(args.n)))
+    _logger.debug("Script starting...")
+
+    print(args)
+
     _logger.info("Script ends here")
 
 
