@@ -87,6 +87,10 @@ def main(args):
     _logger.debug("Script starting...")
 
     print(args)
+    
+    import docker
+    client = docker.from_env()
+    print(client.containers.run("ubuntu:latest", "echo hello world").decode('ascii'))
 
     _logger.info("Script ends here")
 
