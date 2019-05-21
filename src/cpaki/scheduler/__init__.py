@@ -1,3 +1,4 @@
+import tornado.escape
 import tornado.web
 import tornado.ioloop
 from tornado.options import define, options
@@ -5,12 +6,35 @@ from tornado.options import define, options
 import yaml
 
 
-class MainHandler(tornado.web.RequestHandler):
+class JSONBaseHandler(tornado.web.RequestHandler):
+
+    def prepare(self):
+        super(JSONBaseHandler, self).prepare()
+        self.json_data = None
+        if self.request.body:
+            try:
+                self.json_data = tornado.escape.json_decode(self.request.body)
+            except ValueError:
+                pass
+
+    def get_argument(self, arg, default=None):
+        if self.request.method in ['POST', 'PUT'] and self.json_data:
+            return self.json_data.get(arg, default)
+        else:
+            return super(JSONBaseHandler, self).get_argument(arg, default)
+
+
+class MainHandler(JSONBaseHandler):
     def get(self):
-        self.write("Hello, " + "+".join(self.application.settings.get('backends')))
+        self.finish("hello_cpaki")
 
 
-class ScheduleHandler(tornado.web.RequestHandler):
+class BackendsHandler(JSONBaseHandler):
+    def get(self):
+        self.finish({"backends": self.application.settings.get('backends')})
+
+
+class ScheduleHandler(JSONBaseHandler):
     def post(self):
         if not self.request.files.get('data_config'):
             self.clear()
@@ -25,7 +49,7 @@ def start(address, port, backends):
     app = tornado.web.Application([
         (r"/", MainHandler),
         (r"/schedule", ScheduleHandler),
-        # TODO (r"/backends", BackendsHandler),  get available backends on server
+        (r"/backends", BackendsHandler),
     ], backends=backends)
     app.listen(address=address, port=port)
     tornado.ioloop.IOLoop.current().start()
