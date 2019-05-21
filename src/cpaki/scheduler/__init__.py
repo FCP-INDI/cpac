@@ -7,7 +7,7 @@ import yaml
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write("Hello, " + self.application.settings.get('backend'))
+        self.write("Hello, " + "+".join(self.application.settings.get('backends')))
 
 
 class ScheduleHandler(tornado.web.RequestHandler):
@@ -21,10 +21,11 @@ class ScheduleHandler(tornado.web.RequestHandler):
         self.finish(len(data_config))
 
 
-def start(address, port):
+def start(address, port, backends):
     app = tornado.web.Application([
         (r"/", MainHandler),
         (r"/schedule", ScheduleHandler),
-    ], backend='docker')
+        # TODO (r"/backends", BackendsHandler),  get available backends on server
+    ], backends=backends)
     app.listen(address=address, port=port)
     tornado.ioloop.IOLoop.current().start()

@@ -49,6 +49,9 @@ def parse_args(args):
     scheduler_parser.add_argument('--address', action='store', type=str, default='localhost')
     scheduler_parser.add_argument('--port', action='store', type=int, default=8080)
 
+    # TODO fix default and convert to set
+    scheduler_parser.add_argument('--backend', action='append', choices=['docker', 'singularity'])
+
     return parser.parse_args(args)
 
 
@@ -67,7 +70,10 @@ def main(args):
 
     if args.command == 'scheduler':
         from cpaki.scheduler import start
-        start(args.address, args.port)
+
+        # TODO Backend check for availability
+
+        start(args.address, args.port, args.backend or ['docker'])
 
     elif args.command == 'run':
         pass
