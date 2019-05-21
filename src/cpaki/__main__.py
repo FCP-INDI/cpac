@@ -1,20 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-This is a skeleton file that can serve as a starting point for a Python
-console script. To run this script uncomment the following lines in the
-[options.entry_points] section in setup.cfg:
-
-    console_scripts =
-         fibonacci = cpaki.skeleton:run
-
-Then run `python setup.py install` which will install the command `fibonacci`
-inside your current environment.
-Besides console scripts, the header (i.e. until _logger...) of this file can
-also be used as template for Python modules.
-
-Note: This skeleton file can be safely removed if not needed!
-"""
 
 import argparse
 import sys
@@ -30,21 +15,15 @@ _logger = logging.getLogger(__name__)
 
 
 def parse_args(args):
-    """Parse command line parameters
-
-    Args:
-      args ([str]): command line parameters as list of strings
-
-    Returns:
-      :obj:`argparse.Namespace`: command line parameters namespace
-    """
     parser = argparse.ArgumentParser(
-        description="C-PAC utility")
+        description="cpaki: a C-PAC utility"
+    )
 
     parser.add_argument(
         '--version',
         action='version',
-        version='cpaki {ver}'.format(ver=__version__))
+        version='cpaki {ver}'.format(ver=__version__)
+    )
 
     parser.add_argument(
         '-v',
@@ -52,7 +31,8 @@ def parse_args(args):
         dest="loglevel",
         help="set loglevel to INFO",
         action='store_const',
-        const=logging.INFO)
+        const=logging.INFO
+    )
 
     parser.add_argument(
         '-vv',
@@ -60,44 +40,46 @@ def parse_args(args):
         dest="loglevel",
         help="set loglevel to DEBUG",
         action='store_const',
-        const=logging.DEBUG)
+        const=logging.DEBUG
+    )
+
+    subparsers = parser.add_subparsers(dest='command')
+
+    scheduler_parser = subparsers.add_parser('scheduler')
+    scheduler_parser.add_argument('--address', action='store', type=str, default='localhost')
+    scheduler_parser.add_argument('--port', action='store', type=int, default=8080)
 
     return parser.parse_args(args)
 
 
 def setup_logging(loglevel):
-    """Setup basic logging
-
-    Args:
-      loglevel (int): minimum loglevel for emitting messages
-    """
     logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
     logging.basicConfig(level=loglevel, stream=sys.stdout,
                         format=logformat, datefmt="%Y-%m-%d %H:%M:%S")
 
 
 def main(args):
-    """Main entry point allowing external calls
-
-    Args:
-      args ([str]): command line parameter list
-    """
     args = parse_args(args)
     setup_logging(args.loglevel)
     _logger.debug("Script starting...")
 
     print(args)
+
+    if args.command == 'scheduler':
+        from cpaki.scheduler import start
+        start(args.address, args.port)
+
+    elif args.command == 'run':
+        pass
     
-    import docker
-    client = docker.from_env()
-    print(client.containers.run("ubuntu:latest", "echo hello world").decode('ascii'))
+    # import docker
+    # client = docker.from_env()
+    # print(client.containers.run("ubuntu:latest", "echo hello world").decode('ascii'))
 
     _logger.info("Script ends here")
 
 
 def run():
-    """Entry point for console_scripts
-    """
     main(sys.argv[1:])
 
 
