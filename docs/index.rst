@@ -1,8 +1,8 @@
 =====
-cpaki
+theodore
 =====
 
-This is the documentation of **cpaki**.
+This is the documentation of **theodore**.
 
 .. note::
 

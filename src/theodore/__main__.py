@@ -5,7 +5,7 @@ import argparse
 import sys
 import logging
 
-from cpaki import __version__
+from theodore import __version__
 
 __author__ = "anibalsolon"
 __copyright__ = "anibalsolon"
@@ -16,13 +16,13 @@ _logger = logging.getLogger(__name__)
 
 def parse_args(args):
     parser = argparse.ArgumentParser(
-        description="cpaki: a C-PAC utility"
+        description="theodore: a C-PAC utility"
     )
 
     parser.add_argument(
         '--version',
         action='version',
-        version='cpaki {ver}'.format(ver=__version__)
+        version='theodore {ver}'.format(ver=__version__)
     )
 
     parser.add_argument(
@@ -69,7 +69,7 @@ def main(args):
     print(args)
 
     if args.command == 'scheduler':
-        from cpaki.scheduler import start
+        from theodore.scheduler import start
 
         # TODO Backend check for availability
 

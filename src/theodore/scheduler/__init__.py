@@ -26,7 +26,7 @@ class JSONBaseHandler(tornado.web.RequestHandler):
 
 class MainHandler(JSONBaseHandler):
     def get(self):
-        self.finish("hello_cpaki")
+        self.finish("hello_theodore")
 
 
 class BackendsHandler(JSONBaseHandler):

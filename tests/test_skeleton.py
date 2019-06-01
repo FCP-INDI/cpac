@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-from cpaki.backends import docker
+from theodore.backends import docker
 
 def test_docker():
     client = docker.Docker().client
