@@ -7,11 +7,14 @@ import logging
 
 from theodore import __version__
 
-__author__ = "anibalsolon"
-__copyright__ = "anibalsolon"
-__license__ = "mit"
-
 _logger = logging.getLogger(__name__)
+
+
+class ExtendAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        items = (getattr(namespace, self.dest) or []) + values
+        items = [x for n, x in enumerate(items) if x not in items[:n]]
+        setattr(namespace, self.dest, items)
 
 
 def parse_args(args):
@@ -46,13 +49,14 @@ def parse_args(args):
     subparsers = parser.add_subparsers(dest='command')
 
     scheduler_parser = subparsers.add_parser('scheduler')
+    scheduler_parser.register('action', 'extend', ExtendAction)
     scheduler_parser.add_argument('--address', action='store', type=str, default='localhost')
     scheduler_parser.add_argument('--port', action='store', type=int, default=8080)
+    scheduler_parser.add_argument('--backend', nargs='+', action='extend', choices=['docker', 'singularity'])
 
-    # TODO fix default and convert to set
-    scheduler_parser.add_argument('--backend', action='append', choices=['docker', 'singularity'])
+    parsed = parser.parse_args(args)
 
-    return parser.parse_args(args)
+    return parsed
 
 
 def setup_logging(loglevel):
