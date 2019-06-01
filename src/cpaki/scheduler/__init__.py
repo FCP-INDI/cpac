@@ -35,6 +35,14 @@ class BackendsHandler(JSONBaseHandler):
 
 
 class ScheduleHandler(JSONBaseHandler):
+    def get(self):
+        self.finish("""
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="data_config" />
+            <input type="submit" />
+        </form>
+
+""")
     def post(self):
         if not self.request.files.get('data_config'):
             self.clear()
@@ -42,7 +50,7 @@ class ScheduleHandler(JSONBaseHandler):
             return self.finish()
 
         data_config = yaml.load(self.request.files['data_config'][0]['body'])
-        self.finish(len(data_config))
+        self.finish({'subjects': len(data_config)})
 
 
 def start(address, port, backends):
