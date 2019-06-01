@@ -19,6 +19,17 @@ class Docker(Backend):
         for subject in data_config:
             self.scheduler.schedule(self, pipeline_config, subject)
 
+    def _create_data_config(self):
+        container = self.client.containers.run(
+            'fcpindi/c-pac:' + self.tag,
+            command=['dataset_folder', 'output_folder', 'test_config'],
+            detach=True,
+            volumes={
+                '/home/user1/': {'bind': 'dataset_folder', 'mode': 'ro'},
+                '/tmp': {'bind': '/scratch', 'mode': 'rw'},
+            }
+        )
+
     def start(self, pipeline_config, subject):
         container = self.client.containers.run(
             'fcpindi/c-pac:' + self.tag,
