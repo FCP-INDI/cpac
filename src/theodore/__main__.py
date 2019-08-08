@@ -51,7 +51,7 @@ def parse_args(args):
     scheduler_parser = subparsers.add_parser('scheduler')
     scheduler_parser.register('action', 'extend', ExtendAction)
     scheduler_parser.add_argument('--address', action='store', type=str, default='localhost')
-    scheduler_parser.add_argument('--port', action='store', type=int, default=8080)
+    scheduler_parser.add_argument('--port', action='store', type=int, default=3333)
     scheduler_parser.add_argument('--backend', nargs='+', action='extend', choices=['docker', 'singularity'])
 
     parsed = parser.parse_args(args)
@@ -73,11 +73,13 @@ def main(args):
     print(args)
 
     if args.command == 'scheduler':
-        from theodore.scheduler import start
+        from theodore.scheduler.api import start
+        from theodore.scheduler import Scheduler
 
         # TODO Backend check for availability
 
-        start(args.address, args.port, args.backend or ['docker'])
+        scheduler = Scheduler(args.backend or ['docker'])
+        start(args.address, args.port, scheduler)
 
     elif args.command == 'run':
         pass
