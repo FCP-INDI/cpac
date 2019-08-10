@@ -4,7 +4,7 @@ import time
 import yaml
 import collections
 from concurrent.futures import ThreadPoolExecutor   # `pip install futures` for python2
-
+from collections.abc import Iterable
 
 
 MAX_WORKERS = 1
@@ -23,7 +23,7 @@ class Schedule:
         return hash(self.uid)
 
     def __eq__(self, other):
-        return self.uid == self.other.uid
+        return isinstance(other, (type(self), str)) and str(self) == str(other)
 
     @property
     def uid(self):
@@ -38,48 +38,90 @@ class Schedule:
         raise NotImplementedError
 
 
+class ScheduleTree:
+    def __init__(self, name, children=None, parent=None, schedule=None):
+        self.name = name
+        self.children = children or {}
+        self.parent = parent
+        self.schedule = schedule
+
+    @property
+    def status(self):
+        status = {'children': {}}
+        if self.schedule:
+            status['status'] = self.schedule.status
+        for k, v in self.children.items():
+            status['children'][str(k)] = v.status
+        return status
+
+
 class Scheduler:
 
-    def __init__(self, backends=[]):
-        self._schedules = {
-            None: {"children": {}, "parent": None, "schedule": None} # Root
-        }
+    def __init__(self, clients, clients_priority):
+        self._schedules = ScheduleTree(name='ROOT')
         self.executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
+        self.clients = {
+            k: client_class(self)
+            for k, client_class in clients.items()
+        }
+        self.clients_priority = clients_priority
 
-    def schedule(self, schedule, parent=None):
-        assert isinstance(schedule, (Schedule, collections.Mapping))
-        if isinstance(schedule, collections.Mapping):
-            for sid, s in schedule.items():
-                self._schedules[s] = {"children": {}, "parent": parent, "schedule": s}
-                self._schedules[parent]["children"][sid] = self
-                self.executor.submit(self.run_scheduled, s)
+    def __getitem__(self, key):
+        return self._schedules.children[key]
+
+    def schedule(self, schedule, parent=None, client=None):
+
+        if client:
+            assert client in self.clients
+            client = self.clients[client]
         else:
-            self._schedules[schedule] = {"children": {}, "parent": parent, "schedule": schedule}
-            self._schedules[parent]["children"][schedule.uid] = self._schedules[schedule]
+            client = self.clients[self.clients_priority[0]]
+
+        if isinstance(schedule, collections.Mapping):
+            schedules = {}
+            for sid, s in schedule.items():
+                s = self.client_schedule(client, s)
+                self._schedules[s] = ScheduleTree(name=sid, parent=parent, schedule=s)
+                if parent:
+                    self._schedules[parent]["children"][sid] = self
+                    self._schedules[parent].children[sid] = self._schedules[s]
+                schedules[sid] = s
+                self.executor.submit(self.run_scheduled, s)
+            return schedules
+        else:
+            schedule = self.client_schedule(client, schedule)
+            self._schedules.children[schedule] = ScheduleTree(name=schedule.uid, parent=parent, schedule=schedule)
+            if parent:
+                self._schedules[parent].children[schedule] = self._schedules[schedule]
             self.executor.submit(self.run_scheduled, schedule)
+            return schedule
+
+    def client_schedule(self, client, schedule):
+        return schedule(client)
 
     def run_scheduled(self, schedule):
         try:
-            for yid, y in schedule.run():
-                if isinstance(y, Schedule):
-                    self.schedule({
-                        yid: y   
-                    }, parent=schedule)
+            
+            it = schedule.run()
+
+            if not isinstance(it, Iterable):
+                return
+
+            for yid, y in it:
+                if not isinstance(y, Schedule):
+                    continue
+
+                self.schedule({
+                    yid: y   
+                }, parent=schedule)
+
         except:
             import traceback
             traceback.print_exc()
 
     @property
     def statuses(self):
-        statuses = {}
-        # for _s in sorted(self._schedules, key=lambda x: 0 if x.parent is None else 1):
-        #     statuses[_s.uid] = {"status": _s.status}
-        #     if _s.parent:
-        #         if "schedules" not in statuses[_s.parent.uid]:
-        #             statuses[_s.parent.uid]["schedules"] = {}    
-        #         statuses[_s.parent.uid]["schedules"][_s.uid] = statuses[_s.uid]
-
-        return statuses
+        return self._schedules.status
 
     @property
     def logs(self):

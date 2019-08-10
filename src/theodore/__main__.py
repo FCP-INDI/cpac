@@ -70,24 +70,24 @@ def main(args):
     setup_logging(args.loglevel)
     _logger.debug("Script starting...")
 
-    print(args)
-
     if args.command == 'scheduler':
         from theodore.scheduler.api import start
         from theodore.scheduler import Scheduler
+        from theodore.backends import docker
 
         # TODO Backend check for availability
 
-        scheduler = Scheduler(args.backend or ['docker'])
+        backends = args.backend or ['docker']
+        clients = {}
+        if 'docker' in backends:
+            clients['docker'] = docker.Docker
+
+        scheduler = Scheduler(clients, clients_priority=backends)
         start(args.address, args.port, scheduler)
 
     elif args.command == 'run':
         pass
     
-    # import docker
-    # client = docker.from_env()
-    # print(client.containers.run("ubuntu:latest", "echo hello world").decode('ascii'))
-
     _logger.info("Script ends here")
 
 

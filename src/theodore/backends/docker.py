@@ -1,5 +1,6 @@
 import os
 import time
+import json
 import glob
 import yaml
 import docker
@@ -12,8 +13,8 @@ import copy
 from base64 import b64decode, b64encode
 
 from ..utils import string_types
-from ..scheduler import Schedule, SubSchedule
-from .backend import Backend
+from ..scheduler import Schedule
+from .backend import Backend, Result, FileResult
 
 from tornado import httpclient
 
@@ -38,7 +39,6 @@ class DockerRun(object):
 
     def __init__(self, container):
         self.container = container
-        print(container)
 
     @property
     def status(self):
@@ -48,12 +48,12 @@ class DockerRun(object):
             return 'stopped'
         status = self.container.status
         status_map = {
-            'created': 'starting', 
-            'restarting': 'running', 
-            'running': 'running', 
-            'removing': 'running', 
-            'paused': 'running', 
-            'exited': 'success', 
+            'created': 'starting',
+            'restarting': 'running',
+            'running': 'running',
+            'removing': 'running',
+            'paused': 'running',
+            'exited': 'success',
             'dead': 'failed'
         }
         if status in status_map:
@@ -69,10 +69,17 @@ class DockerSchedule(Schedule):
         self.pipeline_config = pipeline_config
         self.data_config = data_config
         self._uid = str(uuid.uuid4())
+        self._results = {}
 
     @property
     def uid(self):
         return self._uid
+
+    def __repr__(self):
+        return self._uid
+
+    def __hash__(self):
+        return hash(str(self))
 
     @property
     def logs(self):
@@ -80,6 +87,19 @@ class DockerSchedule(Schedule):
             'id': 'schedule',
             'hash': 'schedule',
         }]
+
+    def result(self, key=None):
+        if key is None:
+            return self._results
+        
+        r = self._results
+        keys = key.split('/')
+        for k in keys:
+            if type(k) == dict:
+                r = r[k]
+            elif type(k) == list:
+                r = r[int(k)]
+        return r
 
     def run(self):
         if self.data_config:
@@ -202,7 +222,7 @@ class DockerSubjectSchedule(DockerSchedule):
 
         return []
 
-        
+
 class DockerDataConfigSchedule(DockerSchedule):
 
     _start = None
@@ -219,7 +239,7 @@ class DockerDataConfigSchedule(DockerSchedule):
         self._start = time.time()
 
         self._output_folder = tempfile.mkdtemp()
-        
+
         volumes = {
             self._output_folder: {'bind': '/output_folder', 'mode': 'rw'},
             '/tmp': {'bind': '/scratch', 'mode': 'rw'},
@@ -272,6 +292,79 @@ class DockerDataConfigSchedule(DockerSchedule):
                         )
         finally:
             shutil.rmtree(self._output_folder)
+
+        self._finish = time.time()
+
+    @property
+    def status(self):
+        if not self._run:
+            return "unstarted"
+        else:
+            return self._run.status
+
+    @property
+    def logs(self):
+        log = {
+            'id': 'data_config',
+            'hash': 'data_config',
+        }
+
+        if self._start is not None:
+            log['start'] = self._start
+
+        if self._finish is not None:
+            log['finish'] = self._finish
+
+        return [log]
+
+
+class DockerDataSettingsSchedule(DockerSchedule):
+
+    _start = None
+    _finish = None
+
+    def __init__(self, backend, data_settings, parent=None):
+        super(DockerDataSettingsSchedule, self).__init__(backend=backend, parent=parent)
+        self.data_settings = data_settings
+        self._run = None
+
+    def run(self):
+        self._start = time.time()
+        self._output_folder = tempfile.mkdtemp(prefix='theo')
+
+        volumes = {
+            self._output_folder: {'bind': '/output_folder', 'mode': 'rw'},
+            '/tmp': {'bind': '/scratch', 'mode': 'rw'},
+        }
+
+        data_settings = self.data_settings
+        shutil.copy(data_settings, os.path.join(self._output_folder, 'data_settings.yml'))
+
+        container_args = [
+            '/',
+            '/output_folder',
+            'cli',
+            'utils',
+            'data_config',
+            'build',
+            '/output_folder/data_settings.yml',
+        ]
+
+        self._run = DockerRun(self.backend.client.containers.run(
+            'fcpindi/c-pac:' + self.backend.tag,
+            command=container_args,
+            detach=True,
+            working_dir='/output_folder',
+            volumes=volumes
+        ))
+
+        self._run.container.wait()
+        
+        self._results['data_config'] = FileResult(
+            'data_config',
+            glob.glob(os.path.join(self._output_folder, 'data_config*.yml'))[0],
+            'application/yaml'
+        )
 
         self._finish = time.time()
 

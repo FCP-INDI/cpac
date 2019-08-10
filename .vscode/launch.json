@@ -5,13 +5,25 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Scheduler",
+            "type": "python",
+            "request": "launch",
+            "module": "theodore",
+            "args": [
+                "scheduler"
+            ],
+        },
+        {
             "name": "Python Test",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/setup.py",
             "console": "integratedTerminal",
             "args": [
-                "test", "--addopts", "-s", "--addopts",
+                "test",
+                "--addopts",
+                "-s",
+                "--addopts",
                 "${relativeFile}"
             ],
         }
