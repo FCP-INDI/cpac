@@ -65,6 +65,7 @@ class Scheduler:
             for k, client_class in clients.items()
         }
         self.clients_priority = clients_priority
+        self._watchers = {}
 
     def __getitem__(self, key):
         return self._schedules.children[key]
@@ -80,7 +81,7 @@ class Scheduler:
         if isinstance(schedule, collections.Mapping):
             schedules = {}
             for sid, s in schedule.items():
-                s = self.client_schedule(client, s)
+                s = s(client)
                 self._schedules[s] = ScheduleTree(name=sid, parent=parent, schedule=s)
                 if parent:
                     self._schedules[parent]["children"][sid] = self
@@ -89,32 +90,45 @@ class Scheduler:
                 self.executor.submit(self.run_scheduled, s)
             return schedules
         else:
-            schedule = self.client_schedule(client, schedule)
+            schedule = schedule(client)
             self._schedules.children[schedule] = ScheduleTree(name=schedule.uid, parent=parent, schedule=schedule)
             if parent:
                 self._schedules[parent].children[schedule] = self._schedules[schedule]
             self.executor.submit(self.run_scheduled, schedule)
             return schedule
 
-    def client_schedule(self, client, schedule):
-        return schedule(client)
+    def watch(self, schedule, function):
+        schedule = str(schedule)
+        if schedule not in self._watchers:
+            self._watchers[schedule] = []
+        self._watchers[schedule] += [function]
 
     def run_scheduled(self, schedule):
         try:
-            
             it = schedule.run()
 
-            if not isinstance(it, Iterable):
-                return
+            if isinstance(it, Iterable):
+                for yid, y in it:
+                    if not isinstance(y, Schedule):
+                        continue
 
-            for yid, y in it:
-                if not isinstance(y, Schedule):
-                    continue
-
-                self.schedule({
-                    yid: y   
-                }, parent=schedule)
-
+                    self.schedule({
+                        yid: y   
+                    }, parent=schedule)
+            
+            sid = str(schedule)
+            if sid in self._watchers:
+                for function in self._watchers[sid]:
+                    try:
+                        function(
+                            sid,
+                            self[schedule].status,
+                            schedule.available_results
+                        )
+                    except Exception as e:
+                        print(e)
+                        
+                del self._watchers[sid]
         except:
             import traceback
             traceback.print_exc()

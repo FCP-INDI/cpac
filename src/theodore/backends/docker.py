@@ -88,10 +88,15 @@ class DockerSchedule(Schedule):
             'hash': 'schedule',
         }]
 
-    def result(self, key=None):
-        if key is None:
-            return self._results
-        
+    @property
+    def available_results(self):
+        return list(self._results.keys())
+
+    @property
+    def results(self):
+        return self._results
+
+    def result(self, key):
         r = self._results
         keys = key.split('/')
         for k in keys:

@@ -21,7 +21,12 @@ class TheoBaseHandler(tornado.web.RequestHandler):
 
     def set_default_headers(self):
         self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "*")
         self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+
+    def options(self, **kwargs):
+        self.set_status(204)
+        self.finish()
 
     def prepare(self):
         super(TheoBaseHandler, self).prepare()
@@ -49,7 +54,9 @@ class MainHandler(TheoBaseHandler):
 
 class BackendsHandler(TheoBaseHandler):
     def get(self):
-        self.finish({"backends": self.application.settings.get('backends')})
+        self.finish({
+            "backends": self.application.settings.get('backends')
+        })
 
 
 class ExecutionScheduleHandler(TheoBaseHandler):
@@ -66,7 +73,7 @@ class ExecutionScheduleHandler(TheoBaseHandler):
 class DataScheduleHandler(TheoBaseHandler):
     def post(self):
 
-        if not self.request.files.get('data_config'):
+        if not self.json_data.get('settings'):
             self.set_status(400)
             return self.finish()
 
@@ -76,7 +83,7 @@ class DataScheduleHandler(TheoBaseHandler):
         data_settings_file = os.path.join(upload_folder, 'data_settings.yml')
 
         with open(data_settings_file, 'wb') as f:
-            f.write(self.request.files['data_config'][0]['body'])
+            f.write(self.json_data['settings'].encode("utf-8"))
 
         schedule = scheduler.schedule(
             DataSettingsSchedule(
@@ -92,21 +99,21 @@ class ResultScheduleHandler(TheoBaseHandler):
         scheduler = self.application.settings.get('scheduler')
         schedule = scheduler[schedule].schedule
 
-        schedule_results = schedule.result()
+        schedule_results = schedule.results
         if not schedule_results:
             self.set_status(425, 'Result is not ready')
             return self.finish()
-            
+
         if result:
             schedule_result = schedule_results[result]
-            
+
             if schedule_result.mime:
                 self.set_header("Content-Type", schedule_result.mime)
 
             for chunk in schedule_results[result]():
                 self.write(chunk)
             return self.finish()
-        
+
         return self.finish({
             "result": {
                 k: v.description
@@ -117,31 +124,66 @@ class ResultScheduleHandler(TheoBaseHandler):
 class WatchScheduleHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
-        print("New client connected")
         self.write_message(json.dumps({'connected': True}))
-        self.loop = tornado.ioloop.PeriodicCallback(
-            self.check_periodically,
-            1000,
-            io_loop=tornado.ioloop.IOLoop.instance()
-        )
-        self.loop.start()
+    #     self.loop = tornado.ioloop.PeriodicCallback(
+    #         self.check_periodically,
+    #         1000,
+    #         io_loop=tornado.ioloop.IOLoop.instance()
+    #     )
+    #     self.loop.start()
+
+    # def check_periodically(self):
+    #     try:
+    #         self.write_message(json.dumps({'time': time.time()}))
+    #     except tornado.websocket.WebSocketClosedError:
+    #         self.loop.stop()
 
     def on_message(self, message):
-        self.write_message(u"You said: " + message + " -> " + str(self.application.settings.get('scheduler')))
+        try:
+            message = json.loads(message)
+        except:
+            return
+
+        if type(message) is not dict:
+            return
+
+        message_id = None
+        if '__theo_message_id' in message:
+            message_id = message['__theo_message_id']
+
+        if "type" not in message:
+            return
+
+        def schedule_watch(id, status, available_results):
+            content = {
+                "type": "SCHEDULE_WATCH",
+                "data": {
+                    "id": id,
+                    "statuses": status,
+                    "available_results": available_results,
+                }
+            }
+
+            if message_id:
+                content['__theo_message_id'] = message_id
+
+            self.write_message(json.dumps(content))
+
+        if message["type"] == "SCHEDULE_WATCH":
+            self.application.settings.get('scheduler').watch(
+                message["schedule"],
+                schedule_watch
+            )
 
     def on_close(self):
         print("Client disconnected")
 
-    def check_periodically(self):
-        try:
-            self.write_message(json.dumps({'time': time.time()}))
-        except tornado.websocket.WebSocketClosedError:
-            self.loop.stop()
-
     def check_origin(self, origin):
-        print(origin)
+
+        # TODO check for JWT
+
         return True
-    
+
 
 def start(address, port, scheduler):
     app = tornado.web.Application(
@@ -149,7 +191,7 @@ def start(address, port, scheduler):
             (r"/", MainHandler),
             (r"/schedule/(?P<schedule>[^/]+)/result", ResultScheduleHandler),  # TODO uuid regex
             (r"/schedule/(?P<schedule>[^/]+)/result/(?P<result>[^/]+)", ResultScheduleHandler),  # TODO uuid regex
-            (r"/schedule/watch", WatchScheduleHandler),
+            (r"/schedule/connect", WatchScheduleHandler),
             (r"/schedule/data", DataScheduleHandler),
             (r"/schedule/pipeline", ExecutionScheduleHandler),
             (r"/backends", BackendsHandler),
