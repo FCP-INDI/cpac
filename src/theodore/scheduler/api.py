@@ -14,8 +14,11 @@ import time
 import json
 import yaml
 import tempfile
+import logging
 import collections
 
+
+_logger = logging.getLogger(__name__)
 
 class TheoBaseHandler(tornado.web.RequestHandler):
 
@@ -121,22 +124,33 @@ class ResultScheduleHandler(TheoBaseHandler):
             }
         })
 
+
+def schedule_watch_wrapper(scheduler, socket, message_id):
+
+    def schedule_watch(schedule):
+
+        content = {
+            "type": "SCHEDULE_WATCH",
+            "data": {
+                "id": str(schedule),
+                "statuses": scheduler[schedule].status,
+                "available_results": schedule.available_results,
+            }
+        }
+
+        if message_id:
+            content['__theo_message_id'] = message_id
+
+        socket.write_message(json.dumps(content))
+
+    return schedule_watch
+
+
 class WatchScheduleHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         self.write_message(json.dumps({'connected': True}))
-    #     self.loop = tornado.ioloop.PeriodicCallback(
-    #         self.check_periodically,
-    #         1000,
-    #         io_loop=tornado.ioloop.IOLoop.instance()
-    #     )
-    #     self.loop.start()
-
-    # def check_periodically(self):
-    #     try:
-    #         self.write_message(json.dumps({'time': time.time()}))
-    #     except tornado.websocket.WebSocketClosedError:
-    #         self.loop.stop()
+        _logger.debug("Websocket connected")
 
     def on_message(self, message):
         try:
@@ -150,48 +164,25 @@ class WatchScheduleHandler(tornado.websocket.WebSocketHandler):
         if "type" not in message:
             return
 
+        _logger.debug("Websocket message of type %s", message["type"])
+
         message_id = None
         if '__theo_message_id' in message:
             message_id = message['__theo_message_id']
 
         scheduler = self.application.settings.get('scheduler')
 
-        def schedule_watch(schedule):
-
-            content = {
-                "type": "SCHEDULE_WATCH",
-                "data": {
-                    "id": str(schedule),
-                    "statuses": scheduler[schedule].status,
-                    "available_results": schedule.available_results,
-                }
-            }
-
-            if message_id:
-                content['__theo_message_id'] = message_id
-
-            self.write_message(json.dumps(content))
-
-
         if message["type"] == "SCHEDULE_WATCH":
-
-            children = False
-            if "children" in message and message["children"]:
-                children = True
-
             scheduler.watch(
                 message["schedule"],
-                schedule_watch,
-                children=children
+                schedule_watch_wrapper(scheduler, self, message_id),
+                children="children" in message and message["children"]
             )
 
     def on_close(self):
-        print("Client disconnected")
+        _logger.debug("Websocket disconnected")
 
     def check_origin(self, origin):
-
-        # TODO check for JWT
-
         return True
 
 
