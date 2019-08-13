@@ -97,15 +97,19 @@ class Scheduler:
             self.executor.submit(self.run_scheduled, schedule)
             return schedule
 
-    def watch(self, schedule, function):
+    def watch(self, schedule, function, children=False):
         schedule = str(schedule)
         if schedule not in self._watchers:
             self._watchers[schedule] = []
-        self._watchers[schedule] += [function]
+        self._watchers[schedule] += [{
+            "function": function,
+            "children": children,
+        }]
 
     def run_scheduled(self, schedule):
         try:
             it = schedule.run()
+            sid = str(schedule)
 
             if isinstance(it, Iterable):
                 for yid, y in it:
@@ -115,19 +119,28 @@ class Scheduler:
                     self.schedule({
                         yid: y   
                     }, parent=schedule)
+
+                    if sid in self._watchers:
+                        for watcher in self._watchers[sid]:
+                            children = watcher["children"]
+                            if not children:
+                                continue
+
+                            self.watch(
+                                schedule=y,
+                                function=watcher["function"],
+                                children=watcher["children"],
+                            )
             
-            sid = str(schedule)
             if sid in self._watchers:
-                for function in self._watchers[sid]:
+                for watcher in self._watchers[sid]:
+                    function = watcher["function"]
+
                     try:
-                        function(
-                            sid,
-                            self[schedule].status,
-                            schedule.available_results
-                        )
+                        function(schedule)
                     except Exception as e:
                         print(e)
-                        
+
                 del self._watchers[sid]
         except:
             import traceback

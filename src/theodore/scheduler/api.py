@@ -147,20 +147,23 @@ class WatchScheduleHandler(tornado.websocket.WebSocketHandler):
         if type(message) is not dict:
             return
 
+        if "type" not in message:
+            return
+
         message_id = None
         if '__theo_message_id' in message:
             message_id = message['__theo_message_id']
 
-        if "type" not in message:
-            return
+        scheduler = self.application.settings.get('scheduler')
 
-        def schedule_watch(id, status, available_results):
+        def schedule_watch(schedule):
+
             content = {
                 "type": "SCHEDULE_WATCH",
                 "data": {
-                    "id": id,
-                    "statuses": status,
-                    "available_results": available_results,
+                    "id": str(schedule),
+                    "statuses": scheduler[schedule].status,
+                    "available_results": schedule.available_results,
                 }
             }
 
@@ -169,10 +172,17 @@ class WatchScheduleHandler(tornado.websocket.WebSocketHandler):
 
             self.write_message(json.dumps(content))
 
+
         if message["type"] == "SCHEDULE_WATCH":
-            self.application.settings.get('scheduler').watch(
+
+            children = False
+            if "children" in message and message["children"]:
+                children = True
+
+            scheduler.watch(
                 message["schedule"],
-                schedule_watch
+                schedule_watch,
+                children=children
             )
 
     def on_close(self):
