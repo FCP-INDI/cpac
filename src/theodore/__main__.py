@@ -17,6 +17,12 @@ class ExtendAction(argparse.Action):
         setattr(namespace, self.dest, items)
 
 
+def address(str):
+    addr, port = str.split(':')
+    port = int(port)
+    return addr, port
+
+
 def parse_args(args):
     parser = argparse.ArgumentParser(
         description="theodore: a C-PAC utility"
@@ -50,9 +56,15 @@ def parse_args(args):
 
     scheduler_parser = subparsers.add_parser('scheduler')
     scheduler_parser.register('action', 'extend', ExtendAction)
-    scheduler_parser.add_argument('--address', action='store', type=str, default='localhost')
-    scheduler_parser.add_argument('--port', action='store', type=int, default=3333)
+    scheduler_parser.add_argument('--address', action='store', type=address, default='localhost:3333')
     scheduler_parser.add_argument('--backend', nargs='+', action='extend', choices=['docker', 'singularity'])
+
+    run_parser = subparsers.add_parser('run')
+    run_parser.register('action', 'extend', ExtendAction)
+    run_parser.add_argument('--address', action='store', type=address)
+    run_parser.add_argument('--backend', choices=['docker', 'singularity'])
+    run_parser.add_argument('data_config')
+    run_parser.add_argument('pipeline', nargs='?')
 
     parsed = parser.parse_args(args)
 
@@ -66,33 +78,30 @@ def setup_logging(loglevel):
 
 
 def main(args):
-    args = parse_args(args)
+    command = args[0]
+    args = parse_args(args[1:])
     setup_logging(args.loglevel)
-    _logger.debug("Script starting...")
 
     if args.command == 'scheduler':
-        from theodore.scheduler.api import start
-        from theodore.scheduler import Scheduler
-        from theodore.backends import docker
-
-        # TODO Backend check for availability
-
-        backends = args.backend or ['docker']
-        clients = {}
-        if 'docker' in backends:
-            clients['docker'] = docker.Docker
-
-        scheduler = Scheduler(clients, clients_priority=backends)
-        start(args.address, args.port, scheduler)
+        from theodore.scheduler.process import start_scheduler
+        start_scheduler(args.address, args.backend)
 
     elif args.command == 'run':
-        pass
-    
-    _logger.info("Script ends here")
+
+        if not args.address:
+            from theodore.scheduler.process import spawn_scheduler
+            spawn_scheduler(args.address, args.backend)
+
+        from theodore.scheduler.client import schedule, wait
+        from theodore.scheduler import SCHEDULER_ADDRESS
+
+        scheduler = args.address or SCHEDULER_ADDRESS
+
+        schedule(scheduler, args.backend, args.data_config, args.pipeline)
 
 
 def run():
-    main(sys.argv[1:])
+    main(sys.argv)
 
 
 if __name__ == "__main__":

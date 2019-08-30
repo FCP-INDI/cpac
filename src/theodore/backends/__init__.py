@@ -1,4 +1,8 @@
-from .docker import Docker, DockerDataSettingsSchedule
+from .docker import (
+    Docker,
+    DockerDataSettingsSchedule,
+    DockerDataConfigSchedule
+)
 
 
 class BackendMapper(object):
@@ -7,7 +11,6 @@ class BackendMapper(object):
 
     def __init__(self, **kwargs):
         self.parameters = kwargs
-
 
 
 class DataSettingsSchedule(BackendMapper):
@@ -24,3 +27,15 @@ class DataSettingsSchedule(BackendMapper):
         )
 
 
+class DataConfigSchedule(BackendMapper):
+
+    _clients = {
+        Docker: DockerDataConfigSchedule
+    }
+
+    def __call__(self, backend, parent=None):
+        return self._clients[backend.__class__](
+            backend=backend,
+            **self.parameters,
+            parent=parent
+        )

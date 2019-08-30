@@ -8,6 +8,7 @@ from collections.abc import Iterable
 
 
 MAX_WORKERS = 1
+SCHEDULER_ADDRESS = ('localhost', 3333)
 
 
 class Schedule:
@@ -28,7 +29,7 @@ class Schedule:
     @property
     def uid(self):
         raise NotImplementedError
-        
+
     @property
     def status(self):
         raise NotImplementedError
@@ -53,6 +54,9 @@ class ScheduleTree:
         for k, v in self.children.items():
             status['children'][str(k)] = v.status
         return status
+    
+    def __getitem__(self, key):
+        return self.children[key]
 
 
 class Scheduler:
@@ -72,6 +76,8 @@ class Scheduler:
 
     def schedule(self, schedule, parent=None, client=None):
 
+        from theodore.backends import BackendMapper
+
         if client:
             assert client in self.clients
             client = self.clients[client]
@@ -81,16 +87,17 @@ class Scheduler:
         if isinstance(schedule, collections.Mapping):
             schedules = {}
             for sid, s in schedule.items():
-                s = s(client)
-                self._schedules[s] = ScheduleTree(name=sid, parent=parent, schedule=s)
+                if isinstance(s, BackendMapper):
+                    s = s(client)
+                self._schedules.children[s] = ScheduleTree(name=sid, parent=parent, schedule=s)
                 if parent:
-                    self._schedules[parent]["children"][sid] = self
                     self._schedules[parent].children[sid] = self._schedules[s]
                 schedules[sid] = s
                 self.executor.submit(self.run_scheduled, s)
             return schedules
         else:
-            schedule = schedule(client)
+            if isinstance(schedule, BackendMapper):
+                schedule = schedule(client)
             self._schedules.children[schedule] = ScheduleTree(name=schedule.uid, parent=parent, schedule=schedule)
             if parent:
                 self._schedules[parent].children[schedule] = self._schedules[schedule]
@@ -116,9 +123,10 @@ class Scheduler:
                     if not isinstance(y, Schedule):
                         continue
 
-                    self.schedule({
-                        yid: y   
-                    }, parent=schedule)
+                    self.schedule(
+                        { yid: y },
+                        parent=schedule
+                    )
 
                     if sid in self._watchers:
                         for watcher in self._watchers[sid]:
@@ -131,7 +139,7 @@ class Scheduler:
                                 function=watcher["function"],
                                 children=watcher["children"],
                             )
-            
+
             if sid in self._watchers:
                 for watcher in self._watchers[sid]:
                     function = watcher["function"]
@@ -161,12 +169,5 @@ class Scheduler:
             for id, s in root["children"].items():
                 node["children"][id] = __transverse_logs(s)
             return node
-
-        # for _s in sorted(self._schedules, key=lambda x: 0 if x.parent is None else 1):
-        #     logs[_s.uid] = {"logs": _s.logs}
-        #     if _s.parent:
-        #         if "schedules" not in logs[_s.parent.uid]:
-        #             logs[_s.parent.uid]["schedules"] = {}    
-        #         logs[_s.parent.uid]["schedules"][_s.uid] = logs[_s.uid]
 
         return __transverse_logs(self._schedules[None])

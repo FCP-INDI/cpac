@@ -21,7 +21,7 @@ from tornado import httpclient
 
 class Docker(Backend):
 
-    tag = 'latest'
+    tag = 'nightly'
 
     def __init__(self, scheduler):
         self.client = docker.from_env()
@@ -31,8 +31,8 @@ class Docker(Backend):
             raise "Could not connect to Docker"
         self.scheduler = scheduler
 
-    def schedule(self, pipeline_config, data_config):
-        self.scheduler.schedule(DockerSchedule(self, pipeline_config, data_config))
+    def schedule(self, pipeline, data_config):
+        self.scheduler.schedule(DockerSchedule(self, pipeline, data_config))
 
 
 class DockerRun(object):
@@ -64,9 +64,9 @@ class DockerRun(object):
 
 class DockerSchedule(Schedule):
 
-    def __init__(self, backend, pipeline_config=None, data_config=None, parent=None):
+    def __init__(self, backend, pipeline=None, data_config=None, parent=None):
         super(DockerSchedule, self).__init__(backend=backend, parent=parent)
-        self.pipeline_config = pipeline_config
+        self.pipeline = pipeline
         self.data_config = data_config
         self._uid = str(uuid.uuid4())
         self._results = {}
@@ -112,7 +112,7 @@ class DockerSchedule(Schedule):
                 'data_config',
                 DockerDataConfigSchedule(
                     self.backend,
-                    self.pipeline_config,
+                    self.pipeline,
                     self.data_config,
                     parent=self
                 )
@@ -121,9 +121,9 @@ class DockerSchedule(Schedule):
 
 class DockerSubjectSchedule(DockerSchedule):
 
-    def __init__(self, backend, pipeline_config, subject, parent=None):
+    def __init__(self, backend, pipeline, subject, parent=None):
         super(DockerSubjectSchedule, self).__init__(backend=backend, parent=parent)
-        self.pipeline_config = pipeline_config
+        self.pipeline = pipeline
         self.subject = subject
         self._run = None
 
@@ -161,10 +161,10 @@ class DockerSubjectSchedule(DockerSchedule):
         config_folder = tempfile.mkdtemp()
         output_folder = tempfile.mkdtemp()
 
-        if self.pipeline_config is not None:
-            new_pipeline_config = os.path.join(config_folder, 'pipeline.yml')
-            shutil.copy(self.pipeline_config, new_pipeline_config)
-            pipeline_config = new_pipeline_config
+        if self.pipeline is not None:
+            new_pipeline = os.path.join(config_folder, 'pipeline.yml')
+            shutil.copy(self.pipeline, new_pipeline)
+            pipeline = new_pipeline
 
         volumes = {
             '/tmp': {'bind': '/scratch', 'mode': 'rw'},
@@ -176,11 +176,16 @@ class DockerSubjectSchedule(DockerSchedule):
             b64encode(yaml.dump([self.subject], default_flow_style=False).encode("utf-8")).decode("utf-8")
 
         # TODO handle local databases, transverse subject dict to get folder mappings
-        command = ['/', '/output', 'participant',
-                '--monitoring',
-                '--data_config_file', subject]
+        command = [
+            '/', '/output', 'participant',
+            '--monitoring',
+            '--skip_bids_validator',
+            '--save_working_dir',
+            '--data_config_file',
+            subject
+        ]
 
-        if self.pipeline_config:
+        if self.pipeline:
             command += ['--pipeline_file', '/config/pipeline.yml']
 
         self._run = DockerRun(self.backend.client.containers.run(
@@ -233,9 +238,9 @@ class DockerDataConfigSchedule(DockerSchedule):
     _start = None
     _finish = None
 
-    def __init__(self, backend, pipeline_config, data_config, parent=None):
+    def __init__(self, backend, pipeline, data_config, parent=None):
         super(DockerDataConfigSchedule, self).__init__(backend=backend, parent=parent)
-        self.pipeline_config = pipeline_config
+        self.pipeline = pipeline
         self.data_config = data_config
         self._run = None
 
@@ -292,8 +297,8 @@ class DockerDataConfigSchedule(DockerSchedule):
                             subject_id += [subject['unique_id']]
 
                         yield (
-                            '_'.join(subject_id),
-                            DockerSubjectSchedule(self.backend, self.pipeline_config, subject, parent=self)
+                            '/'.join(subject_id),
+                            DockerSubjectSchedule(self.backend, self.pipeline, subject, parent=self)
                         )
         finally:
             shutil.rmtree(self._output_folder)

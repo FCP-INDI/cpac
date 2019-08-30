@@ -7,7 +7,7 @@ from tornado.options import define, options
 from tornado.concurrent import run_on_executor
 
 from theodore import __version__
-from theodore.backends import DataSettingsSchedule
+from theodore.backends import DataSettingsSchedule, DataConfigSchedule
 
 import os
 import time
@@ -30,6 +30,10 @@ class TheoBaseHandler(tornado.web.RequestHandler):
     def options(self, **kwargs):
         self.set_status(204)
         self.finish()
+
+    def bad_request(self):
+        self.set_status(400)
+        return self.finish()
 
     def prepare(self):
         super(TheoBaseHandler, self).prepare()
@@ -62,39 +66,60 @@ class BackendsHandler(TheoBaseHandler):
         })
 
 
-class ExecutionScheduleHandler(TheoBaseHandler):
+class ScheduleHandler(TheoBaseHandler):
     def post(self):
 
-        if not self.request.files.get('data_config'):
-            self.set_status(400)
-            return self.finish()
+        if "type" not in self.json_data:
+            return self.bad_request()
 
-        data_config = yaml.load(self.request.files['data_config'][0]['body'])
-        self.finish({'subjects': len(data_config)})
+        scheduler = self.application.settings.get("scheduler")
 
+        if self.json_data["type"] == "DATA_CONFIG":
 
-class DataScheduleHandler(TheoBaseHandler):
-    def post(self):
+            if not self.json_data.get("data_settings"):
+                return self.bad_request()
 
-        if not self.json_data.get('settings'):
-            self.set_status(400)
-            return self.finish()
+            upload_folder = tempfile.mkdtemp()
+            data_settings_file = os.path.join(upload_folder, "data_settings.yml")
 
-        scheduler = self.application.settings.get('scheduler')
+            with open(data_settings_file, "wb") as f:
+                f.write(self.json_data["data_settings"].encode("utf-8"))
 
-        upload_folder = tempfile.mkdtemp()
-        data_settings_file = os.path.join(upload_folder, 'data_settings.yml')
-
-        with open(data_settings_file, 'wb') as f:
-            f.write(self.json_data['settings'].encode("utf-8"))
-
-        schedule = scheduler.schedule(
-            DataSettingsSchedule(
-                data_settings=data_settings_file
+            schedule = scheduler.schedule(
+                DataSettingsSchedule(
+                    data_settings=data_settings_file
+                )
             )
-        )
 
-        self.finish({'schedule': str(schedule)})
+            return self.finish({"schedule": str(schedule)})
+
+        elif self.json_data["type"] == "PIPELINE":
+
+            if not self.json_data.get("data_config"):
+                return self.bad_request()
+
+            if self.json_data["data_config"].startswith('s3://'):
+                data_config_file = self.json_data["data_config"]
+            else:
+                upload_folder = tempfile.mkdtemp()
+                data_config_file = os.path.join(upload_folder, "data_config.yml")
+                with open(data_config_file, "wb") as f:
+                    f.write(self.json_data["data_config"].encode("utf-8"))
+
+            pipeline_file = None
+            if self.json_data.get("pipeline"):
+                pipeline_file = os.path.join(upload_folder, "pipeline.yml")
+
+            schedule = scheduler.schedule(
+                DataConfigSchedule(
+                    data_config=data_config_file,
+                    pipeline=pipeline_file
+                )
+            )
+
+            return self.finish({"schedule": str(schedule)})
+
+        return self.bad_request()
 
 
 class ResultScheduleHandler(TheoBaseHandler):
@@ -186,20 +211,20 @@ class WatchScheduleHandler(tornado.websocket.WebSocketHandler):
         return True
 
 
-def start(address, port, scheduler):
+def start(address, scheduler):
     app = tornado.web.Application(
         [
             (r"/", MainHandler),
             (r"/schedule/(?P<schedule>[^/]+)/result", ResultScheduleHandler),  # TODO uuid regex
             (r"/schedule/(?P<schedule>[^/]+)/result/(?P<result>[^/]+)", ResultScheduleHandler),  # TODO uuid regex
             (r"/schedule/connect", WatchScheduleHandler),
-            (r"/schedule/data", DataScheduleHandler),
-            (r"/schedule/pipeline", ExecutionScheduleHandler),
+            (r"/schedule", ScheduleHandler),
             (r"/backends", BackendsHandler),
         ],
         scheduler=scheduler
     )
 
+    address, port = address
     app.listen(address=address, port=port)
     tornado.autoreload.start()
     tornado.ioloop.IOLoop.current().start()
