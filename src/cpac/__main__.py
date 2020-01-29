@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import sys
 import logging
+import os
+import sys
 
 from cpac import __version__
 
@@ -25,7 +26,8 @@ def address(str):
 
 def parse_args(args):
     parser = argparse.ArgumentParser(
-        description="cpac: a C-PAC utility"
+        description="cpac: a Python package that wraps C-PAC "
+                    "<http://fcp-indi.github.io>"
     )
 
     parser.add_argument(
@@ -54,19 +56,26 @@ def parse_args(args):
 
     subparsers = parser.add_subparsers(dest='command')
 
-    scheduler_parser = subparsers.add_parser('scheduler')
-    scheduler_parser.register('action', 'extend', ExtendAction)
-    scheduler_parser.add_argument('--address', action='store', type=address, default='localhost:3333')
-    scheduler_parser.add_argument('--backend', nargs='+', action='extend', choices=['docker', 'singularity'])
+    # scheduler_parser = subparsers.add_parser('scheduler')
+    # scheduler_parser.register('action', 'extend', ExtendAction)
+    # scheduler_parser.add_argument('--address', action='store', type=address, default='localhost:3333')
+    # scheduler_parser.add_argument('--backend', nargs='+', action='extend', choices=['docker', 'singularity'])
 
-    run_parser = subparsers.add_parser('run')
+    run_parser = subparsers.add_parser('run', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     run_parser.register('action', 'extend', ExtendAction)
+    run_parser.add_argument('--temp_dir', default='/tmp', help="directory for temporary files", metavar="PATH")
+    run_parser.add_argument('--working_dir', default=os.getcwd(), help="working directory", metavar="PATH")
     run_parser.add_argument('--address', action='store', type=address)
-    run_parser.add_argument('--backend', choices=['docker', 'singularity'])
-    run_parser.add_argument('data_config')
-    run_parser.add_argument('pipeline', nargs='?')
+    run_parser.add_argument('--bids_dir', help="input dataset directory", metavar="PATH")
+    run_parser.add_argument('--output_dir', default='/outputs', help="directory where output files should be stored", metavar="PATH")
+    # run_parser.add_argument('--backend', choices=['docker']) # TODO: Add Singularity
+    run_parser.add_argument('level_of_analysis', choices=['participant', 'group', 'test_config'])
+    run_parser.add_argument('args', nargs=argparse.REMAINDER, help="any C-PAC optional arguments <http://fcp-indi.github.io/docs/user/quick>")
 
     parsed = parser.parse_args(args)
+
+    # Set backend automatically while there's only one supported backend
+    parsed.backend = 'docker'
 
     return parsed
 
@@ -97,7 +106,18 @@ def main(args):
 
         scheduler = args.address or SCHEDULER_ADDRESS
 
-        schedule(scheduler, args.backend, args.data_config, args.pipeline)
+        schedule(
+            scheduler,
+            args.backend,
+            args.data_config_file if hasattr(
+                args,
+                'data_config_file'
+            ) else None,
+            args.pipeline_file if hasattr(
+                args,
+                'pipeline_file'
+            ) else None
+        )
 
 
 def run():
