@@ -1,8 +1,8 @@
-=====
-theodore
-=====
+====
+cpac
+====
 
-This is the documentation of **theodore**.
+This is the documentation of **cpac**.
 
 .. note::
 

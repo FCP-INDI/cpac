@@ -3,8 +3,8 @@
 
 import time
 import pytest
-from theodore.backends import docker
-from theodore.scheduler import Scheduler
+from cpac.backends import docker
+from cpac.scheduler import Scheduler
 
 def test_remap():
     newdict, mapping = docker.DockerSchedule._remap_files({

@@ -4,9 +4,9 @@
 import os
 import time
 import pytest
-from theodore.backends import docker, DataSettingsSchedule
-from theodore.backends.docker import DockerDataSettingsSchedule
-from theodore.scheduler import Scheduler
+from cpac.backends import docker, DataSettingsSchedule
+from cpac.backends.docker import DockerDataSettingsSchedule
+from cpac.scheduler import Scheduler
 
 def test_docker():
     scheduler = Scheduler({

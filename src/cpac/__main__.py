@@ -5,7 +5,7 @@ import argparse
 import sys
 import logging
 
-from theodore import __version__
+from cpac import __version__
 
 _logger = logging.getLogger(__name__)
 
@@ -25,13 +25,13 @@ def address(str):
 
 def parse_args(args):
     parser = argparse.ArgumentParser(
-        description="theodore: a C-PAC utility"
+        description="cpac: a C-PAC utility"
     )
 
     parser.add_argument(
         '--version',
         action='version',
-        version='theodore {ver}'.format(ver=__version__)
+        version='cpac {ver}'.format(ver=__version__)
     )
 
     parser.add_argument(
@@ -83,17 +83,17 @@ def main(args):
     setup_logging(args.loglevel)
 
     if args.command == 'scheduler':
-        from theodore.scheduler.process import start_scheduler
+        from cpac.scheduler.process import start_scheduler
         start_scheduler(args.address, args.backend)
 
     elif args.command == 'run':
 
         if not args.address:
-            from theodore.scheduler.process import spawn_scheduler
+            from cpac.scheduler.process import spawn_scheduler
             spawn_scheduler(args.address, args.backend)
 
-        from theodore.scheduler.client import schedule, wait
-        from theodore.scheduler import SCHEDULER_ADDRESS
+        from cpac.scheduler.client import schedule, wait
+        from cpac.scheduler import SCHEDULER_ADDRESS
 
         scheduler = args.address or SCHEDULER_ADDRESS
 

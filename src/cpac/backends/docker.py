@@ -340,7 +340,7 @@ class DockerDataSettingsSchedule(DockerSchedule):
 
     def run(self):
         self._start = time.time()
-        self._output_folder = tempfile.mkdtemp(prefix='theo')
+        self._output_folder = tempfile.mkdtemp(prefix='cpac_python_')
 
         volumes = {
             self._output_folder: {'bind': '/output_folder', 'mode': 'rw'},
@@ -369,7 +369,7 @@ class DockerDataSettingsSchedule(DockerSchedule):
         ))
 
         self._run.container.wait()
-        
+
         self._results['data_config'] = FileResult(
             'data_config',
             glob.glob(os.path.join(self._output_folder, 'data_config*.yml'))[0],

@@ -6,8 +6,8 @@ import tornado.autoreload
 from tornado.options import define, options
 from tornado.concurrent import run_on_executor
 
-from theodore import __version__
-from theodore.backends import DataSettingsSchedule, DataConfigSchedule
+from cpac import __version__
+from cpac.backends import DataSettingsSchedule, DataConfigSchedule
 
 import os
 import time
@@ -54,7 +54,7 @@ class TheoBaseHandler(tornado.web.RequestHandler):
 class MainHandler(TheoBaseHandler):
     def get(self):
         self.finish({
-            "api": "theodore",
+            "api": "cpac",
             "version": __version__,
         })
 

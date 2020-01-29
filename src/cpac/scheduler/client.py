@@ -3,8 +3,8 @@ import json
 import time
 import logging
 
-from theodore.scheduler import SCHEDULER_ADDRESS
-from theodore.utils import Request, urlopen, bytes, HTTPError
+from cpac.scheduler import SCHEDULER_ADDRESS
+from cpac.utils import Request, urlopen, bytes, HTTPError
 
 from tornado import gen
 from tornado.websocket import websocket_connect
@@ -68,7 +68,7 @@ def wait(scheduler):
             req = Request('http://%s:%d' % scheduler)
             res = urlopen(req, timeout=5)
             data = json.loads(res.read())
-            if data["api"] == "theodore":
+            if data["api"] == "cpac":
                 break
         except:
             pass

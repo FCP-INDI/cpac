@@ -1,4 +1,4 @@
-from theodore import __version__
+from cpac import __version__
 
 import time
 import yaml
@@ -76,7 +76,7 @@ class Scheduler:
 
     def schedule(self, schedule, parent=None, client=None):
 
-        from theodore.backends import BackendMapper
+        from cpac.backends import BackendMapper
 
         if client:
             assert client in self.clients

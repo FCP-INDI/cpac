@@ -12,9 +12,9 @@ if sys.platform != "win32":
     import fcntl
 
 
-from theodore.scheduler import Scheduler, SCHEDULER_ADDRESS
-from theodore.scheduler.api import start
-from theodore.backends import docker
+from cpac.scheduler import Scheduler, SCHEDULER_ADDRESS
+from cpac.scheduler.api import start
+from cpac.backends import docker
 
 
 class SingleInstance(object):
@@ -95,7 +95,7 @@ def spawn_scheduler(command='theo', address=SCHEDULER_ADDRESS, backends=None):
     import subprocess
 
     popen = [
-        'python', '-m', 'theodore',
+        'python', '-m', 'cpac',
         'scheduler'
     ]
 

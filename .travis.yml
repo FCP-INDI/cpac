@@ -4,15 +4,15 @@ virtualenv:
   system_site_packages: true
 matrix:
   include:
-    - python: 3.4
-      env: DISTRIB="ubuntu" TOX_PYTHON_VERSION="py34" COVERAGE="true"
+    - python: 3.5
+      env: DISTRIB="ubuntu" TOX_PYTHON_VERSION="py35" COVERAGE="true"
     - env: DISTRIB="conda" PYTHON_VERSION="3.6" COVERAGE="false"
 install:
   - source tests/travis_install.sh
   - pip install -r requirements.txt
 before_script:
-  - git config --global user.email "you@example.com"
-  - git config --global user.name "Your Name"
+  - git config --global user.email "cpac@cnl.childmind.org"
+  - git config --global user.name "Travis"
 script:
   - python setup.py test
 after_success:
