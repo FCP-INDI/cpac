@@ -119,8 +119,7 @@ class Docker(Backend):
         self._run = DockerRun(self.client.containers.run(
             image,
             command=command,
-            detach=False,
-            stream=True,
+            detach=True,
             user=':'.join([
                 str(bindings['uid']),
                 str(bindings['gid'])
@@ -152,8 +151,7 @@ class Docker(Backend):
         self._run = DockerRun(self.client.containers.run(
             image,
             command=command,
-            detach=False,
-            stream=True,
+            detach=True,
             user=':'.join([
                 str(bindings['uid']),
                 str(bindings['gid'])
@@ -167,12 +165,12 @@ class DockerRun(object):
 
     def __init__(self, container):
         self.container = container
-        running = True
-        while running:
-            try:
-                print(next(self.container).decode('utf-8'), end='')
-            except:
-                running = False
+        [print(l.decode('utf-8'), end='') for l in self.container.attach(
+            logs=True,
+            stderr=True,
+            stdout=True,
+            stream=True
+        )]
 
     @property
     def status(self):
