@@ -1,9 +1,14 @@
 import os
-import subprocess
+from contextlib import redirect_stdout
+from cpac.__main__ import main
+from io import StringIO
 from utils import recursive_remove_dir
 
 def test_utils_help():
-    o = subprocess.getoutput('cpac utils --help')
+    f = StringIO()
+    with redirect_stdout(f):
+        main('cpac utils --help'.split(' '))
+    o = f.getvalue()
 
     assert "Docker" in o
     assert "COMMAND" in o
@@ -11,9 +16,10 @@ def test_utils_help():
 def test_utils_new_settings_template():
     import tempfile
     wd = tempfile.mkdtemp(prefix='cpac_pip_temp_')
-    o = subprocess.getoutput(
-        ' '.join([
-            'cpac utils data_config new_settings_template',
+    f = StringIO()
+    with redirect_stdout(f):
+        main([
+            *'cpac utils data_config new_settings_template'.split(' '),
             '--temp_dir',
             wd,
             '--working_dir',
@@ -21,7 +27,8 @@ def test_utils_new_settings_template():
             '--output_dir',
             wd
         ])
-    )
+
+    o = f.getvalue()
 
     template_path = os.path.join(wd, 'data_settings.yml')
 
