@@ -78,27 +78,26 @@ def parse_args(args):
     )
     run_parser.add_argument('--address', action='store', type=address)
     run_parser.add_argument(
-        '--bids_dir',
-        help="input dataset directory",
-        metavar="PATH"
-    )
-    run_parser.add_argument(
-        '--output_dir',
-        default=os.path.join(cwd, 'outputs'),
-        help="directory where output files should be stored",
-        metavar="PATH"
-    )
-    run_parser.add_argument(
         '--data_config_file',
-        help="Yaml file containing the location of the data that is to be "
+        help="YAML file containing the location of the data that is to be "
              "processed.",
         metavar="PATH"
     )
     run_parser.add_argument(
         '--tag',
+        default="latest",
         help="tag of the container image to use (eg, latest or nightly)"
     )
     # run_parser.add_argument('--backend', choices=['docker']) # TODO: Add Singularity
+    run_parser.add_argument(
+        'bids_dir',
+        help="input dataset directory"
+    )
+    run_parser.add_argument(
+        'output_dir',
+        default=os.path.join(cwd, 'outputs'),
+        help="directory where output files should be stored"
+    )
     run_parser.add_argument(
         'level_of_analysis',
         choices=['participant', 'group', 'test_config']
@@ -128,11 +127,12 @@ def parse_args(args):
         help="directory where output files should be stored",
         metavar="PATH"
     )
-    # utils_parser.add_argument(
-    #     '-h',
-    #     '--help',
-    #     action='store_true'
-    # )
+    utils_parser.add_argument(
+        '--working_dir',
+        default=cwd,
+        help="working directory",
+        metavar="PATH"
+    )
 
     parsed, extras = parser.parse_known_args(args)
 

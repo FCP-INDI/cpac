@@ -32,7 +32,7 @@ class Docker(Backend):
     def _set_bindings(self, **kwargs):
 
         tag = kwargs.get('tag', None)
-        tag = tag if isinstance(tag, str) else 'nightly'
+        tag = tag if isinstance(tag, str) else 'latest'
 
         temp_dir = kwargs.get(
             'temp_dir',
@@ -90,7 +90,7 @@ class Docker(Backend):
 
         print("Logging messages will refer to the Docker paths.\n")
 
-    def run(self, tag='nightly', flags="", **kwargs):
+    def run(self, flags="", **kwargs):
 
         bindings = self._set_bindings(**kwargs)
 
@@ -119,7 +119,8 @@ class Docker(Backend):
         _run = DockerRun(self.client.containers.run(
             image,
             command=command,
-            detach=True,
+            detach=False,
+            stream=True,
             user=':'.join([
                 str(bindings['uid']),
                 str(bindings['gid'])
@@ -128,9 +129,7 @@ class Docker(Backend):
             working_dir='/wd'
         ))
 
-        _run.container.wait()
-
-    def utils(self, tag='nightly', flags="", **kwargs):
+    def utils(self, flags="", **kwargs):
 
         bindings = self._set_bindings(**kwargs)
 
