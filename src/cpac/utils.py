@@ -1,18 +1,8 @@
-import sys
-
-PY3 = sys.version_info[0] == 3
-
-if PY3:
-    string_types = str,
-else:
-    string_types = basestring,
+string_types = str,
 
 
 _bytes = bytes
-if PY3:
-    bytes = lambda data: _bytes(data, 'utf8')
-else:
-    bytes = lambda data: _bytes(data, 'utf8')
+bytes = lambda data: _bytes(data, 'utf8')
 
 
 try:
