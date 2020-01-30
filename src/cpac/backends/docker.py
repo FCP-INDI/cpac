@@ -116,7 +116,7 @@ class Docker(Backend):
 
         self._load_logging(image, bindings)
 
-        _run = DockerRun(self.client.containers.run(
+        self._run = DockerRun(self.client.containers.run(
             image,
             command=command,
             detach=False,
@@ -149,7 +149,7 @@ class Docker(Backend):
 
         self._load_logging(image, bindings)
 
-        _run = DockerRun(self.client.containers.run(
+        self._run = DockerRun(self.client.containers.run(
             image,
             command=command,
             detach=False,
@@ -163,13 +163,16 @@ class Docker(Backend):
         ))
 
 
-
 class DockerRun(object):
 
     def __init__(self, container):
         self.container = container
-        for l in self.container:
-            print(l.decode('utf-8'), end='')
+        running = True
+        while running:
+            try:
+                print(next(self.container).decode('utf-8'), end='')
+            except:
+                running = False
 
     @property
     def status(self):

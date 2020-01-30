@@ -1,5 +1,6 @@
 import os
 import subprocess
+from utils import recursive_remove_dir
 
 def test_utils_help():
     o = subprocess.getoutput('cpac utils --help')
@@ -26,5 +27,4 @@ def test_utils_new_settings_template():
 
     assert(os.path.exists(template_path))
 
-    os.remove(template_path)
-    os.rmdir(wd)
+    recursive_remove_dir(wd)
