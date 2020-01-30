@@ -1,6 +1,6 @@
-====================================================
-C-PAC Python Package |github-version| |build-status|
-====================================================
+===============================================================
+C-PAC Python Package |github-version| |build-status| |coverage|
+===============================================================
 
 A Python package that wraps `C-PAC <http://fcp-indi.github.io>`_, enabling users to install cpac with `pip <https://pip.pypa.io>`_ and run from the command line.
 
@@ -24,3 +24,6 @@ Dependencies
 .. |build-status| image:: https://travis-ci.com/shnizzedy/cpac-python-package.svg?token=xtFLLsKMdgeBsqAbzzFx&branch=master
     :target: https://travis-ci.com/shnizzedy/cpac-python-package
     :alt: Travis CI build status
+.. |coverage| image:: https://coveralls.io/repos/github/shnizzedy/cpac-python-package/badge.svg?branch=master
+    :target: https://coveralls.io/github/shnizzedy/cpac-python-package?branch=master
+    :alt: coverage badge
