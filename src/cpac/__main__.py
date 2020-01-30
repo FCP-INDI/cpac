@@ -57,11 +57,6 @@ def parse_args(args):
 
     subparsers = parser.add_subparsers(dest='command')
 
-    # scheduler_parser = subparsers.add_parser('scheduler')
-    # scheduler_parser.register('action', 'extend', ExtendAction)
-    # scheduler_parser.add_argument('--address', action='store', type=address, default='localhost:3333')
-    # scheduler_parser.add_argument('--backend', nargs='+', action='extend', choices=['docker', 'singularity'])
-
     run_parser = subparsers.add_parser('run', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     run_parser.register('action', 'extend', ExtendAction)
     run_parser.add_argument('--temp_dir', default='/tmp', help="directory for temporary files", metavar="PATH")
@@ -124,26 +119,6 @@ def main(args):
     if args.command == 'run':
 
         Docker().run(flags=" ".join(args.extra_args), **vars(args))
-        # DockerRun()
-        #
-        # if not args.address:
-        #     from cpac.scheduler.process import spawn_scheduler
-        #     spawn_scheduler(args.address, args.backend)
-        #
-        # from cpac.scheduler.client import schedule, wait
-        # from cpac.scheduler import SCHEDULER_ADDRESS
-        #
-        # scheduler = args.address or SCHEDULER_ADDRESS
-        #
-        # schedule(
-        #     scheduler,
-        #     args.backend,
-        #     args.data_config_file,
-        #     args.pipeline_file if hasattr(
-        #         args,
-        #         'pipeline_file'
-        #     ) else None
-        # )
 
 
 def run():

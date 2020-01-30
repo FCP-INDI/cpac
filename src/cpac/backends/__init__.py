@@ -1,7 +1,5 @@
 from .docker import (
-    Docker,
-    DockerDataSettingsSchedule,
-    DockerDataConfigSchedule
+    Docker
 )
 
 
@@ -18,17 +16,3 @@ class BackendMapper(object):
             **self.parameters,
             parent=parent
         )
-
-
-class DataSettingsSchedule(BackendMapper):
-
-    _clients = {
-        Docker: DockerDataSettingsSchedule
-    }
-
-
-class DataConfigSchedule(BackendMapper):
-
-    _clients = {
-        Docker: DockerDataConfigSchedule
-    }
