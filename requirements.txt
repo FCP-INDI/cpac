@@ -1,3 +1,4 @@
+coveralls
 docker
 pandas >= 0.23.4
 pytest

@@ -15,7 +15,7 @@ before_script:
   - git config --global user.email "support@travis-ci.com"
   - git config --global user.name "Travis"
 script:
-  - python setup.py test
+  - coverage run --source=cpac setup.py test
 after_success:
   - if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; fi
 after_script:
