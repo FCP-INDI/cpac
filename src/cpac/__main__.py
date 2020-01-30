@@ -57,23 +57,82 @@ def parse_args(args):
 
     subparsers = parser.add_subparsers(dest='command')
 
-    run_parser = subparsers.add_parser('run', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    cwd = os.getcwd()
+
+    run_parser = subparsers.add_parser(
+        'run',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
     run_parser.register('action', 'extend', ExtendAction)
-    run_parser.add_argument('--temp_dir', default='/tmp', help="directory for temporary files", metavar="PATH")
-    run_parser.add_argument('--working_dir', default=os.getcwd(), help="working directory", metavar="PATH")
+    run_parser.add_argument(
+        '--temp_dir',
+        default='/tmp',
+        help="directory for temporary files",
+        metavar="PATH"
+    )
+    run_parser.add_argument(
+        '--working_dir',
+        default=cwd,
+        help="working directory",
+        metavar="PATH"
+    )
     run_parser.add_argument('--address', action='store', type=address)
-    run_parser.add_argument('--bids_dir', help="input dataset directory", metavar="PATH")
-    run_parser.add_argument('--output_dir', default='/outputs', help="directory where output files should be stored", metavar="PATH")
+    run_parser.add_argument(
+        '--bids_dir',
+        help="input dataset directory",
+        metavar="PATH"
+    )
+    run_parser.add_argument(
+        '--output_dir',
+        default=os.path.join(cwd, 'outputs'),
+        help="directory where output files should be stored",
+        metavar="PATH"
+    )
     run_parser.add_argument(
         '--data_config_file',
         help="Yaml file containing the location of the data that is to be "
              "processed.",
         metavar="PATH"
     )
-    run_parser.add_argument('--tag', help="tag of the container image to use (eg, latest or nightly)")
+    run_parser.add_argument(
+        '--tag',
+        help="tag of the container image to use (eg, latest or nightly)"
+    )
     # run_parser.add_argument('--backend', choices=['docker']) # TODO: Add Singularity
-    run_parser.add_argument('level_of_analysis', choices=['participant', 'group', 'test_config'])
-    run_parser.add_argument('extra_args', nargs=argparse.REMAINDER, help="any C-PAC optional arguments <http://fcp-indi.github.io/docs/user/running>")
+    run_parser.add_argument(
+        'level_of_analysis',
+        choices=['participant', 'group', 'test_config']
+    )
+    run_parser.add_argument(
+        'extra_args',
+        nargs=argparse.REMAINDER,
+        help="any C-PAC optional arguments "
+             "<http://fcp-indi.github.io/docs/user/running>"
+    )
+
+    utils_parser = subparsers.add_parser(
+        'utils',
+        add_help=False,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    utils_parser.register('action', 'extend', ExtendAction)
+    utils_parser.add_argument(
+        '--temp_dir',
+        default='/tmp',
+        help="directory for temporary files",
+        metavar="PATH"
+    )
+    utils_parser.add_argument(
+        '--output_dir',
+        default=os.path.join(cwd, 'outputs'),
+        help="directory where output files should be stored",
+        metavar="PATH"
+    )
+    # utils_parser.add_argument(
+    #     '-h',
+    #     '--help',
+    #     action='store_true'
+    # )
 
     parsed, extras = parser.parse_known_args(args)
 
@@ -107,19 +166,20 @@ def main(args):
         'bids_dir'
     ) else None
 
-
-    if ((args.bids_dir is None) and (args.data_config_file is None)):
-        raise AttributeError(
-            "cpac requires at least one of `bids_dir` or `data_config_file` to "
-            "run. See http://fcp-indi.github.io/docs/user/running"
-        )
-
     setup_logging(args.loglevel)
 
     if args.command == 'run':
+        if ((args.bids_dir is None) and (args.data_config_file is None)):
+            raise AttributeError(
+                "cpac requires at least one of `bids_dir` or "
+                "`data_config_file` to run. See "
+                "http://fcp-indi.github.io/docs/user/running"
+            )
 
         Docker().run(flags=" ".join(args.extra_args), **vars(args))
 
+    if args.command == 'utils':
+        Docker().utils(flags=" ".join(args.extra_args), **vars(args))
 
 def run():
     main(sys.argv)
