@@ -21,8 +21,8 @@ Dependencies
 .. |github-version| image:: https://img.shields.io/github/tag/shnizzedy/cpac-python-package.svg
     :target: https://github.com/shnizzedy/cpac-python-package/releases
     :alt: GitHub version
-.. |build-status| image:: https://travis-ci.com/shnizzedy/cpac-python-package.svg?token=xtFLLsKMdgeBsqAbzzFx&branch=master
-    :target: https://travis-ci.com/shnizzedy/cpac-python-package
+.. |build-status| image:: https://travis-ci.org/shnizzedy/cpac-python-package.svg?branch=master
+    :target: https://travis-ci.org/shnizzedy/cpac-python-package
     :alt: Travis CI build status
 .. |coverage| image:: https://coveralls.io/repos/github/shnizzedy/cpac-python-package/badge.svg?branch=master
     :target: https://coveralls.io/github/shnizzedy/cpac-python-package?branch=master
