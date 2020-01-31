@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.1.2
+=============
+* 🚑 Fixed bug preventing binding the same local directory to multiple Docker directories
+
 Version 0.1.1
 =============
 
