@@ -12,7 +12,7 @@ import copy
 import pwd
 
 from base64 import b64decode, b64encode
-
+from docker.types import Mount
 from ..utils import string_types
 from .backend import Backend, Result, FileResult
 
@@ -26,11 +26,18 @@ class Docker(Backend):
         self.client = docker.from_env()
         try:
             self.client.ping()
-        except docker.errors.APIError:
+        except docker.errors.APIError:  # pragma: no cover
             raise "Could not connect to Docker"
 
-    def _set_bindings(self, **kwargs):
+    def _bind_volume(self, volumes, local, remote, mode):
+        b = {'bind': remote, 'mode': mode}
+        if local in volumes:
+            volumes[local].append(b)
+        else:
+            volumes[local] = [b]
+        return(volumes)
 
+    def _set_bindings(self, **kwargs):
         tag = kwargs.get('tag', None)
         tag = tag if isinstance(tag, str) else 'latest'
 
@@ -42,21 +49,26 @@ class Docker(Backend):
             'output_dir',
             tempfile.mkdtemp(prefix='cpac_pip_output_')
         )
+        working_dir = kwargs.get(
+            'working_dir',
+            os.getcwd()
+        )
 
-        volumes = {
-            temp_dir: {'bind': '/scratch', 'mode': 'rw'},
-            output_dir: {'bind': '/outputs', 'mode':'rw'},
-            kwargs.get(
-                'working_dir',
-                os.getcwd()
-            ): {'bind': '/wd', 'mode': 'rw'}
-        }
-
+        volumes = self._bind_volume({}, temp_dir, '/scratch', 'rw')
+        volumes = self._bind_volume(volumes, output_dir, '/outputs', 'rw')
+        volumes = self._bind_volume(volumes, working_dir, '/wd', 'rw')
 
         uid = os.getuid()
 
         bindings = {
             'gid': pwd.getpwuid(uid).pw_gid,
+            'mounts': [
+                '{}:{}:{}'.format(
+                    i,
+                    j['bind'],
+                    j['mode']
+                ) for i in volumes.keys() for j in volumes[i]
+            ],
             'tag': tag,
             'uid': uid,
             'volumes': volumes
@@ -69,11 +81,11 @@ class Docker(Backend):
         import textwrap
         from tabulate import tabulate
 
-        t = pd.DataFrame(
-            bindings['volumes']
-        ).T.rename(columns = {"bind": "Docker"})
-        t.index.name = "local"
-        t.reset_index(inplace=True)
+        t = pd.DataFrame([
+            (i, j['bind'], j['mode']) for i in bindings['volumes'].keys(
+            ) for j in bindings['volumes'][i]
+        ])
+        t.columns = ['local', 'Docker', 'mode']
 
         print("")
 
@@ -102,13 +114,22 @@ class Docker(Backend):
         if isinstance(
             kwargs['bids_dir'], str
         ) and not kwargs['bids_dir'].startswith('s3://'):
-            bids_dir = '/bids_dir'
-            volumes[kwargs['bids_dir']] = {'bind': bids_dir, 'mode': 'ro'}
+            b = {
+                'bind': '/bids_dir',
+                'mode': 'ro'
+            }
+            if kwargs['bids_dir'] in bindings['volumes']:
+                bindings['volumes'][kwargs['bids_dir']].append(b)
+            else:
+                bindings['volumes'][kwargs['bids_dir']] = [b]
+            bindings['mounts'].append('/bids_dir:{}:ro'.format(
+                kwargs['bids_dir']
+            ))
         else:
-            bids_dir = str(kwargs['bids_dir'])
+            kwargs['bids_dir'] = str(kwargs['bids_dir'])
 
         command = [i for i in [
-            bids_dir,
+            kwargs['bids_dir'],
             '/outputs',
             kwargs['level_of_analysis'],
             *flags.split(' ')
@@ -124,7 +145,7 @@ class Docker(Backend):
                 str(bindings['uid']),
                 str(bindings['gid'])
             ]),
-            volumes=bindings['volumes'],
+            volumes=bindings['mounts'],
             working_dir='/wd'
         ))
 
@@ -156,7 +177,7 @@ class Docker(Backend):
                 str(bindings['uid']),
                 str(bindings['gid'])
             ]),
-            volumes=bindings['volumes'],
+            volumes=bindings['mounts'],
             working_dir='/wd'
         ))
 
