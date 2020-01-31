@@ -19,9 +19,10 @@ def test_run_test_config():
     f = StringIO()
     with redirect_stdout(f):
         main([
-            *'cpac run s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU'.split(
-                ' '
-            ),
+            *(
+                'cpac run --address=8888:8888 '
+                's3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU'
+            ).split(' '),
             wd,
             *'test_config --participant_ndx=2'.split(' ')
         ])

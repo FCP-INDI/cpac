@@ -169,13 +169,6 @@ def main(args):
     setup_logging(args.loglevel)
 
     if args.command == 'run':
-        if ((args.bids_dir is None) and (args.data_config_file is None)):
-            raise AttributeError(
-                "cpac requires at least one of `bids_dir` or "
-                "`data_config_file` to run. See "
-                "http://fcp-indi.github.io/docs/user/running"
-            )
-
         Docker().run(flags=" ".join(args.extra_args), **vars(args))
 
     if args.command == 'utils':
