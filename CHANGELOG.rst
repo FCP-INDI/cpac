@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.1.3
+=============
+* ➕ Require ``docker-pycreds``, ``websocket-client``, ``yml``
+
 Version 0.1.2
 =============
 * 🚑 Fixed bug preventing binding the same local directory to multiple Docker directories
