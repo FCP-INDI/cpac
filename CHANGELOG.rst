@@ -2,9 +2,13 @@
 Changelog
 =========
 
+Version 0.1.4
+=============
+* 🚑 Remove erroneous import statement
+
 Version 0.1.3
 =============
-* ➕ Require ``docker-pycreds``, ``websocket-client``, ``yml``
+* ➕ Require ``docker-pycreds``, ``websocket-client``
 
 Version 0.1.2
 =============

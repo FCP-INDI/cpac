@@ -2,7 +2,6 @@ import os
 import time
 import json
 import glob
-import yml
 import docker
 import shutil
 import tempfile
