@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.1.5
+=============
+* ⬆ Add installation depencencies
+
 Version 0.1.4
 =============
 * 🚑 Remove erroneous import statement
