@@ -1,3 +1,7 @@
+import os
+import pwd
+import tempfile
+
 
 class Backend(object):
 

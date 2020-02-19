@@ -7,7 +7,7 @@ import os
 import sys
 
 from cpac import __version__
-from cpac.backends.docker import Docker, DockerRun
+from cpac.backends import Backends
 
 _logger = logging.getLogger(__name__)
 
@@ -57,6 +57,8 @@ def parse_args(args):
 
     subparsers = parser.add_subparsers(dest='command')
 
+    parser.add_argument('--backend', choices=['docker', 'singularity'])
+
     cwd = os.getcwd()
 
     run_parser = subparsers.add_parser(
@@ -88,7 +90,6 @@ def parse_args(args):
         default="latest",
         help="tag of the container image to use (eg, latest or nightly)"
     )
-    # run_parser.add_argument('--backend', choices=['docker']) # TODO: Add Singularity
     run_parser.add_argument(
         'bids_dir',
         help="input dataset directory"
@@ -136,8 +137,6 @@ def parse_args(args):
 
     parsed, extras = parser.parse_known_args(args)
 
-    # Set backend automatically while there's only one supported backend
-    parsed.backend = 'docker'
     parsed.extra_args = [
         *(parsed.extra_args if hasattr(parsed, 'extra_args') else []),
         *extras
@@ -153,8 +152,28 @@ def setup_logging(loglevel):
 
 
 def main(args):
+    original_args = args
     command = args[0]
     args = parse_args(args[1:])
+
+    if not args.backend and "--backend" not in original_args:
+        try:
+            main([
+                original_args[0],
+                '--backend',
+                'docker',
+                *original_args[1:]
+            ])
+        except Exception as e:
+            main([
+                original_args[0],
+                '--backend',
+                'singularity',
+                *original_args[1:]
+            ])
+        return()
+    else:
+        del original_args
 
     args.data_config_file = args.data_config_file if hasattr(
         args,
@@ -169,10 +188,20 @@ def main(args):
     setup_logging(args.loglevel)
 
     if args.command == 'run':
-        Docker().run(flags=" ".join(args.extra_args), **vars(args))
+        Backends(args.backend).run(
+            flags=" ".join(args.extra_args),
+            **vars(args)
+        )
 
     if args.command == 'utils':
-        Docker().utils(flags=" ".join(args.extra_args), **vars(args))
+        Backends(args.backend).utils(
+            flags=" ".join(args.extra_args),
+            **vars(args)
+        )
+
+
+
+
 
 def run():
     main(sys.argv)

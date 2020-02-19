@@ -2,13 +2,17 @@
 Changelog
 =========
 
+Version 0.2.0
+=============
+* ✨Ⓢ Added Singularity support
+
 Version 0.1.5
 =============
-* ⬆ Add installation depencencies
+* ⬆ Added installation depenencies
 
 Version 0.1.4
 =============
-* 🚑 Remove erroneous import statement
+* 🚑 Removed erroneous import statement
 
 Version 0.1.3
 =============
@@ -26,3 +30,7 @@ Version 0.1.1
 * ✨ Added support for ``cpac utils``
 * 🔊🐳 Routed live Docker logging to stdout
 * 🔬 Added tests for ``cpac run`` and ``cpac utils``
+
+Version 0.1.0
+=============
+* ✨🐳 Ported Docker support from Theodore

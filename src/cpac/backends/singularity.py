@@ -24,7 +24,10 @@ class Singularity(Backend):
     def __init__(self):
         print("Loading Ⓢ Singularity")
         try:
-            self.client = Client.pull("shub://FCP-INDI/C-PAC")
+            self.client = Client.pull(
+                "shub://FCP-INDI/C-PAC",
+                stream=True
+            )[0]
         except:  # pragma: no cover
         # except docker.errors.APIError:  # pragma: no cover
             raise "Could not connect to Singularity"
@@ -38,34 +41,54 @@ class Singularity(Backend):
         return(volumes)
 
     def _load_logging(self, image, bindings):
-        # import pandas as pd
-        # import textwrap
-        # from tabulate import tabulate
-        #
-        # t = pd.DataFrame([
-        #     (i, j['bind'], j['mode']) for i in bindings['volumes'].keys(
-        #     ) for j in bindings['volumes'][i]
-        # ])
-        # t.columns = ['local', 'Docker', 'mode']
-        #
-        # print("")
-        #
-        # print(" ".join([
-        #     "Loading Ⓢ",
-        #     image,
-        #     "with these directory bindings:"
-        # ]))
-        #
-        # print(textwrap.indent(
-        #     tabulate(t, headers='keys', showindex=False),
-        #     '  '
-        # ))
+        import pandas as pd
+        import textwrap
+        from tabulate import tabulate
+
+        t = pd.DataFrame([
+            (i, j['bind'], j['mode']) for i in bindings['volumes'].keys(
+            ) for j in bindings['volumes'][i]
+        ])
+        t.columns = ['local', 'Docker', 'mode']
+
+        print("")
+
+        print(" ".join([
+            "Loading Ⓢ",
+            image,
+            "with these directory bindings:"
+        ]))
+
+        print(textwrap.indent(
+            tabulate(t, headers='keys', showindex=False),
+            '  '
+        ))
 
         print("Logging messages will refer to the Singularity paths.\n")
 
     def run(self, flags="", **kwargs):
 
         bindings = self._set_bindings(**kwargs)
+
+        self._load_logging(image, bindings)
+        print(bindings)
+
+        return()
+
+        self.instance = Client.instance(self.client)
+        [
+            print(o, end="") for o in Client.run(
+                self.instance,
+                args=" ".join([
+                    kwargs['bids_dir'],
+                    kwargs['output_dir'],
+                    kwargs['level_of_analysis'],
+                    flags
+                ]).strip(' '),
+                stream=True,
+                return_result=True
+            )
+        ]
 
         # image = ':'.join([
         #     'fcpindi/c-pac',
@@ -96,7 +119,7 @@ class Singularity(Backend):
         #     *flags.split(' ')
         # ] if (i is not None and len(i))]
         #
-        # self._load_logging(image, bindings)
+        self._load_logging(image, bindings)
         #
         # self._run = DockerRun(self.client.containers.run(
         #     image,
@@ -112,60 +135,29 @@ class Singularity(Backend):
 
     def utils(self, flags="", **kwargs):
 
-        bindings = self._set_bindings(**kwargs)
+        # bindings = self._set_bindings(**kwargs)
 
-        # image = ':'.join([
-        #     'fcpindi/c-pac',
-        #     bindings['tag']
-        # ])
-        #
-        # command = [i for i in [
-        #     kwargs.get('working_dir', 'NA'),
-        #     '/outputs',
-        #     'cli',
-        #     '--',
-        #     'utils',
-        #     *flags.split(' ')
-        # ] if (i is not None and len(i))]
-        #
-        # self._load_logging(image, bindings)
-        #
-        # self._run = DockerRun(self.client.containers.run(
-        #     image,
-        #     command=command,
-        #     detach=True,
-        #     user=':'.join([
-        #         str(bindings['uid']),
-        #         str(bindings['gid'])
-        #     ]),
-        #     volumes=bindings['mounts'],
-        #     working_dir='/wd'
-        # ))
+        self.instance = Client.instance(self.client)
+
+        [
+            print(o, end="") for o in Client.run(
+                self.instance,
+                args=" ".join([
+                    'cpac utils',
+                    *flags.split(' ')
+                ]).strip(' '),
+                stream=True,
+                return_result=True
+            )
+        ]
 
 
 class SingularityRun(object):
 
-    def __init__(self, container, args):
-        container.run(args=args)
+    def __init__():
         pass
 
     @property
     def status(self):
-        # try:
-        #     self.container.reload()
-        # except Exception as e:
-        #     return 'stopped'
-        # status = self.container.status
-        # status_map = {
-        #     'created': 'starting',
-        #     'restarting': 'running',
-        #     'running': 'running',
-        #     'removing': 'running',
-        #     'paused': 'running',
-        #     'exited': 'success',
-        #     'dead': 'failed'
-        # }
-        # if status in status_map:
-        #     return status_map[status]
 
         return 'unknown'
