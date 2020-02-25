@@ -51,6 +51,13 @@ jobs:
       uses: eWaterCycle/setup-singularity@v7
       with:
         singularity-version: ${{ matrix.singularity }}
+    - name: free disk space
+      run: |
+        sudo swapoff -a
+        sudo rm -f /swapfile
+        sudo apt clean
+        docker rmi $(docker image ls -aq)
+        df -h
     - name: Prepare Singularity cache and tmp directories
       if: ${{ matrix.platform == 'singularity' }}
       run: mkdir -p ${SINGULARITY_CACHEDIR} && mkdir -p ${SINGULARITY_TMPDIR}
