@@ -15,7 +15,6 @@ from ..utils import string_types
 from .platform import Backend, Result, FileResult
 
 from spython.main import Client
-
 from tornado import httpclient
 
 
@@ -26,8 +25,8 @@ class Singularity(Backend):
         try:
             self.client = Client.pull(
                 "shub://FCP-INDI/C-PAC",
-                stream=True
-            )[0]
+                pull_folder=os.getcwd()
+            )
         except:  # pragma: no cover
         # except docker.errors.APIError:  # pragma: no cover
             raise "Could not connect to Singularity"
