@@ -27,8 +27,8 @@ def address(str):
 
 def parse_args(args):
     parser = argparse.ArgumentParser(
-        description="cpac: a Python package that wraps C-PAC "
-                    "<http://fcp-indi.github.io>"
+        description="cpac: a Python package that simplifies using C-PAC "
+                    "<http://fcp-indi.github.io> containerized images."
     )
 
     parser.add_argument(
@@ -57,7 +57,7 @@ def parse_args(args):
 
     subparsers = parser.add_subparsers(dest='command')
 
-    parser.add_argument('--backend', choices=['docker', 'singularity'])
+    parser.add_argument('--platform', choices=['docker', 'singularity'])
 
     cwd = os.getcwd()
 
@@ -156,18 +156,18 @@ def main(args):
     command = args[0]
     args = parse_args(args[1:])
 
-    if not args.backend and "--backend" not in original_args:
+    if not args.platform and "--platform" not in original_args:
         try:
             main([
                 original_args[0],
-                '--backend',
+                '--platform',
                 'docker',
                 *original_args[1:]
             ])
         except Exception as e:
             main([
                 original_args[0],
-                '--backend',
+                '--platform',
                 'singularity',
                 *original_args[1:]
             ])
@@ -188,13 +188,13 @@ def main(args):
     setup_logging(args.loglevel)
 
     if args.command == 'run':
-        Backends(args.backend).run(
+        Backends(args.platform).run(
             flags=" ".join(args.extra_args),
             **vars(args)
         )
 
     if args.command == 'utils':
-        Backends(args.backend).utils(
+        Backends(args.platform).utils(
             flags=" ".join(args.extra_args),
             **vars(args)
         )

@@ -12,7 +12,7 @@ import pwd
 from base64 import b64decode, b64encode
 # from docker.types import Mount
 from ..utils import string_types
-from .backend import Backend, Result, FileResult
+from .platform import Backend, Result, FileResult
 
 from spython.main import Client
 
