@@ -20,7 +20,7 @@ from tornado import httpclient
 
 class Docker(Backend):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         print("Loading 🐳 Docker")
         self.client = docker.from_env()
         try:

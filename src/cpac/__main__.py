@@ -26,9 +26,25 @@ def address(str):
 
 
 def parse_args(args):
+    cwd = os.getcwd()
+
     parser = argparse.ArgumentParser(
         description="cpac: a Python package that simplifies using C-PAC "
                     "<http://fcp-indi.github.io> containerized images."
+    )
+
+    parser.add_argument('--platform', choices=['docker', 'singularity'])
+
+    parser.add_argument(
+        '--image',
+        help='path to Singularity image file. Will attempt to pull from '
+             'Singularity Hub or Docker Hub if not provided.'
+    )
+
+    parser.add_argument(
+        '--tag',
+        help='tag of the Docker image to use (eg, "latest" or "nightly"). '
+             'Ignored if IMAGE also provided.'
     )
 
     parser.add_argument(
@@ -40,8 +56,8 @@ def parse_args(args):
     parser.add_argument(
         '-v',
         '--verbose',
-        dest="loglevel",
-        help="set loglevel to INFO",
+        dest='loglevel',
+        help='set loglevel to INFO',
         action='store_const',
         const=logging.INFO
     )
@@ -49,17 +65,20 @@ def parse_args(args):
     parser.add_argument(
         '-vv',
         '--very-verbose',
-        dest="loglevel",
-        help="set loglevel to DEBUG",
+        dest='loglevel',
+        help='set loglevel to DEBUG',
         action='store_const',
         const=logging.DEBUG
     )
 
+    parser.add_argument(
+        '--working_dir',
+        default=cwd,
+        help="working directory",
+        metavar="PATH"
+    )
+
     subparsers = parser.add_subparsers(dest='command')
-
-    parser.add_argument('--platform', choices=['docker', 'singularity'])
-
-    cwd = os.getcwd()
 
     run_parser = subparsers.add_parser(
         'run',
@@ -72,23 +91,12 @@ def parse_args(args):
         help="directory for temporary files",
         metavar="PATH"
     )
-    run_parser.add_argument(
-        '--working_dir',
-        default=cwd,
-        help="working directory",
-        metavar="PATH"
-    )
     run_parser.add_argument('--address', action='store', type=address)
     run_parser.add_argument(
         '--data_config_file',
         help="YAML file containing the location of the data that is to be "
              "processed.",
         metavar="PATH"
-    )
-    run_parser.add_argument(
-        '--tag',
-        default="latest",
-        help="tag of the container image to use (eg, latest or nightly)"
     )
     run_parser.add_argument(
         'bids_dir',
@@ -126,12 +134,6 @@ def parse_args(args):
         '--output_dir',
         default=os.path.join(cwd, 'outputs'),
         help="directory where output files should be stored",
-        metavar="PATH"
-    )
-    utils_parser.add_argument(
-        '--working_dir',
-        default=cwd,
-        help="working directory",
         metavar="PATH"
     )
 
@@ -187,16 +189,18 @@ def main(args):
 
     setup_logging(args.loglevel)
 
+    arg_vars = vars(args)
+
     if args.command == 'run':
-        Backends(args.platform).run(
+        Backends(**arg_vars).run(
             flags=" ".join(args.extra_args),
-            **vars(args)
+            **arg_vars
         )
 
     if args.command == 'utils':
-        Backends(args.platform).utils(
+        Backends(**arg_vars).utils(
             flags=" ".join(args.extra_args),
-            **vars(args)
+            **arg_vars
         )
 
 

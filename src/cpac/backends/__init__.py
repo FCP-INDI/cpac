@@ -12,7 +12,7 @@ class BackendMapper(object):
             parent=parent
         )
 
-def Backends(platform):
+def Backends(platform, **kwargs):
     """
     Given a string, return a Backend
     """
@@ -23,5 +23,5 @@ def Backends(platform):
         {
             'docker': Docker,
             'singularity': Singularity
-        }[platform]()
+        }[platform](**kwargs)
     )

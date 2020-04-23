@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.2.1
+=============
+* Ⓢ Enabled specifying Singularity image file or Docker tag for Singularity
+
 Version 0.2.0
 =============
 * ✨Ⓢ Added Singularity support

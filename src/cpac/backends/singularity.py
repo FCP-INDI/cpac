@@ -20,16 +20,20 @@ from tornado import httpclient
 
 class Singularity(Backend):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
+        image = kwargs["image"] if "image" in kwargs else None
+        tag = kwargs["tag"] if "tag" in kwargs else None
         print("Loading Ⓢ Singularity")
-        try:
-            self.client = Client.pull(
-                "shub://FCP-INDI/C-PAC",
-                pull_folder=os.getcwd()
-            )
-        except:  # pragma: no cover
-        # except docker.errors.APIError:  # pragma: no cover
-            raise "Could not connect to Singularity"
+        if image:
+            self.instance = Client.instance(image)
+        elif tag:
+            self.instance = Client.instance(f"docker://fcpindi/c-pac:{tag}")
+        else:
+            try:
+                self.instance = Client.instance("shub://FCP-INDI/C-PAC")
+            except:  # pragma: no cover
+            # except docker.errors.APIError:  # pragma: no cover
+                raise "Could not connect to Singularity"
 
     def _bind_volume(self, volumes, local, remote, mode):
         # b = {'bind': remote, 'mode': mode}
@@ -73,8 +77,6 @@ class Singularity(Backend):
         print(bindings)
 
         return()
-
-        self.instance = Client.instance(self.client)
         [
             print(o, end="") for o in Client.run(
                 self.instance,
@@ -136,13 +138,11 @@ class Singularity(Backend):
 
         # bindings = self._set_bindings(**kwargs)
 
-        self.instance = Client.instance(self.client)
-
         [
             print(o, end="") for o in Client.run(
                 self.instance,
                 args=" ".join([
-                    'cpac utils',
+                    'bids_dir outputs_dir cli -- utils',
                     *flags.split(' ')
                 ]).strip(' '),
                 stream=True,
