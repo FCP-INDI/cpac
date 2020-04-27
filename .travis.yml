@@ -5,19 +5,19 @@ services:
 jobs:
   include:
     - python: 3.5
-      env: DISTRIB="ubuntu" TOX_PYTHON_VERSION="py35" COVERAGE="true"
-    - env: DISTRIB="conda" PYTHON_VERSION="3.6" COVERAGE="false"
+      env: DISTRIB="conda" PYTHON_VERSION="3.6" COVERAGE="false"
 install:
   - source tests/travis_install.sh
   - pip install -r requirements.txt
   - pip install .
 before_script:
-  - git config --global user.email "support@travis-ci.com"
+  - git config --global user.email "support@travis-ci.org"
   - git config --global user.name "Travis"
 script:
   - coverage run --source=cpac setup.py test
 after_success:
   - if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; fi
+  - bash .travis/update_README_usage.sh
 after_script:
   - travis-cleanup
 cache:
