@@ -17,25 +17,6 @@ Dependencies
 * `pip <https://pip.pypa.io>`_
 * `Docker <https://www.docker.com>`_
 
---help
-======
-
-.. code-block:: shell
-
-    positional arguments:
-      {run,utils}
-
-    optional arguments:
-      -h, --help            show this help message and exit
-      --platform {docker,singularity}
-      --image IMAGE         path to Singularity image file. Will attempt to pull from Singularity Hub or Docker Hub if not provided.
-      --tag TAG             tag of the Docker image to use (eg, "latest" or "nightly"). Ignored if IMAGE also provided.
-      --version             show program's version number and exit
-      -v, --verbose         set loglevel to INFO
-      -vv, --very-verbose   set loglevel to DEBUG
-      --working_dir PATH    working directory
-
-
 Usage
 =====
 
@@ -44,18 +25,31 @@ Usage
 .. code-block:: shell
 
     cpac --help
-    usage: cpac [-h] [--version] [-v] [-vv] {run,utils} ...
-    
-    cpac: a Python package that wraps C-PAC <http://fcp-indi.github.io>
-    
+    usage: cpac [-h] [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
+                [--version] [-v] [-vv] [--working_dir PATH] [--temp_dir PATH]
+                [--output_dir PATH]
+                {run,utils} ...
+
+    cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io>
+    containerized images.
+
     positional arguments:
       {run,utils}
-    
+
     optional arguments:
-      -h, --help           show this help message and exit
-      --version            show program's version number and exit
-      -v, --verbose        set loglevel to INFO
-      -vv, --very-verbose  set loglevel to DEBUG
+      -h, --help            show this help message and exit
+      --platform {docker,singularity}
+      --image IMAGE         path to Singularity image file OR name of Docker image
+                            (eg, "fcpindi/c-pac"). Will attempt to pull from
+                            Singularity Hub or Docker Hub if not provided.
+      --tag TAG             tag of the Docker image to use (eg, "latest" or
+                            "nightly").
+      --version             show program's version number and exit
+      -v, --verbose         set loglevel to INFO
+      -vv, --very-verbose   set loglevel to DEBUG
+      --working_dir PATH    working directory
+      --temp_dir PATH       directory for temporary files
+      --output_dir PATH     directory where output files should be stored
 
 .. END USAGE
 

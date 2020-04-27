@@ -78,6 +78,20 @@ def parse_args(args):
         metavar="PATH"
     )
 
+    parser.add_argument(
+        '--temp_dir',
+        default='/tmp',
+        help="directory for temporary files",
+        metavar="PATH"
+    )
+
+    parser.add_argument(
+        '--output_dir',
+        default=os.path.join(cwd, 'outputs'),
+        help="directory where output files should be stored",
+        metavar="PATH"
+    )
+
     subparsers = parser.add_subparsers(dest='command')
 
     run_parser = subparsers.add_parser(
@@ -85,12 +99,6 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     run_parser.register('action', 'extend', ExtendAction)
-    run_parser.add_argument(
-        '--temp_dir',
-        default='/tmp',
-        help="directory for temporary files",
-        metavar="PATH"
-    )
     run_parser.add_argument('--address', action='store', type=address)
     run_parser.add_argument(
         '--data_config_file',
@@ -124,18 +132,6 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     utils_parser.register('action', 'extend', ExtendAction)
-    utils_parser.add_argument(
-        '--temp_dir',
-        default='/tmp',
-        help="directory for temporary files",
-        metavar="PATH"
-    )
-    utils_parser.add_argument(
-        '--output_dir',
-        default=os.path.join(cwd, 'outputs'),
-        help="directory where output files should be stored",
-        metavar="PATH"
-    )
 
     parsed, extras = parser.parse_known_args(args)
 
@@ -202,9 +198,6 @@ def main(args):
             flags=" ".join(args.extra_args),
             **arg_vars
         )
-
-
-
 
 
 def run():

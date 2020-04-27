@@ -25,15 +25,18 @@ class Singularity(Backend):
         tag = kwargs["tag"] if "tag" in kwargs else None
         print("Loading Ⓢ Singularity")
         if image:
-            self.instance = Client.instance(image)
+            self.image = image
         elif tag:
-            self.instance = Client.instance(f"docker://fcpindi/c-pac:{tag}")
+            self.image = f"docker://fcpindi/c-pac:{tag}"
         else:
             try:
-                self.instance = Client.instance("shub://FCP-INDI/C-PAC")
+                self.image = Client.pull(
+                    "shub://FCP-INDI/C-PAC",
+                    pull_folder=os.getcwd()
+                )
             except:  # pragma: no cover
-            # except docker.errors.APIError:  # pragma: no cover
                 raise "Could not connect to Singularity"
+        self.instance = Client.instance(self.image)
 
     def _bind_volume(self, volumes, local, remote, mode):
         # b = {'bind': remote, 'mode': mode}
@@ -43,7 +46,7 @@ class Singularity(Backend):
         #     volumes[local] = [b]
         return(volumes)
 
-    def _load_logging(self, image, bindings):
+    def _load_logging(self, bindings):
         import pandas as pd
         import textwrap
         from tabulate import tabulate
@@ -52,13 +55,13 @@ class Singularity(Backend):
             (i, j['bind'], j['mode']) for i in bindings['volumes'].keys(
             ) for j in bindings['volumes'][i]
         ])
-        t.columns = ['local', 'Docker', 'mode']
+        t.columns = ['local', 'Singularity', 'mode']
 
         print("")
 
         print(" ".join([
             "Loading Ⓢ",
-            image,
+            self.image,
             "with these directory bindings:"
         ]))
 
@@ -73,7 +76,7 @@ class Singularity(Backend):
 
         bindings = self._set_bindings(**kwargs)
 
-        self._load_logging(image, bindings)
+        self._load_logging(bindings)
         print(bindings)
 
         return()
@@ -91,52 +94,9 @@ class Singularity(Backend):
             )
         ]
 
-        # image = ':'.join([
-        #     'fcpindi/c-pac',
-        #     bindings['tag']
-        # ])
-        #
-        # if isinstance(
-        #     kwargs['bids_dir'], str
-        # ) and not kwargs['bids_dir'].startswith('s3://'):
-        #     b = {
-        #         'bind': '/bids_dir',
-        #         'mode': 'ro'
-        #     }
-        #     if kwargs['bids_dir'] in bindings['volumes']:
-        #         bindings['volumes'][kwargs['bids_dir']].append(b)
-        #     else:
-        #         bindings['volumes'][kwargs['bids_dir']] = [b]
-        #     bindings['mounts'].append('/bids_dir:{}:ro'.format(
-        #         kwargs['bids_dir']
-        #     ))
-        # else:
-        #     kwargs['bids_dir'] = str(kwargs['bids_dir'])
-        #
-        # command = [i for i in [
-        #     kwargs['bids_dir'],
-        #     '/outputs',
-        #     kwargs['level_of_analysis'],
-        #     *flags.split(' ')
-        # ] if (i is not None and len(i))]
-        #
-        self._load_logging(image, bindings)
-        #
-        # self._run = DockerRun(self.client.containers.run(
-        #     image,
-        #     command=command,
-        #     detach=True,
-        #     user=':'.join([
-        #         str(bindings['uid']),
-        #         str(bindings['gid'])
-        #     ]),
-        #     volumes=bindings['mounts'],
-        #     working_dir='/wd'
-        # ))
-
     def utils(self, flags="", **kwargs):
 
-        # bindings = self._set_bindings(**kwargs)
+        bindings = self._set_bindings(**kwargs)
 
         [
             print(o, end="") for o in Client.run(
