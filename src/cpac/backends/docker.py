@@ -12,11 +12,10 @@ import pwd
 
 from base64 import b64decode, b64encode
 from docker.types import Mount
-from ..utils import string_types
-from .platform import Backend, Result, FileResult
-
 from tornado import httpclient
 
+from cpac.utils import Permission_mode
+from cpac.backends.platform import Backend, Result, FileResult
 
 class Docker(Backend):
 
@@ -27,23 +26,30 @@ class Docker(Backend):
             self.client.ping()
         except docker.errors.APIError:  # pragma: no cover
             raise "Could not connect to Docker"
+        self.volumes = {}
 
-    def _bind_volume(self, volumes, local, remote, mode):
-        b = {'bind': remote, 'mode': mode}
-        if local in volumes:
-            volumes[local].append(b)
+    def _bind_volume(self, local, remote, mode):
+        b = {'bind': remote, 'mode': Permission_mode(mode)}
+        if local in self.volumes:
+            if remote in [binding['bind'] for binding in self.volumes[local]]:
+                for i, binding in enumerate(self.volumes[local]):
+                    self.volumes[local][i] = {
+                        'bind': remote,
+                        'mode': max([self.volumes[local][i]['mode'], b['mode']])
+                    }
+            else:
+                self.volumes[local].append(b)
         else:
-            volumes[local] = [b]
-        return(volumes)
+            self.volumes[local] = [b]
 
-    def _load_logging(self, image, bindings):
+    def _load_logging(self, image):
         import pandas as pd
         import textwrap
         from tabulate import tabulate
 
         t = pd.DataFrame([
-            (i, j['bind'], j['mode']) for i in bindings['volumes'].keys(
-            ) for j in bindings['volumes'][i]
+            (i, j['bind'], j['mode']) for i in self.bindings['volumes'].keys(
+            ) for j in self.bindings['volumes'][i]
         ])
         t.columns = ['local', 'Docker', 'mode']
 
@@ -64,12 +70,7 @@ class Docker(Backend):
 
     def run(self, flags="", **kwargs):
 
-        bindings = self._set_bindings(**kwargs)
-
-        image = ':'.join([
-            'fcpindi/c-pac',
-            bindings['tag']
-        ])
+        self._set_bindings(**kwargs)
 
         if isinstance(
             kwargs['bids_dir'], str
@@ -78,47 +79,30 @@ class Docker(Backend):
                 'bind': '/bids_dir',
                 'mode': 'ro'
             }
-            if kwargs['bids_dir'] in bindings['volumes']:
-                bindings['volumes'][kwargs['bids_dir']].append(b)
+            if kwargs['bids_dir'] in self.bindings['volumes']:
+                self.bindings['volumes'][kwargs['bids_dir']].append(b)
             else:
-                bindings['volumes'][kwargs['bids_dir']] = [b]
-            bindings['mounts'].append('/bids_dir:{}:ro'.format(
+                self.bindings['volumes'][kwargs['bids_dir']] = [b]
+            self.bindings['mounts'].append('/bids_dir:{}:ro'.format(
                 kwargs['bids_dir']
             ))
         else:
             kwargs['bids_dir'] = str(kwargs['bids_dir'])
 
-        command = [i for i in [
+        kwargs['command'] = [i for i in [
+            'run',
             kwargs['bids_dir'],
             '/outputs',
             kwargs['level_of_analysis'],
             *flags.split(' ')
         ] if (i is not None and len(i))]
 
-        self._load_logging(image, bindings)
-
-        self._run = DockerRun(self.client.containers.run(
-            image,
-            command=command,
-            detach=True,
-            user=':'.join([
-                str(bindings['uid']),
-                str(bindings['gid'])
-            ]),
-            volumes=bindings['mounts'],
-            working_dir='/wd'
-        ))
+        self._execute(**kwargs)
 
     def utils(self, flags="", **kwargs):
+        self._set_bindings(**kwargs)
 
-        bindings = self._set_bindings(**kwargs)
-
-        image = ':'.join([
-            'fcpindi/c-pac',
-            bindings['tag']
-        ])
-
-        command = [i for i in [
+        kwargs['command'] = [i for i in [
             kwargs.get('working_dir', 'NA'),
             '/outputs',
             'cli',
@@ -127,18 +111,27 @@ class Docker(Backend):
             *flags.split(' ')
         ] if (i is not None and len(i))]
 
-        self._load_logging(image, bindings)
+        self._execute(**kwargs)
+
+
+    def _execute(self, command, **kwargs):
+        image = ':'.join([
+            'fcpindi/c-pac',
+            self.bindings['tag']
+        ])
+
+        self._load_logging(image)
 
         self._run = DockerRun(self.client.containers.run(
             image,
             command=command,
             detach=True,
             user=':'.join([
-                str(bindings['uid']),
-                str(bindings['gid'])
+                str(self.bindings['uid']),
+                str(self.bindings['gid'])
             ]),
-            volumes=bindings['mounts'],
-            working_dir='/wd'
+            volumes=self.bindings['mounts'],
+            working_dir=kwargs.get('working_dir', '/tmp')
         ))
 
 

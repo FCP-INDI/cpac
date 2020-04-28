@@ -28,27 +28,25 @@ class Backend(object):
             os.getcwd()
         )
 
-        volumes = self._bind_volume({}, temp_dir, '/scratch', 'rw')
-        volumes = self._bind_volume(volumes, output_dir, '/outputs', 'rw')
-        volumes = self._bind_volume(volumes, working_dir, '/wd', 'rw')
+        self._bind_volume(temp_dir, temp_dir, 'rw')
+        self._bind_volume(output_dir, output_dir, 'rw')
+        self._bind_volume(working_dir, working_dir, 'rw')
 
         uid = os.getuid()
 
-        bindings = {
+        self.bindings = {
             'gid': pwd.getpwuid(uid).pw_gid,
             'mounts': [
                 '{}:{}:{}'.format(
                     i,
                     j['bind'],
                     j['mode']
-                ) for i in volumes.keys() for j in volumes[i]
+                ) for i in self.volumes.keys() for j in self.volumes[i]
             ],
             'tag': tag,
             'uid': uid,
-            'volumes': volumes
+            'volumes': self.volumes
         }
-
-        return(bindings)
 
 
 class Result(object):

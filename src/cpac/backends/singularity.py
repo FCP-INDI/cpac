@@ -11,7 +11,6 @@ import pwd
 
 from base64 import b64decode, b64encode
 # from docker.types import Mount
-from ..utils import string_types
 from .platform import Backend, Result, FileResult
 
 from spython.main import Client
@@ -38,7 +37,7 @@ class Singularity(Backend):
                 raise "Could not connect to Singularity"
         self.instance = Client.instance(self.image)
 
-    def _bind_volume(self, volumes, local, remote, mode):
+    def _bind_volume(self, local, remote, mode):
         # b = {'bind': remote, 'mode': mode}
         # if local in volumes:
         #     volumes[local].append(b)
@@ -50,6 +49,8 @@ class Singularity(Backend):
         import pandas as pd
         import textwrap
         from tabulate import tabulate
+
+        print(bindings['volumes'])
 
         t = pd.DataFrame([
             (i, j['bind'], j['mode']) for i in bindings['volumes'].keys(
@@ -74,7 +75,7 @@ class Singularity(Backend):
 
     def run(self, flags="", **kwargs):
 
-        bindings = self._set_bindings(**kwargs)
+        self._set_bindings(**kwargs)
 
         self._load_logging(bindings)
         print(bindings)
@@ -96,7 +97,7 @@ class Singularity(Backend):
 
     def utils(self, flags="", **kwargs):
 
-        bindings = self._set_bindings(**kwargs)
+        self._set_bindings(**kwargs)
 
         [
             print(o, end="") for o in Client.run(
