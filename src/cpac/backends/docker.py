@@ -29,6 +29,9 @@ class Docker(Backend):
         self.volumes = {}
 
     def _bind_volume(self, local, remote, mode):
+        local = os.path.abspath(local)
+        os.makedirs(os.path.dirname(local), exist_ok=True)
+        remote = os.path.abspath(remote)
         b = {'bind': remote, 'mode': Permission_mode(mode)}
         if local in self.volumes:
             if remote in [binding['bind'] for binding in self.volumes[local]]:
@@ -72,27 +75,9 @@ class Docker(Backend):
 
         self._set_bindings(**kwargs)
 
-        if isinstance(
-            kwargs['bids_dir'], str
-        ) and not kwargs['bids_dir'].startswith('s3://'):
-            b = {
-                'bind': '/bids_dir',
-                'mode': 'ro'
-            }
-            if kwargs['bids_dir'] in self.bindings['volumes']:
-                self.bindings['volumes'][kwargs['bids_dir']].append(b)
-            else:
-                self.bindings['volumes'][kwargs['bids_dir']] = [b]
-            self.bindings['mounts'].append('/bids_dir:{}:ro'.format(
-                kwargs['bids_dir']
-            ))
-        else:
-            kwargs['bids_dir'] = str(kwargs['bids_dir'])
-
         kwargs['command'] = [i for i in [
-            'run',
             kwargs['bids_dir'],
-            '/outputs',
+            kwargs['output_dir'],
             kwargs['level_of_analysis'],
             *flags.split(' ')
         ] if (i is not None and len(i))]
@@ -103,8 +88,8 @@ class Docker(Backend):
         self._set_bindings(**kwargs)
 
         kwargs['command'] = [i for i in [
-            kwargs.get('working_dir', 'NA'),
-            '/outputs',
+            kwargs.get('bids_dir', kwargs.get('working_dir', '/tmp')),
+            kwargs.get('output_dir', '/outputs'),
             'cli',
             '--',
             'utils',

@@ -18,14 +18,11 @@ def test_run_test_config():
 
     f = StringIO()
     with redirect_stdout(f):
-        main([
-            *(
-                'cpac run --address=8888:8888 '
-                's3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU'
-            ).split(' '),
-            wd,
-            *'test_config --participant_ndx=2'.split(' ')
-        ])
+        main((
+            'cpac run --address=8888:8888 '
+            f's3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU {wd} '
+            'test_config --participant_ndx=2'
+        ).split(' '))
     o = f.getvalue()
 
     assert(

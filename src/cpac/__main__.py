@@ -99,13 +99,8 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     run_parser.register('action', 'extend', ExtendAction)
-    run_parser.add_argument('--address', action='store', type=address)
-    run_parser.add_argument(
-        '--data_config_file',
-        help="YAML file containing the location of the data that is to be "
-             "processed.",
-        metavar="PATH"
-    )
+    # run_parser.add_argument('--address', action='store', type=address)
+
     run_parser.add_argument(
         'bids_dir',
         help="input dataset directory"
@@ -118,6 +113,12 @@ def parse_args(args):
     run_parser.add_argument(
         'level_of_analysis',
         choices=['participant', 'group', 'test_config']
+    )
+    run_parser.add_argument(
+        '--data_config_file',
+        help="YAML file containing the location of the data that is to be "
+             "processed.",
+        metavar="PATH"
     )
     run_parser.add_argument(
         'extra_args',
@@ -181,7 +182,7 @@ def main(args):
     args.bids_dir = args.bids_dir if hasattr(
         args,
         'bids_dir'
-    ) else None
+    ) else 'bids_dir'
 
     setup_logging(args.loglevel)
 

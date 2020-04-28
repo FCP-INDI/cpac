@@ -43,7 +43,7 @@ class Singularity(Backend):
         #     volumes[local].append(b)
         # else:
         #     volumes[local] = [b]
-        return(volumes)
+        pass
 
     def _load_logging(self, bindings):
         import pandas as pd
@@ -103,7 +103,9 @@ class Singularity(Backend):
             print(o, end="") for o in Client.run(
                 self.instance,
                 args=" ".join([
-                    'bids_dir outputs_dir cli -- utils',
+                    kwargs.get('bids_dir', 'bids_dir'),
+                    kwargs.get('output_dir', 'output_dir'),
+                    'cli -- utils',
                     *flags.split(' ')
                 ]).strip(' '),
                 stream=True,
