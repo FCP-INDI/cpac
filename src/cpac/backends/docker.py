@@ -14,7 +14,6 @@ from base64 import b64decode, b64encode
 from docker.types import Mount
 from tornado import httpclient
 
-from cpac.utils import Permission_mode
 from cpac.backends.platform import Backend, Result, FileResult
 
 class Docker(Backend):
@@ -27,23 +26,6 @@ class Docker(Backend):
         except docker.errors.APIError:  # pragma: no cover
             raise "Could not connect to Docker"
         self.volumes = {}
-
-    def _bind_volume(self, local, remote, mode):
-        local = os.path.abspath(local)
-        os.makedirs(os.path.dirname(local), exist_ok=True)
-        remote = os.path.abspath(remote)
-        b = {'bind': remote, 'mode': Permission_mode(mode)}
-        if local in self.volumes:
-            if remote in [binding['bind'] for binding in self.volumes[local]]:
-                for i, binding in enumerate(self.volumes[local]):
-                    self.volumes[local][i] = {
-                        'bind': remote,
-                        'mode': max([self.volumes[local][i]['mode'], b['mode']])
-                    }
-            else:
-                self.volumes[local].append(b)
-        else:
-            self.volumes[local] = [b]
 
     def _load_logging(self, image):
         import pandas as pd
@@ -101,7 +83,9 @@ class Docker(Backend):
 
     def _execute(self, command, **kwargs):
         image = ':'.join([
-            'fcpindi/c-pac',
+            kwargs['image'] if kwargs.get(
+                'image'
+            ) is not None else 'fcpindi/c-pac',
             self.bindings['tag']
         ])
 

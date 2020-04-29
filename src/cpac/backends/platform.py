@@ -2,6 +2,7 @@ import os
 import pwd
 import tempfile
 
+from cpac.utils import Permission_mode
 
 class Backend(object):
 
@@ -10,6 +11,26 @@ class Backend(object):
 
     def start(self, pipeline_config, subject_config):
         raise NotImplementedError()
+
+    def _bind_volume(self, local, remote, mode):
+        local, remote = self._prep_binding(local, remote)
+        b = {'bind': remote, 'mode': Permission_mode(mode)}
+        if local in self.volumes:
+            if remote in [binding['bind'] for binding in self.volumes[local]]:
+                for i, binding in enumerate(self.volumes[local]):
+                    self.volumes[local][i] = {
+                        'bind': remote,
+                        'mode': max([self.volumes[local][i]['mode'], b['mode']])
+                    }
+            else:
+                self.volumes[local].append(b)
+        else:
+            self.volumes[local] = [b]
+
+    def _prep_binding(self, binding_path_local, binding_path_remote):
+        binding_path_local = os.path.abspath(binding_path_local)
+        os.makedirs(os.path.dirname(binding_path_local), exist_ok=True)
+        return(binding_path_local, os.path.abspath(binding_path_remote))
 
     def _set_bindings(self, **kwargs):
         tag = kwargs.get('tag', None)

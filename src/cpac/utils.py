@@ -7,14 +7,14 @@ class Permission_mode():
 
     'rw' > 'w' > 'r'
     """
-    defined_modes = {'rw', 'w', 'r'}
+    defined_modes = {'rw', 'w', 'r', 'ro'}
 
     def __init__(self, fs_str):
 
         self.mode = fs_str.mode if isinstance(
             fs_str,
             Permission_mode
-        ) else fs_str
+        ) else 'r' if fs_str=='ro' else fs_str
         self.defined = self.mode in Permission_mode.defined_modes
         self._warn_if_undefined()
 

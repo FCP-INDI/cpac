@@ -37,14 +37,14 @@ def parse_args(args):
 
     parser.add_argument(
         '--image',
-        help='path to Singularity image file. Will attempt to pull from '
-             'Singularity Hub or Docker Hub if not provided.'
+        help='path to Singularity image file OR name of Docker image (eg, '
+             '"fcpindi/c-pac"). Will attempt to pull from Singularity Hub or '
+             'Docker Hub if not provided.'
     )
 
     parser.add_argument(
         '--tag',
         help='tag of the Docker image to use (eg, "latest" or "nightly"). '
-             'Ignored if IMAGE also provided.'
     )
 
     parser.add_argument(
