@@ -5,7 +5,7 @@ services:
 jobs:
   include:
     - python: 3.5
-      env: DISTRIB="conda" PYTHON_VERSION="3.6" COVERAGE="false"
+      env: DISTRIB="conda" PYTHON_VERSION="3.6" COVERAGE="true"
 install:
   - source tests/travis_install.sh
   - pip install -r requirements.txt
