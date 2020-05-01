@@ -103,6 +103,12 @@ class Singularity(Backend):
 
     def run(self, flags="", **kwargs):
         self._load_logging()
+        print(" ".join([
+            kwargs['bids_dir'],
+            kwargs['output_dir'],
+            kwargs['level_of_analysis'],
+            flags
+        ]).strip(' '))
         [
             print(o, end="") for o in self._try_to_stream(
                 args=" ".join([
@@ -117,6 +123,12 @@ class Singularity(Backend):
 
     def utils(self, flags="", **kwargs):
         self._load_logging()
+        print(" ".join([
+            kwargs.get('bids_dir', 'bids_dir'),
+            kwargs.get('output_dir', 'output_dir'),
+            'cli -- utils',
+            *flags.split(' ')
+        ]).strip(' '))
         [
             print(o, end="") for o in self._try_to_stream(
                 args=" ".join([

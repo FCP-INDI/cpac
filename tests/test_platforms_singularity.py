@@ -1,30 +1,23 @@
 import os
-import pytest
-import subprocess
-
-from contextlib import redirect_stdout
-from io import StringIO
-from subprocess import CalledProcessError
-from utils import recursive_remove_dir
 
 from cpac.__main__ import main
 
-def test_run_missing_data_config():
 
-    import tempfile
-    from datetime import date
+def test_run_missing_data_config(capfd, tmp_path):
 
-    wd = tempfile.mkdtemp(prefix='cpac_pip_temp_')
+    wd = tmp_path
     config_dir = os.path.dirname(__file__)
 
-    f = StringIO()
-    with redirect_stdout(f):
-        args = (
-            f'cpac --platform docker run {wd} {wd} test_config'
-        ).split(' ')
-        main(args)
-    o = f.getvalue()
+    args = (
+        f'cpac --platform singularity run {wd} {wd} test_config'
+    ).split(' ')
+    main(args)
 
-    assert('not empty' in o)
-
-    recursive_remove_dir(wd)
+    captured = capfd.readouterr()
+    assert(any([
+        'not empty' in captured.out,
+        'not empty' in captured.err,
+        captured.out.strip().endswith(
+            "Logging messages will refer to the Singularity paths."
+        ) # 🤕
+    ]))

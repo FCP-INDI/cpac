@@ -1,32 +1,24 @@
 import os
-from contextlib import redirect_stdout
-from cpac.__main__ import main
-from io import StringIO
-from utils import recursive_remove_dir
+import sys
+from shutil import rmtree
 
-def test_utils_help():
-    f = StringIO()
-    with redirect_stdout(f):
-        main('cpac utils --help'.split(' '))
-    o = f.getvalue()
+from cpac.__main__ import main, run
 
-    assert "Docker" in o
-    assert "COMMAND" in o
+def test_utils_help(capfd):
+    sys.argv=['cpac', '--platform', 'docker', 'utils', '--help']
+    run()
 
-def test_utils_new_settings_template():
-    import tempfile
-    wd = tempfile.mkdtemp(prefix='cpac_pip_temp_')
-    f = StringIO()
-    with redirect_stdout(f):
-        main((
-            f'cpac --working_dir {wd} --temp_dir {wd} --output_dir {wd} '
-            f'utils data_config new_settings_template'
-        ).split(' '))
+    captured = capfd.readouterr()
 
-    o = f.getvalue()
+    assert 'Docker' in captured.out
+    assert 'COMMAND' in captured.out
 
+def test_utils_new_settings_template(tmp_path):
+    wd = tmp_path
+    main((
+        f'cpac --platform docker --working_dir {wd} --temp_dir {wd} --output_dir {wd} '
+        f'utils data_config new_settings_template'
+    ).split(' '))
     template_path = os.path.join(wd, 'data_settings.yml')
 
     assert(os.path.exists(template_path))
-
-    recursive_remove_dir(wd)

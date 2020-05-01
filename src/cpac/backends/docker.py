@@ -114,7 +114,7 @@ class Docker(Backend):
             ]),
             volumes=self.bindings['mounts'],
             working_dir=kwargs.get('working_dir', '/tmp'),
-            **self.docker_kwargs_
+            **self.docker_kwargs
         ))
 
 
