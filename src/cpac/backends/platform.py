@@ -2,10 +2,9 @@ import os
 import pwd
 import tempfile
 
-from cpac.utils import Permission_mode
+from cpac.utils import Locals_to_bind, Permission_mode
 
 class Backend(object):
-
     def __init__(self):
         pass
 
@@ -20,7 +19,9 @@ class Backend(object):
                 for i, binding in enumerate(self.volumes[local]):
                     self.volumes[local][i] = {
                         'bind': remote,
-                        'mode': max([self.volumes[local][i]['mode'], b['mode']])
+                        'mode': max([
+                            self.volumes[local][i]['mode'], b['mode']
+                        ])
                     }
             else:
                 self.volumes[local].append(b)
@@ -48,6 +49,16 @@ class Backend(object):
             'working_dir',
             os.getcwd()
         )
+
+        if 'data_config_file' in kwargs and isinstance(
+            kwargs['data_config_file'], str
+        ) and os.path.exists(kwargs['data_config_file']):
+            dc_dir = os.path.dirname(kwargs['data_config_file'])
+            self._bind_volume(dc_dir, dc_dir, 'r')
+            locals_from_data_config = Locals_to_bind()
+            locals_from_data_config.from_config_file(kwargs['data_config_file'])
+            for local in locals_from_data_config.locals:
+                self._bind_volume(local, local, 'r')
 
         self._bind_volume(temp_dir, temp_dir, 'rw')
         self._bind_volume(output_dir, output_dir, 'rw')

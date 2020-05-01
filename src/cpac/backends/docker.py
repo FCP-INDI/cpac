@@ -8,7 +8,6 @@ import tempfile
 import hashlib
 import uuid
 import copy
-import pwd
 
 from base64 import b64decode, b64encode
 from docker.types import Mount
@@ -26,6 +25,25 @@ class Docker(Backend):
         except docker.errors.APIError:  # pragma: no cover
             raise "Could not connect to Docker"
         self.volumes = {}
+        self._set_bindings(**kwargs)
+        self.docker_kwargs = {}
+        if isinstance(kwargs['container_options'], list):
+            for opt in kwargs['container_options']:
+                if '=' in opt or ' ' in opt:
+                    delimiter = min([
+                        i for i in [
+                            opt.find('='), opt.find(' ')
+                        ] if i>0
+                    ])
+                    k = opt[:delimiter].lstrip('-').replace('-', '_')
+                    v = opt[delimiter+1:].strip('"').strip("'")
+                    if k in self.docker_kwargs:
+                        if isinstance(self.docker_kwargs[k], list):
+                            self.docker_kwargs[k].append(v)
+                        else:
+                            self.docker_kwargs[k] = [self.docker_kwargs[k], v]
+                    else:
+                        self.docker_kwargs[k] = v
 
     def _load_logging(self, image):
         import pandas as pd
@@ -54,9 +72,6 @@ class Docker(Backend):
         print("Logging messages will refer to the Docker paths.\n")
 
     def run(self, flags="", **kwargs):
-
-        self._set_bindings(**kwargs)
-
         kwargs['command'] = [i for i in [
             kwargs['bids_dir'],
             kwargs['output_dir'],
@@ -67,8 +82,6 @@ class Docker(Backend):
         self._execute(**kwargs)
 
     def utils(self, flags="", **kwargs):
-        self._set_bindings(**kwargs)
-
         kwargs['command'] = [i for i in [
             kwargs.get('bids_dir', kwargs.get('working_dir', '/tmp')),
             kwargs.get('output_dir', '/outputs'),
@@ -100,7 +113,8 @@ class Docker(Backend):
                 str(self.bindings['gid'])
             ]),
             volumes=self.bindings['mounts'],
-            working_dir=kwargs.get('working_dir', '/tmp')
+            working_dir=kwargs.get('working_dir', '/tmp'),
+            **self.docker_kwargs_
         ))
 
 

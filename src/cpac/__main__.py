@@ -92,6 +92,14 @@ def parse_args(args):
         metavar="PATH"
     )
 
+    parser.add_argument(
+        '-o', '--container_options',
+        dest='container_options',
+        nargs='+',
+        help="parameters and flags to pass through to Docker or Singularity",
+        metavar="OPT"
+    )
+
     subparsers = parser.add_subparsers(dest='command')
 
     run_parser = subparsers.add_parser(
@@ -156,28 +164,56 @@ def main(args):
     args = parse_args(args[1:])
 
     if not args.platform and "--platform" not in original_args:
-        try:
-            main([
-                original_args[0],
-                '--platform',
-                'docker',
-                *original_args[1:]
-            ])
-        except Exception as e:
-            main([
-                original_args[0],
-                '--platform',
-                'singularity',
-                *original_args[1:]
-            ])
-        return()
+        if args.image and os.path.exists(args.image):
+            args.platform = 'singularity'
+        else:
+            try:
+                main([
+                    original_args[0],
+                    '--platform',
+                    'docker',
+                    *original_args[1:]
+                ])
+            except Exception as e:
+                main([
+                    original_args[0],
+                    '--platform',
+                    'singularity',
+                    *original_args[1:]
+                ])
+            return
     else:
         del original_args
 
-    args.data_config_file = args.data_config_file if hasattr(
-        args,
-        'data_config_file'
-    ) else None
+    if any([
+        '--data_config_file' in arg for arg in args.extra_args
+    ]):
+        try:
+            args.data_config_file = args.extra_args[
+                args.extra_args.index('--data_config_file')+1
+            ]
+        except ValueError:
+            try:
+                args.data_config_file = [
+                    arg.split(
+                        '=',
+                        1
+                    )[1] for arg in args.extra_args if arg.startswith(
+                        '--data_config_file='
+                    )
+                ][0]
+            except:
+                raise ValueError(
+                    f"""Something about {[
+                        arg for arg in args.extra_args if
+                        '--data_config_file' in arg
+                    ]} is confusing."""
+                )
+    else:
+        args.data_config_file = args.data_config_file if hasattr(
+            args,
+            'data_config_file'
+        ) else None
 
     args.bids_dir = args.bids_dir if hasattr(
         args,

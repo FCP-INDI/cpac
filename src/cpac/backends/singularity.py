@@ -7,7 +7,6 @@ import tempfile
 import hashlib
 import uuid
 import copy
-import pwd
 
 from base64 import b64decode, b64encode
 from itertools import chain
@@ -17,7 +16,7 @@ from tornado import httpclient
 
 from cpac.backends.platform import Backend
 
-BINDING_MODES = {'r': 'ro', 'w': 'rw', 'rw': 'rw'}
+BINDING_MODES = {'ro': 'ro', 'w': 'rw', 'rw': 'rw'}
 
 class Singularity(Backend):
 
@@ -42,9 +41,13 @@ class Singularity(Backend):
                     raise "Could not connect to Singularity"
         self.instance = Client.instance(self.image)
         self.volumes = {}
+        self.options = list(chain.from_iterable(kwargs[
+            "container_options"
+        ])) if bool(kwargs.get("container_options")) else []
+        self._set_bindings(**kwargs)
 
     def _bindings_as_option(self):
-        return(
+        self.options += (
             ['-B', ','.join((chain.from_iterable([[
                 ':'.join([b for b in [
                     local,
@@ -71,8 +74,6 @@ class Singularity(Backend):
         ])
         t.columns = ['local', 'Singularity', 'mode']
 
-        print("")
-
         print(" ".join([
             "Loading Ⓢ",
             self.image,
@@ -84,7 +85,7 @@ class Singularity(Backend):
             '  '
         ))
 
-        print("Logging messages will refer to the Singularity paths.\n")
+        print("Logging messages will refer to the Singularity paths.")
 
     def _try_to_stream(self, args, options):
         try:
@@ -101,10 +102,7 @@ class Singularity(Backend):
             raise(e)
 
     def run(self, flags="", **kwargs):
-
-        self._set_bindings(**kwargs)
         self._load_logging()
-
         [
             print(o, end="") for o in self._try_to_stream(
                 args=" ".join([
@@ -113,23 +111,20 @@ class Singularity(Backend):
                     kwargs['level_of_analysis'],
                     flags
                 ]).strip(' '),
-                options=self._bindings_as_option()
+                options=self.options
             )
         ]
 
     def utils(self, flags="", **kwargs):
-
-        self._set_bindings(**kwargs)
         self._load_logging()
-
         [
-            print(o, end="") for o in self.self_try_to_stream(
+            print(o, end="") for o in self._try_to_stream(
                 args=" ".join([
                     kwargs.get('bids_dir', 'bids_dir'),
                     kwargs.get('output_dir', 'output_dir'),
                     'cli -- utils',
                     *flags.split(' ')
                 ]).strip(' '),
-                options=self._bindings_as_option()
+                options=self.options
             )
         ]
