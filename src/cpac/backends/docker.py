@@ -23,7 +23,7 @@ class Docker(Backend):
         try:
             self.client.ping()
         except docker.errors.APIError:  # pragma: no cover
-            raise "Could not connect to Docker"
+            raise OSError("Could not connect to Docker")
         self.volumes = {}
         self._set_bindings(**kwargs)
         self.docker_kwargs = {}

@@ -148,15 +148,16 @@ class Permission_mode():
         return(False)
 
 
-def ls_newest(directory, extension):
+def ls_newest(directory, extensions):
     """
-    Function to return the most-recently-modified of a given extension in a given directory
+    Function to return the most-recently-modified of a given extension in a
+    given directory
 
     Parameters
     ----------
     directory: str
 
-    extension: str
+    extension: iterable
 
     Returns
     -------
@@ -168,7 +169,9 @@ def ls_newest(directory, extension):
             d
         ) for d in os.listdir(
             directory
-        ) if d.endswith(extension.lstrip('.').lower())
+        ) if any([d.endswith(
+            extension.lstrip('.').lower()
+        ) for extension in extensions])
     ]
     ls.sort(key=lambda fp: os.stat(fp).st_mtime)
     try:

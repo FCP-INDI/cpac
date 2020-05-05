@@ -48,7 +48,7 @@ class Singularity(Backend):
                         pull_folder=os.getcwd()
                     )
                 except:  # pragma: no cover
-                    raise "Could not connect to Singularity"
+                    raise OSError("Could not connect to Singularity")
         self.instance = Client.instance(self.image)
         self.volumes = {}
         self.options = list(chain.from_iterable(kwargs[

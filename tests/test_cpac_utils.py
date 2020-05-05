@@ -12,10 +12,10 @@ PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION]
     (PLATFORM_ARGS[0], 'docker'),
     (PLATFORM_ARGS[1], 'singularity')
 ])
-def test_utils_help(args, capsys, platform):
+def test_utils_help(args, capfd, platform):
     sys.argv=['cpac', *args.split(' '), 'utils', '--help']
     run()
-    captured = capsys.readouterr()
+    captured = capfd.readouterr()
     assert platform.title() in captured.out
     assert 'COMMAND' in captured.out
 
