@@ -9,6 +9,7 @@ jobs:
 install:
   - source tests/travis_install.sh
   - pip install -r requirements.txt
+  - pip install twine
   - pip install .
 before_script:
   - git config --global user.email "support@travis-ci.org"
@@ -18,6 +19,7 @@ script:
 after_success:
   - if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; fi
   - bash .travis/update_README_usage.sh
+  - '[ "${TRAVIS_PULL_REQUEST}" = "true" ] && bash .travis/deploy_to_pypi.sh'
 after_script:
   - travis-cleanup
 cache:
