@@ -44,26 +44,6 @@ if [[ "$COVERAGE" == "true" ]]; then
     pip install coverage coveralls
 fi
 
-# Install Singularity <https://sylabs.io/guides/3.5/admin-guide/installation.html#installation-on-linux>
-sudo apt-get update && sudo apt-get install -y \
-    build-essential \
-    uuid-dev \
-    libgpgme-dev \
-    squashfs-tools \
-    libseccomp-dev \
-    wget \
-    pkg-config \
-    git
-
-export VERSION=3.5.3 && # adjust this as necessary \
-    wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && \
-    tar -xzf singularity-${VERSION}.tar.gz && \
-    cd singularity
-./mconfig && \
-    make -C ./builddir && \
-    sudo make -C ./builddir install && \
-    cd ..
-
 travis-cleanup() {
     printf "Cleaning up environments ... "  # printf avoids new lines
     if [[ "$DISTRIB" == "conda" ]]; then
