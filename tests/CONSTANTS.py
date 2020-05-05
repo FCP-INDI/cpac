@@ -2,8 +2,8 @@ import os
 
 from cpac.utils import ls_newest
 
-
-SINGULARITY_OPTION = ls_newest(os.getcwd(), ['sif', 'simg'])
-SINGULARITY_OPTION = f'--image {SINGULARITY_OPTION} --quiet' if (
-    SINGULARITY_OPTION is not None
-) else '--platform singularity'
+def SINGULARITY_OPTION():
+    singularity_option = ls_newest(os.getcwd(), ['sif', 'simg'])
+    return(f'--image {singularity_option}' if (
+        singularity_option is not None
+    ) else '--platform singularity')

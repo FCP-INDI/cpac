@@ -5,17 +5,17 @@ from shutil import rmtree
 
 from cpac.__main__ import run
 from CONSTANTS import SINGULARITY_OPTION
-PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION]
+PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION()]
 
 
 @pytest.mark.parametrize('args,platform', [
     (PLATFORM_ARGS[0], 'docker'),
     (PLATFORM_ARGS[1], 'singularity')
 ])
-def test_utils_help(args, capfd, platform):
+def test_utils_help(args, capsys, platform):
     sys.argv=['cpac', *args.split(' '), 'utils', '--help']
     run()
-    captured = capfd.readouterr()
+    captured = capsys.readouterr()
     assert platform.title() in captured.out
     assert 'COMMAND' in captured.out
 
