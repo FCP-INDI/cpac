@@ -160,7 +160,6 @@ def setup_logging(loglevel):
 
 
 def main(args):
-    print(args)
     original_args = args
     command = args[0]
     args = parse_args(args[1:])
@@ -225,7 +224,6 @@ def main(args):
     setup_logging(args.loglevel)
 
     arg_vars = vars(args)
-    print(arg_vars)
     if args.command == 'run':
         if '--help' in arg_vars or '--help' in args.extra_args:
             pwd = os.getcwd()

@@ -23,8 +23,10 @@ class Singularity(Backend):
     def __init__(self, **kwargs):
         image = kwargs["image"] if "image" in kwargs else None
         tag = kwargs["tag"] if "tag" in kwargs else None
-        print(image)
-        print(tag)
+        pwd = os.getcwd()
+        if kwargs.get("working_dir") is not None:
+            pwd = kwargs["working_dir"]
+            os.chdir(pwd)
         print("Loading Ⓢ Singularity")
         if image and isinstance(image, str) and os.path.exists(image):
             self.image = image

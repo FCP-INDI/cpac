@@ -1,24 +1,32 @@
 import os
+import pytest
 import sys
 from shutil import rmtree
 
-from cpac.__main__ import main, run
+from cpac.__main__ import run
+from CONSTANTS import SINGULARITY_OPTION
+PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION]
 
-def test_utils_help(capfd):
-    sys.argv=['cpac', '--platform', 'docker', 'utils', '--help']
+
+@pytest.mark.parametrize('args,platform', [
+    (PLATFORM_ARGS[0], 'docker'),
+    (PLATFORM_ARGS[1], 'singularity')
+])
+def test_utils_help(args, capsys, platform):
+    sys.argv=['cpac', *args.split(' '), 'utils', '--help']
     run()
-
-    captured = capfd.readouterr()
-
-    assert 'Docker' in captured.out
+    captured = capsys.readouterr()
+    assert platform.title() in captured.out
     assert 'COMMAND' in captured.out
 
-def test_utils_new_settings_template(tmp_path):
-    wd = tmp_path
-    main((
-        f'cpac --platform docker --working_dir {wd} --temp_dir {wd} --output_dir {wd} '
-        f'utils data_config new_settings_template'
-    ).split(' '))
-    template_path = os.path.join(wd, 'data_settings.yml')
 
+@pytest.mark.parametrize('args', PLATFORM_ARGS)
+def test_utils_new_settings_template(args, tmp_path):
+    wd = tmp_path
+    sys.argv = (
+        f'cpac {args} --working_dir {wd} --temp_dir {wd} --output_dir {wd} '
+        f'utils data_config new_settings_template'
+    ).split(' ')
+    run()
+    template_path = os.path.join(wd, 'data_settings.yml')
     assert(os.path.exists(template_path))

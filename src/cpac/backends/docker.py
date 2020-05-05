@@ -56,8 +56,6 @@ class Docker(Backend):
         ])
         t.columns = ['local', 'Docker', 'mode']
 
-        print("")
-
         print(" ".join([
             "Loading 🐳",
             image,
