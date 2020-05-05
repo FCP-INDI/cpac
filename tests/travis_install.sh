@@ -55,13 +55,6 @@ sudo apt-get update && sudo apt-get install -y \
     pkg-config \
     git
 
-wget -O go.tar.gz https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz && \
-    sudo tar -C /usr/local -xzf go.tar.gz && \
-    export PATH=$PATH:/usr/local/go/bin && \
-    echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
-    echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
-    source ~/.bashrc
-
 export VERSION=3.5.3 && # adjust this as necessary \
     wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && \
     tar -xzf singularity-${VERSION}.tar.gz && \

@@ -3,6 +3,7 @@ import pytest
 import sys
 
 from datetime import date
+from subprocess import CalledProcessError
 
 from cpac.__main__ import run
 from CONSTANTS import SINGULARITY_OPTION
@@ -17,11 +18,25 @@ PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION()]
 @pytest.mark.parametrize('args', PLATFORM_ARGS)
 def test_run_help(args, capsys):
     sys.argv=['cpac', *args.split(' '), 'run', '--help']
-    print(' '.join(sys.argv))
     run()
     captured = capsys.readouterr()
     assert 'participant' in captured.out or 'participant' in captured.err
 
+@pytest.mark.parametrize('args', PLATFORM_ARGS)
+def test_run_missing_data_config(args, capsys, tmp_path):
+    wd = tmp_path
+    sys.argv=(f'cpac {args} run {wd} {wd} test_config').split(' ')
+    checkstring = ""
+    if 'docker' not in args:
+        with pytest.raises(CalledProcessError) as singularity_raises:
+            run()
+            checkstring = str(singularity_raises.value)
+    else:
+        run()
+        checkstring = ""
+    captured = capsys.readouterr()
+    print(checkstring)
+    assert('not empty' in '\n'.join([checkstring, captured.err, captured.out]))
 
 @pytest.mark.parametrize('args', PLATFORM_ARGS)
 def test_run_test_config(args, capsys, tmp_path):
@@ -36,13 +51,3 @@ def test_run_test_config(args, capsys, tmp_path):
     assert(
         any([date.today().isoformat() in fp for fp in os.listdir(wd)])
     )
-
-
-@pytest.mark.parametrize('args', PLATFORM_ARGS)
-def test_run_missing_data_config(args, capsys, tmp_path):
-    wd = tmp_path
-    sys.argv=(f'cpac {args} run {wd} {wd} test_config').split(' ')
-    print(' '.join(sys.argv))
-    run()
-    captured = capsys.readouterr()
-    assert('not empty' in '\n'.join([captured.err, captured.out]))
