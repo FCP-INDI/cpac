@@ -21,13 +21,18 @@ BINDING_MODES = {'ro': 'ro', 'w': 'rw', 'rw': 'rw'}
 class Singularity(Backend):
 
     def __init__(self, **kwargs):
-        image = kwargs["image"] if "image" in kwargs else "fcpindi/c-pac"
+        image = kwargs["image"] if "image" in kwargs else None
         tag = kwargs["tag"] if "tag" in kwargs else None
+        print(image)
+        print(tag)
         print("Loading Ⓢ Singularity")
-        if image and os.path.exists(image):
+        if image and isinstance(image, str) and os.path.exists(image):
             self.image = image
-        elif tag:
-            self.image = f"docker://{image}:{tag}"
+        elif tag and isinstace(tag, str):
+            self.image = Client.pull(
+                f"docker://{image}:{tag}",
+                pull_folder=os.getcwd()
+            )
         else:
             try:
                 self.image = Client.pull(
@@ -36,7 +41,10 @@ class Singularity(Backend):
                 )
             except:
                 try:
-                    self.image = f"docker://fcpindi/c-pac:latest"
+                    self.image = Client.pull(
+                        f"docker://fcpindi/c-pac:latest",
+                        pull_folder=os.getcwd()
+                    )
                 except:  # pragma: no cover
                     raise "Could not connect to Singularity"
         self.instance = Client.instance(self.image)
@@ -90,53 +98,47 @@ class Singularity(Backend):
     def _try_to_stream(self, args, options):
         try:
             yield from next(
-                Client.run(
-                    self.instance,
-                    args=args,
-                    options=options,
-                    stream=True,
-                    return_result=True
-                )
+
             )
         except Exception as e:
             raise(e)
 
     def run(self, flags="", **kwargs):
         self._load_logging()
-        print(" ".join([
-            kwargs['bids_dir'],
-            kwargs['output_dir'],
-            kwargs['level_of_analysis'],
-            flags
-        ]).strip(' '))
-        [
-            print(o, end="") for o in self._try_to_stream(
-                args=" ".join([
-                    kwargs['bids_dir'],
-                    kwargs['output_dir'],
-                    kwargs['level_of_analysis'],
-                    flags
-                ]).strip(' '),
-                options=self.options
-            )
-        ]
+        for o in Client.run(
+            self.instance,
+            args=" ".join([
+                kwargs['bids_dir'],
+                kwargs['output_dir'],
+                kwargs['level_of_analysis'],
+                flags
+            ]).strip(' '),
+            options=self.options,
+            stream=True,
+            return_result=True
+        ):
+            try:
+                print(o)
+            except CalledProcessError as e:
+                print(e)
+                print(dir(e))
 
     def utils(self, flags="", **kwargs):
         self._load_logging()
-        print(" ".join([
-            kwargs.get('bids_dir', 'bids_dir'),
-            kwargs.get('output_dir', 'output_dir'),
-            'cli -- utils',
-            *flags.split(' ')
-        ]).strip(' '))
-        [
-            print(o, end="") for o in self._try_to_stream(
-                args=" ".join([
-                    kwargs.get('bids_dir', 'bids_dir'),
-                    kwargs.get('output_dir', 'output_dir'),
-                    'cli -- utils',
-                    *flags.split(' ')
-                ]).strip(' '),
-                options=self.options
-            )
-        ]
+        for o in Client.run(
+            self.instance,
+            args=" ".join([
+                kwargs.get('bids_dir', 'bids_dir'),
+                kwargs.get('output_dir', 'output_dir'),
+                'cli -- utils',
+                *flags.split(' ')
+            ]).strip(' '),
+            options=self.options,
+            stream=True,
+            return_result=True
+        ):
+            try:
+                print(o)
+            except CalledProcessError as e:
+                print(e)
+                print(dir(e))

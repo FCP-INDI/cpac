@@ -30,7 +30,8 @@ def parse_args(args):
 
     parser = argparse.ArgumentParser(
         description="cpac: a Python package that simplifies using C-PAC "
-                    "<http://fcp-indi.github.io> containerized images."
+                    "<http://fcp-indi.github.io> containerized images.",
+        conflict_handler='resolve'
     )
 
     parser.add_argument('--platform', choices=['docker', 'singularity'])
@@ -104,35 +105,35 @@ def parse_args(args):
 
     run_parser = subparsers.add_parser(
         'run',
+        add_help=False,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
+
+    help_call = '--help' in sys.argv
     run_parser.register('action', 'extend', ExtendAction)
     # run_parser.add_argument('--address', action='store', type=address)
 
-    run_parser.add_argument(
-        'bids_dir',
-        help="input dataset directory"
-    )
-    run_parser.add_argument(
-        'output_dir',
-        default=os.path.join(cwd, 'outputs'),
-        help="directory where output files should be stored"
-    )
-    run_parser.add_argument(
-        'level_of_analysis',
-        choices=['participant', 'group', 'test_config']
-    )
+    if not help_call:
+        # These positional arguments are required unless we're just getting
+        # the helpstring
+        run_parser.add_argument(
+            'bids_dir'
+        )
+        run_parser.add_argument(
+            'output_dir',
+            default=os.path.join(cwd, 'outputs')
+        )
+        run_parser.add_argument(
+            'level_of_analysis',
+            choices=['participant', 'group', 'test_config']
+        )
     run_parser.add_argument(
         '--data_config_file',
-        help="YAML file containing the location of the data that is to be "
-             "processed.",
         metavar="PATH"
     )
     run_parser.add_argument(
         'extra_args',
-        nargs=argparse.REMAINDER,
-        help="any C-PAC optional arguments "
-             "<http://fcp-indi.github.io/docs/user/running>"
+        nargs=argparse.REMAINDER
     )
 
     utils_parser = subparsers.add_parser(
@@ -159,6 +160,7 @@ def setup_logging(loglevel):
 
 
 def main(args):
+    print(args)
     original_args = args
     command = args[0]
     args = parse_args(args[1:])
@@ -223,16 +225,23 @@ def main(args):
     setup_logging(args.loglevel)
 
     arg_vars = vars(args)
-
+    print(arg_vars)
     if args.command == 'run':
+        if '--help' in arg_vars or '--help' in args.extra_args:
+            pwd = os.getcwd()
+            if arg_vars.get('level_of_analysis') is None:
+                arg_vars['level_of_analysis'] = 'participant'
+            for arg in ['output_dir', 'bids_dir']:
+                if arg_vars.get(arg) is None:
+                    arg_vars[arg] = pwd
         Backends(**arg_vars).run(
-            flags=" ".join(args.extra_args),
+            flags=' '.join(args.extra_args),
             **arg_vars
         )
 
     if args.command == 'utils':
         Backends(**arg_vars).utils(
-            flags=" ".join(args.extra_args),
+            flags=' '.join(args.extra_args),
             **arg_vars
         )
 

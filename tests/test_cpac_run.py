@@ -1,26 +1,32 @@
 import os
+import pytest
 import sys
 
 from datetime import date
 
-from cpac.__main__ import main, run
+from cpac.__main__ import run
+from cpac.utils import ls_newest
+from CONSTANTS import SINGULARITY_OPTION
+PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION]
 
-def test_run_help(capfd):
-    sys.argv=['cpac', '--platform', 'docker', 'run', '--help']
+@pytest.mark.parametrize('args', PLATFORM_ARGS)
+def test_run_help(args, capsys):
+    sys.argv=['cpac', *args.split(' '), 'run', '--help']
     run()
 
-    captured = capfd.readouterr()
+    captured = capsys.readouterr()
 
-    assert 'participant' in captured.out
+    assert 'participant' in captured.out or 'participant' in captured.err
 
-def test_run_test_config(capsys, tmp_path):
+@pytest.mark.parametrize('args', PLATFORM_ARGS)
+def test_run_test_config(args, capsys, tmp_path):
     wd = tmp_path
-
-    main((
-        'cpac run '
+    sys.argv=(
+        f'cpac {args} run '
         f's3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU {wd} '
         'test_config --participant_ndx=2'
-    ).split(' '))
+    ).split(' ')
+    run()
 
     captured = capsys.readouterr()
 

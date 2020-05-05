@@ -146,3 +146,32 @@ class Permission_mode():
             )
             return(True)
         return(False)
+
+
+def ls_newest(directory, extension):
+    """
+    Function to return the most-recently-modified of a given extension in a given directory
+
+    Parameters
+    ----------
+    directory: str
+
+    extension: str
+
+    Returns
+    -------
+    full_path_to_file: str or None if none found
+    """
+    ls = [
+        os.path.join(
+            directory,
+            d
+        ) for d in os.listdir(
+            directory
+        ) if d.endswith(extension.lstrip('.').lower())
+    ]
+    ls.sort(key=lambda fp: os.stat(fp).st_mtime)
+    try:
+        return(ls[-1])
+    except IndexError:
+        return(None)

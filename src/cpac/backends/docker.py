@@ -99,7 +99,9 @@ class Docker(Backend):
             kwargs['image'] if kwargs.get(
                 'image'
             ) is not None else 'fcpindi/c-pac',
-            self.bindings['tag']
+            self.bindings['tag'] if self.bindings.get(
+                'tag'
+            ) is not None else 'latest'
         ])
 
         self._load_logging(image)

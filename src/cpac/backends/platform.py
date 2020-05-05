@@ -30,12 +30,12 @@ class Backend(object):
 
     def _prep_binding(self, binding_path_local, binding_path_remote):
         binding_path_local = os.path.abspath(binding_path_local)
-        os.makedirs(os.path.dirname(binding_path_local), exist_ok=True)
+        os.makedirs(binding_path_local, exist_ok=True)
         return(binding_path_local, os.path.abspath(binding_path_remote))
 
     def _set_bindings(self, **kwargs):
         tag = kwargs.get('tag', None)
-        tag = tag if isinstance(tag, str) else 'latest'
+        tag = tag if isinstance(tag, str) else None
 
         temp_dir = kwargs.get(
             'temp_dir',
