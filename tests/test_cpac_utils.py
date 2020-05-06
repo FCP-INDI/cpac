@@ -1,7 +1,8 @@
 import os
 import pytest
 import sys
-from shutil import rmtree
+
+from unittest import mock
 
 from cpac.__main__ import run
 from CONSTANTS import SINGULARITY_OPTION
@@ -13,20 +14,22 @@ PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION()]
     (PLATFORM_ARGS[1], 'singularity')
 ])
 def test_utils_help(args, capsys, platform):
-    sys.argv=['cpac', *args.split(' '), 'utils', '--help']
-    run()
-    captured = capsys.readouterr()
-    assert platform.title() in captured.out
-    assert 'COMMAND' in captured.out
+    argv=['cpac', *args.split(' '), 'utils', '--help']
+    with mock.patch.object(sys, 'argv', argv):
+        run()
+        captured = capsys.readouterr()
+        assert platform.title() in captured.out
+        assert 'COMMAND' in captured.out
 
 
 @pytest.mark.parametrize('args', PLATFORM_ARGS)
 def test_utils_new_settings_template(args, tmp_path):
     wd = tmp_path
-    sys.argv = (
+    argv = (
         f'cpac {args} --working_dir {wd} --temp_dir {wd} --output_dir {wd} '
         f'utils data_config new_settings_template'
     ).split(' ')
-    run()
-    template_path = os.path.join(wd, 'data_settings.yml')
-    assert(os.path.exists(template_path))
+    with mock.patch.object(sys, 'argv', argv):
+        run()
+        template_path = os.path.join(wd, 'data_settings.yml')
+        assert(os.path.exists(template_path))
