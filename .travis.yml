@@ -35,6 +35,7 @@ install:
 before_script:
   - git config --global user.email "support@travis-ci.org"
   - git config --global user.name "Travis"
+  - singularity pull shub://FCP-INDI/C-PAC
 script:
   - coverage run --source=cpac setup.py test
 after_success:
