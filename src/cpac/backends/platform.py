@@ -31,7 +31,10 @@ class Backend(object):
     def _prep_binding(self, binding_path_local, binding_path_remote):
         binding_path_local = os.path.abspath(binding_path_local)
         os.makedirs(binding_path_local, exist_ok=True)
-        return(binding_path_local, os.path.abspath(binding_path_remote))
+        return(
+            os.path.realpath(binding_path_local),
+            os.path.abspath(binding_path_remote)
+        )
 
     def _set_bindings(self, **kwargs):
         tag = kwargs.get('tag', None)
@@ -50,6 +53,12 @@ class Backend(object):
             os.getcwd()
         )
 
+        for f in ['pipeline_file', 'group_file']:
+            if f in kwargs and isinstance(kwargs, str) and os.path.exists(
+                kwargs[f]
+            ):
+                d = os.path.dirname(kwargs[f])
+                self._bind_volume(d, d, 'r')
         if 'data_config_file' in kwargs and isinstance(
             kwargs['data_config_file'], str
         ) and os.path.exists(kwargs['data_config_file']):
@@ -59,10 +68,23 @@ class Backend(object):
             locals_from_data_config.from_config_file(kwargs['data_config_file'])
             for local in locals_from_data_config.locals:
                 self._bind_volume(local, local, 'r')
-
         self._bind_volume(temp_dir, temp_dir, 'rw')
         self._bind_volume(output_dir, output_dir, 'rw')
         self._bind_volume(working_dir, working_dir, 'rw')
+        for d in ['bids_dir', 'output_dir']:
+            if d in kwargs and isinstance(kwargs[d], str) and os.path.exists(
+                kwargs[d]
+            ):
+                self._bind_volume(
+                    kwargs[d],
+                    kwargs[d],
+                    'rw' if d=='output_dir' else 'r'
+                )
+        for i in range(len(kwargs['extra_args'])):
+            if kwargs['extra_args'][i]=='run':
+                # positional argument bids_dir
+                if i+1<len(kwargs['extra_args']):
+                    self._bind_volume()
 
         uid = os.getuid()
 

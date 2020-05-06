@@ -83,27 +83,16 @@ class Singularity(Backend):
             ) for j in self.bindings['volumes'][i]
         ])
         t.columns = ['local', 'Singularity', 'mode']
-
         print(" ".join([
             "Loading Ⓢ",
             self.image,
             "with these directory bindings:"
         ]))
-
         print(textwrap.indent(
             tabulate(t, headers='keys', showindex=False),
             '  '
         ))
-
         print("Logging messages will refer to the Singularity paths.")
-
-    def _try_to_stream(self, args, options):
-        try:
-            yield from next(
-
-            )
-        except Exception as e:
-            raise(e)
 
     def run(self, flags="", **kwargs):
         self._load_logging()
@@ -123,7 +112,6 @@ class Singularity(Backend):
                 print(o)
             except CalledProcessError as e:
                 print(e)
-                print(dir(e))
 
     def utils(self, flags="", **kwargs):
         self._load_logging()
@@ -143,4 +131,3 @@ class Singularity(Backend):
                 print(o)
             except CalledProcessError as e:
                 print(e)
-                print(dir(e))
