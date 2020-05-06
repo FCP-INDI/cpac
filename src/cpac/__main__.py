@@ -29,8 +29,10 @@ def parse_args(args):
     cwd = os.getcwd()
 
     parser = argparse.ArgumentParser(
-        description="cpac: a Python package that simplifies using C-PAC "
-                    "<http://fcp-indi.github.io> containerized images.",
+        description='cpac: a Python package that simplifies using C-PAC '
+                    '<http://fcp-indi.github.io> containerized images. If no '
+                    'platform nor image is specified, cpac will try Docker '
+                    'first, then try Singularity if Docker fails.',
         conflict_handler='resolve'
     )
 
