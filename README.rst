@@ -15,7 +15,9 @@ Dependencies
 
 * `Python <https://www.python.org>`_ ≥3.5
 * `pip <https://pip.pypa.io>`_
+At least one of:
 * `Docker <https://www.docker.com>`_
+* `Singularity <https://sylabs.io/singularity>`_ ≥2.5&≤3.0
 
 Usage
 =====
