@@ -48,7 +48,7 @@ before_script:
   - git config --global user.name "Travis"
   - singularity pull shub://FCP-INDI/C-PAC
 script:
-  - coverage run --source=cpac setup.py test
+  - coverage run -m pytest
 after_success:
   - if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; fi
   - bash .travis/update_README_usage.sh
