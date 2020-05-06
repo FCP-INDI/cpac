@@ -1,5 +1,5 @@
 os: linux
-language: go
+language: python
 dist: bionic
 go:
   - "1.14"
@@ -52,7 +52,7 @@ script:
 after_success:
   - if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; fi
   - bash .travis/update_README_usage.sh
-  - '[ "${TRAVIS_PULL_REQUEST}" = "true" ] && bash .travis/deploy_to_pypi.sh'
+  - if [[ "$TRAVIS_PULL_REQUEST" == "true" ]]; then bash .travis/deploy_to_pypi.sh; fi
 after_script:
   - travis-cleanup
 cache:
