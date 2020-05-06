@@ -37,7 +37,7 @@ before_install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - conda activate test-environment
   - sudo chmod u+x .travis/*.sh
-  - /bin/bash .travis/setup.sh
+  - /bin/bash .travis/setup_singularity.sh
 install:
   - source tests/travis_install.sh
   - pip install -r requirements.txt
