@@ -111,7 +111,7 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
-    help_call = '--help' in sys.argv
+    help_call = '--help' in sys.argv or '-h' in sys.argv
     run_parser.register('action', 'extend', ExtendAction)
     # run_parser.add_argument('--address', action='store', type=address)
 
@@ -226,7 +226,12 @@ def main(args):
 
     arg_vars = vars(args)
     if args.command == 'run':
-        if '--help' in arg_vars or '--help' in args.extra_args:
+        if any([
+            '--help' in arg_vars,
+            '-h' in arg_vars,
+            '--help' in args.extra_args,
+            '-h' in args.extra_args
+        ]):
             pwd = os.getcwd()
             if arg_vars.get('level_of_analysis') is None:
                 arg_vars['level_of_analysis'] = 'participant'
