@@ -15,7 +15,7 @@ PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION()]
     ('', '')
 ])
 def test_utils_help(args, capsys, platform):
-    argv=['cpac', *args.split(' '), 'utils', '--help']
+    argv = ['cpac', *args.split(' '), 'utils', '--help']
     with mock.patch.object(sys, 'argv', [arg for arg in argv if len(arg)]):
         run()
         captured = capsys.readouterr()

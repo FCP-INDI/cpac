@@ -19,7 +19,7 @@ class ExtendAction(argparse.Action):
         setattr(namespace, self.dest, items)
 
 
-def address(str): # pragma: no cover
+def address(str):  # pragma: no cover
     addr, port = str.split(':')
     port = int(port)
     return addr, port
@@ -163,7 +163,6 @@ def setup_logging(loglevel):
 
 def main(args):
     original_args = args
-    command = args[0]
     args = parse_args(args[1:])
 
     if not args.platform and "--platform" not in original_args:
@@ -177,14 +176,14 @@ def main(args):
                     'docker',
                     *original_args[1:]
                 ])
-            except Exception as e: # pragma: no cover
+            except Exception:  # pragma: no cover
                 main([
                     original_args[0],
                     '--platform',
                     'singularity',
                     *original_args[1:]
                 ])
-            return # pragma: no cover
+            return  # pragma: no cover
     else:
         del original_args
 
@@ -205,7 +204,7 @@ def main(args):
                         '--data_config_file='
                     )
                 ][0]
-            except: # pragma: no cover
+            except Exception:  # pragma: no cover
                 raise ValueError(
                     f"""Something about {[
                         arg for arg in args.extra_args if

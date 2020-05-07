@@ -4,9 +4,10 @@ import tempfile
 
 from cpac.utils import Locals_to_bind, Permission_mode
 
+
 class Backend(object):
     def __init__(self):
-        pass # pragma: no cover
+        pass  # pragma: no cover
 
     def start(self, pipeline_config, subject_config):
         raise NotImplementedError()
@@ -65,7 +66,9 @@ class Backend(object):
             dc_dir = os.path.dirname(kwargs['data_config_file'])
             self._bind_volume(dc_dir, dc_dir, 'r')
             locals_from_data_config = Locals_to_bind()
-            locals_from_data_config.from_config_file(kwargs['data_config_file'])
+            locals_from_data_config.from_config_file(
+                kwargs['data_config_file']
+            )
             for local in locals_from_data_config.locals:
                 self._bind_volume(local, local, 'r')
         self._bind_volume(temp_dir, temp_dir, 'rw')
@@ -78,7 +81,7 @@ class Backend(object):
                 self._bind_volume(
                     kwargs[d],
                     kwargs[d],
-                    'rw' if d=='output_dir' else 'r'
+                    'rw' if d == 'output_dir' else 'r'
                 )
 
         uid = os.getuid()

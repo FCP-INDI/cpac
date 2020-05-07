@@ -1,25 +1,15 @@
 import os
-import time
-import json
-import glob
-import shutil
-import tempfile
-import hashlib
-import uuid
-import copy
 
-from base64 import b64decode, b64encode
 from itertools import chain
 from spython.main import Client
 from subprocess import CalledProcessError
-from tornado import httpclient
 
 from cpac.backends.platform import Backend
 
 BINDING_MODES = {'ro': 'ro', 'w': 'rw', 'rw': 'rw'}
 
-class Singularity(Backend):
 
+class Singularity(Backend):
     def __init__(self, **kwargs):
         image = kwargs["image"] if "image" in kwargs else None
         tag = kwargs["tag"] if "tag" in kwargs else None
@@ -30,24 +20,24 @@ class Singularity(Backend):
         print("Loading Ⓢ Singularity")
         if image and isinstance(image, str) and os.path.exists(image):
             self.image = image
-        elif tag and isinstace(tag, str): # pragma: no cover
+        elif tag and isinstance(tag, str):  # pragma: no cover
             self.image = Client.pull(
                 f"docker://{image}:{tag}",
                 pull_folder=os.getcwd()
             )
-        else: # pragma: no cover
+        else:  # pragma: no cover
             try:
                 self.image = Client.pull(
                     "shub://FCP-INDI/C-PAC",
                     pull_folder=os.getcwd()
                 )
-            except:
+            except Exception:
                 try:
                     self.image = Client.pull(
                         f"docker://fcpindi/c-pac:latest",
                         pull_folder=os.getcwd()
                     )
-                except:
+                except Exception:
                     raise OSError("Could not connect to Singularity")
         self.instance = Client.instance(self.image)
         self.volumes = {}
@@ -61,11 +51,11 @@ class Singularity(Backend):
             ['-B', ','.join((chain.from_iterable([[
                 ':'.join([b for b in [
                     local,
-                    binding['bind'] if \
-                    local!=binding['bind'] or \
-                    BINDING_MODES[str(binding['mode'])]!='rw' else None,
-                    BINDING_MODES[str(binding['mode'])] if \
-                    BINDING_MODES[str(binding['mode'])]!='rw' else None
+                    binding['bind'] if
+                    local != binding['bind'] or
+                    BINDING_MODES[str(binding['mode'])] != 'rw' else None,
+                    BINDING_MODES[str(binding['mode'])] if
+                    BINDING_MODES[str(binding['mode'])] != 'rw' else None
                 ] if b is not None]) for binding in self.volumes[local]
             ] for local in self.volumes])))]
         )
@@ -110,7 +100,7 @@ class Singularity(Backend):
         ):
             try:
                 print(o)
-            except CalledProcessError as e: # pragma: no cover
+            except CalledProcessError as e:  # pragma: no cover
                 print(e)
 
     def utils(self, flags="", **kwargs):
@@ -129,5 +119,5 @@ class Singularity(Backend):
         ):
             try:
                 print(o)
-            except CalledProcessError as e: # pragma: no cover
+            except CalledProcessError as e:  # pragma: no cover
                 print(e)

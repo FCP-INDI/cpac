@@ -49,16 +49,6 @@ class Locals_to_bind():
     def _local_common_paths(self):
         new_locals = set()
         stragglers = set()
-        for i in list(permutations(self.locals, 3)):
-            c = common_path(i)
-            if len(c)>1:
-                new_locals.add(c)
-            else:
-                for f in i:
-                    stragglers.add(f)
-        self.locals = new_locals | {s for s in stragglers if not any([
-            s.startswith(n) for n in new_locals
-        ])}
 
         def common_path(paths):
             x = os.path.commonprefix(list(paths))
@@ -66,6 +56,16 @@ class Locals_to_bind():
                 x = x[:-2]
             x
             return(x)
+        for i in list(permutations(self.locals, 3)):
+            c = common_path(i)
+            if len(c) > 1:
+                new_locals.add(c)
+            else:
+                for f in i:
+                    stragglers.add(f)
+        self.locals = new_locals | {s for s in stragglers if not any([
+            s.startswith(n) for n in new_locals
+        ])}
 
 
 class Permission_mode():
@@ -81,7 +81,7 @@ class Permission_mode():
         self.mode = fs_str.mode if isinstance(
             fs_str,
             Permission_mode
-        ) else 'ro' if fs_str=='r' else fs_str
+        ) else 'ro' if fs_str == 'r' else fs_str
         self.defined = self.mode in Permission_mode.defined_modes
         self._warn_if_undefined()
 
@@ -90,51 +90,51 @@ class Permission_mode():
 
     def __gt__(self, other):
         for permission in (self, other):
-            if(permission._warn_if_undefined()): # pragma: no cover
+            if(permission._warn_if_undefined()):  # pragma: no cover
                 return(NotImplemented)
 
-        if self.mode=='rw':
+        if self.mode == 'rw':
             if other.mode in {'w', 'ro'}:
                 return(True)
-        elif self.mode=='w' and other.mode=='ro':
+        elif self.mode == 'w' and other.mode == 'ro':
             return(True)
 
         return(False)
 
     def __ge__(self, other):
         for permission in (self, other):
-            if(permission._warn_if_undefined()): # pragma: no cover
+            if(permission._warn_if_undefined()):  # pragma: no cover
                 return(NotImplemented)
 
-        if self.mode==other.mode or self>other:
+        if self.mode == other.mode or self > other:
             return(True)
 
         return(False)
 
     def __lt__(self, other):
         for permission in (self, other):
-            if(permission._warn_if_undefined()): # pragma: no cover
+            if(permission._warn_if_undefined()):  # pragma: no cover
                 return(NotImplemented)
 
-        if self.mode=='ro':
+        if self.mode == 'ro':
             if other.mode in {'w', 'rw'}:
                 return(True)
-        elif self.mode=='ro' and other.mode=='w':
+        elif self.mode == 'ro' and other.mode == 'w':
             return(True)
 
         return(False)
 
     def __le__(self, other):
         for permission in (self, other):
-            if(permission._warn_if_undefined()): # pragma: no cover
+            if(permission._warn_if_undefined()):  # pragma: no cover
                 return(NotImplemented)
 
-        if self.mode==other.mode or self<other:
+        if self.mode == other.mode or self < other:
             return(True)
 
         return(False)
 
-    def _warn_if_undefined(self): # pragma: no cover
+    def _warn_if_undefined(self):  # pragma: no cover
         if not self.defined:
             warn(
                 f'\'{self.mode}\' is not a fully-configured permission '
@@ -176,5 +176,5 @@ def ls_newest(directory, extensions):
     ls.sort(key=lambda fp: os.stat(fp).st_mtime)
     try:
         return(ls[-1])
-    except IndexError: # pragma: no cover
+    except IndexError:  # pragma: no cover
         return(None)

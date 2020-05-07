@@ -50,7 +50,8 @@ before_script:
   - git config --global user.name "Travis"
   - singularity pull shub://FCP-INDI/C-PAC
 script:
-  - coverage run --source=cpac -m pytest
+  - coverage run --parallel -m pytest
+  - coverage combine
   - coverage report -m
 after_success:
   - if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; fi

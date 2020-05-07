@@ -1,22 +1,9 @@
-import os
-import time
-import json
-import glob
 import docker
-import shutil
-import tempfile
-import hashlib
-import uuid
-import copy
 
-from base64 import b64decode, b64encode
-from docker.types import Mount
-from tornado import httpclient
+from cpac.backends.platform import Backend
 
-from cpac.backends.platform import Backend, Result, FileResult
 
 class Docker(Backend):
-
     def __init__(self, **kwargs):
         print("Loading 🐳 Docker")
         self.client = docker.from_env()
@@ -33,7 +20,7 @@ class Docker(Backend):
                     delimiter = min([
                         i for i in [
                             opt.find('='), opt.find(' ')
-                        ] if i>0
+                        ] if i > 0
                     ])
                     k = opt[:delimiter].lstrip('-').replace('-', '_')
                     v = opt[delimiter+1:].strip('"').strip("'")
@@ -55,18 +42,15 @@ class Docker(Backend):
             ) for j in self.bindings['volumes'][i]
         ])
         t.columns = ['local', 'Docker', 'mode']
-
         print(" ".join([
             "Loading 🐳",
             image,
             "with these directory bindings:"
         ]))
-
         print(textwrap.indent(
             tabulate(t, headers='keys', showindex=False),
             '  '
         ))
-
         print("Logging messages will refer to the Docker paths.\n")
 
     def run(self, flags="", **kwargs):
@@ -76,7 +60,6 @@ class Docker(Backend):
             kwargs['level_of_analysis'],
             *flags.split(' ')
         ] if (i is not None and len(i))]
-
         self._execute(**kwargs)
 
     def utils(self, flags="", **kwargs):
@@ -88,9 +71,7 @@ class Docker(Backend):
             'utils',
             *flags.split(' ')
         ] if (i is not None and len(i))]
-
         self._execute(**kwargs)
-
 
     def _execute(self, command, **kwargs):
         image = ':'.join([
@@ -133,7 +114,7 @@ class DockerRun(object):
     def status(self):
         try:
             self.container.reload()
-        except Exception as e:
+        except Exception:
             return 'stopped'
         status = self.container.status
         status_map = {

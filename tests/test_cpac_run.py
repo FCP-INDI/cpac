@@ -13,7 +13,7 @@ PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION()]
 
 @pytest.mark.parametrize('args', PLATFORM_ARGS)
 def test_run_help(args, capsys):
-    argv=['cpac', *args.split(' '), 'run', '--help']
+    argv = ['cpac', *args.split(' '), 'run', '--help']
     with mock.patch.object(sys, 'argv', argv):
         run()
         captured = capsys.readouterr()
@@ -21,16 +21,15 @@ def test_run_help(args, capsys):
 
 
 @pytest.mark.parametrize('args', PLATFORM_ARGS)
-def test_run_test_config(args, capsys, tmp_path):
+def test_run_test_config(args, tmp_path):
     wd = tmp_path
-    argv=(
+    argv = (
         f'cpac {args} run '
         f's3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU {wd} '
         'test_config --participant_ndx=2'
     ).split(' ')
     with mock.patch.object(sys, 'argv', argv):
         run()
-        captured = capsys.readouterr()
         assert(
             any([date.today().isoformat() in fp for fp in os.listdir(wd)])
         )
