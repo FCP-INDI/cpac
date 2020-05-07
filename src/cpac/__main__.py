@@ -19,7 +19,7 @@ class ExtendAction(argparse.Action):
         setattr(namespace, self.dest, items)
 
 
-def address(str):
+def address(str): # pragma: no cover
     addr, port = str.split(':')
     port = int(port)
     return addr, port
@@ -177,14 +177,14 @@ def main(args):
                     'docker',
                     *original_args[1:]
                 ])
-            except Exception as e:
+            except Exception as e: # pragma: no cover
                 main([
                     original_args[0],
                     '--platform',
                     'singularity',
                     *original_args[1:]
                 ])
-            return
+            return # pragma: no cover
     else:
         del original_args
 
@@ -205,7 +205,7 @@ def main(args):
                         '--data_config_file='
                     )
                 ][0]
-            except:
+            except: # pragma: no cover
                 raise ValueError(
                     f"""Something about {[
                         arg for arg in args.extra_args if

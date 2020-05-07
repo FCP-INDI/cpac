@@ -90,7 +90,7 @@ class Permission_mode():
 
     def __gt__(self, other):
         for permission in (self, other):
-            if(permission._warn_if_undefined()):
+            if(permission._warn_if_undefined()): # pragma: no cover
                 return(NotImplemented)
 
         if self.mode=='rw':
@@ -103,7 +103,7 @@ class Permission_mode():
 
     def __ge__(self, other):
         for permission in (self, other):
-            if(permission._warn_if_undefined()):
+            if(permission._warn_if_undefined()): # pragma: no cover
                 return(NotImplemented)
 
         if self.mode==other.mode or self>other:
@@ -113,7 +113,7 @@ class Permission_mode():
 
     def __lt__(self, other):
         for permission in (self, other):
-            if(permission._warn_if_undefined()):
+            if(permission._warn_if_undefined()): # pragma: no cover
                 return(NotImplemented)
 
         if self.mode=='ro':
@@ -126,7 +126,7 @@ class Permission_mode():
 
     def __le__(self, other):
         for permission in (self, other):
-            if(permission._warn_if_undefined()):
+            if(permission._warn_if_undefined()): # pragma: no cover
                 return(NotImplemented)
 
         if self.mode==other.mode or self<other:
@@ -134,7 +134,7 @@ class Permission_mode():
 
         return(False)
 
-    def _warn_if_undefined(self):
+    def _warn_if_undefined(self): # pragma: no cover
         if not self.defined:
             warn(
                 f'\'{self.mode}\' is not a fully-configured permission '
@@ -176,5 +176,5 @@ def ls_newest(directory, extensions):
     ls.sort(key=lambda fp: os.stat(fp).st_mtime)
     try:
         return(ls[-1])
-    except IndexError:
+    except IndexError: # pragma: no cover
         return(None)

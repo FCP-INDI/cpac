@@ -30,12 +30,12 @@ class Singularity(Backend):
         print("Loading Ⓢ Singularity")
         if image and isinstance(image, str) and os.path.exists(image):
             self.image = image
-        elif tag and isinstace(tag, str):
+        elif tag and isinstace(tag, str): # pragma: no cover
             self.image = Client.pull(
                 f"docker://{image}:{tag}",
                 pull_folder=os.getcwd()
             )
-        else:
+        else: # pragma: no cover
             try:
                 self.image = Client.pull(
                     "shub://FCP-INDI/C-PAC",
@@ -47,7 +47,7 @@ class Singularity(Backend):
                         f"docker://fcpindi/c-pac:latest",
                         pull_folder=os.getcwd()
                     )
-                except:  # pragma: no cover
+                except:
                     raise OSError("Could not connect to Singularity")
         self.instance = Client.instance(self.image)
         self.volumes = {}
@@ -110,7 +110,7 @@ class Singularity(Backend):
         ):
             try:
                 print(o)
-            except CalledProcessError as e:
+            except CalledProcessError as e: # pragma: no cover
                 print(e)
 
     def utils(self, flags="", **kwargs):
@@ -129,5 +129,5 @@ class Singularity(Backend):
         ):
             try:
                 print(o)
-            except CalledProcessError as e:
+            except CalledProcessError as e: # pragma: no cover
                 print(e)

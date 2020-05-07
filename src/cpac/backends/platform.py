@@ -6,7 +6,7 @@ from cpac.utils import Locals_to_bind, Permission_mode
 
 class Backend(object):
     def __init__(self):
-        pass
+        pass # pragma: no cover
 
     def start(self, pipeline_config, subject_config):
         raise NotImplementedError()
@@ -80,11 +80,6 @@ class Backend(object):
                     kwargs[d],
                     'rw' if d=='output_dir' else 'r'
                 )
-        for i in range(len(kwargs['extra_args'])):
-            if kwargs['extra_args'][i]=='run':
-                # positional argument bids_dir
-                if i+1<len(kwargs['extra_args']):
-                    self._bind_volume()
 
         uid = os.getuid()
 

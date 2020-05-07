@@ -11,14 +11,16 @@ PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION()]
 
 @pytest.mark.parametrize('args,platform', [
     (PLATFORM_ARGS[0], 'docker'),
-    (PLATFORM_ARGS[1], 'singularity')
+    (PLATFORM_ARGS[1], 'singularity'),
+    ('', '')
 ])
 def test_utils_help(args, capsys, platform):
     argv=['cpac', *args.split(' '), 'utils', '--help']
-    with mock.patch.object(sys, 'argv', argv):
+    with mock.patch.object(sys, 'argv', [arg for arg in argv if len(arg)]):
         run()
         captured = capsys.readouterr()
-        assert platform.title() in captured.out
+        if len(platform):
+            assert platform.title() in captured.out
         assert 'COMMAND' in captured.out
 
 
