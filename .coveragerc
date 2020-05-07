@@ -2,6 +2,7 @@
 [run]
 branch = True
 source = cpac
+relative_files = True
 # omit = bad_file.py
 
 [paths]
