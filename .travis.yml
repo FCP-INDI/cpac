@@ -55,7 +55,6 @@ script:
 after_success:
   - if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; fi
   - bash .travis/update_README_usage.sh
-  - if [[ "$TRAVIS_PULL_REQUEST" == "true" ]]; then bash .travis/deploy_to_pypi.sh; fi
 after_script:
   - travis-cleanup
 cache:
