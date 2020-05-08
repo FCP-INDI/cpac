@@ -4,6 +4,13 @@ Changelog
 
 `Version 0.2.2: Autobind <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.2>`_
 =================================================================================================
+
+Version 0.2.2.post1
+-------------------
+* 🖉 Pass ``run -h`` through like ``run --help``
+
+Version 0.2.2
+-------------
 * ✨ Automatic binding of necessary local directories to Docker or Singularity
 * 📚 Pass ``run --help`` through to container without positional arguments to get full current helpstring
 
