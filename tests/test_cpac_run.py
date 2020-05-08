@@ -11,9 +11,11 @@ from CONSTANTS import SINGULARITY_OPTION
 PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION()]
 
 
-@pytest.mark.parametrize('args', PLATFORM_ARGS)
-def test_run_help(args, capsys):
-    argv = ['cpac', *args.split(' '), 'run', '--help']
+@pytest.mark.parametrize('args,helpflag', [
+    (arg, flag) for arg in PLATFORM_ARGS for flag in ['--help', '-h']
+])
+def test_run_help(args, capsys, helpflag):
+    argv = ['cpac', *args.split(' '), 'run', helpflag]
     with mock.patch.object(sys, 'argv', argv):
         run()
         captured = capsys.readouterr()
