@@ -17,8 +17,8 @@ Dependencies
 * `pip <https://pip.pypa.io>`_
 * At least one of:
 
-    * `Docker <https://www.docker.com>`_
-    * `Singularity <https://sylabs.io/singularity>`_ ≥2.5&≤3.0
+  * `Docker <https://www.docker.com>`_
+  * `Singularity <https://sylabs.io/singularity>`_ ≥2.5&≤3.0
 
 Usage
 =====
@@ -32,14 +32,14 @@ Usage
                 [--version] [-v] [-vv] [--working_dir PATH] [--temp_dir PATH]
                 [--output_dir PATH] [-o OPT [OPT ...]]
                 {run,utils} ...
-    
+
     cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io>
     containerized images. If no platform nor image is specified, cpac will try
     Docker first, then try Singularity if Docker fails.
-    
+
     positional arguments:
       {run,utils}
-    
+
     optional arguments:
       -h, --help            show this help message and exit
       --platform {docker,singularity}
