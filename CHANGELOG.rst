@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.2.3
+=============
+* ✨ Added ``group`` command
+
 `Version 0.2.2: Autobind <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.2>`_
 =================================================================================================
 
