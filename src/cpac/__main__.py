@@ -11,6 +11,8 @@ from cpac.backends import Backends
 
 _logger = logging.getLogger(__name__)
 
+clargs = {'group', 'utils'}
+
 
 class ExtendAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
@@ -138,6 +140,13 @@ def parse_args(args):
         nargs=argparse.REMAINDER
     )
 
+    group_parser = subparsers.add_parser(
+        'group',
+        add_help=False,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    group_parser.register('action', 'extend', ExtendAction)
+
     utils_parser = subparsers.add_parser(
         'utils',
         add_help=False,
@@ -243,8 +252,9 @@ def main(args):
             **arg_vars
         )
 
-    if args.command == 'utils':
-        Backends(**arg_vars).utils(
+    if args.command in clargs:
+        Backends(**arg_vars).clarg(
+            args.command,
             flags=' '.join(args.extra_args),
             **arg_vars
         )

@@ -62,13 +62,24 @@ class Docker(Backend):
         ] if (i is not None and len(i))]
         self._execute(**kwargs)
 
-    def utils(self, flags="", **kwargs):
+    def clarg(self, clcommand, flags="", **kwargs):
+        """
+        Runs a commandline command
+
+        Parameters
+        ----------
+        clcommand: str
+
+        flags: str
+
+        kwargs: dict
+        """
         kwargs['command'] = [i for i in [
             kwargs.get('bids_dir', kwargs.get('working_dir', '/tmp')),
             kwargs.get('output_dir', '/outputs'),
             'cli',
             '--',
-            'utils',
+            clcommand,
             *flags.split(' ')
         ] if (i is not None and len(i))]
         self._execute(**kwargs)

@@ -103,14 +103,25 @@ class Singularity(Backend):
             except CalledProcessError as e:  # pragma: no cover
                 print(e)
 
-    def utils(self, flags="", **kwargs):
+    def clarg(self, clcommand, flags="", **kwargs):
+        """
+        Runs a commandline command
+
+        Parameters
+        ----------
+        clcommand: str
+
+        flags: str
+
+        kwargs: dict
+        """
         self._load_logging()
         for o in Client.run(
             self.instance,
             args=" ".join([
                 kwargs.get('bids_dir', 'bids_dir'),
                 kwargs.get('output_dir', 'output_dir'),
-                'cli -- utils',
+                f'cli -- {clcommand}',
                 *flags.split(' ')
             ]).strip(' '),
             options=self.options,
