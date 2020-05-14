@@ -11,8 +11,8 @@ BINDING_MODES = {'ro': 'ro', 'w': 'rw', 'rw': 'rw'}
 
 class Singularity(Backend):
     def __init__(self, **kwargs):
-        image = kwargs["image"] if "image" in kwargs else None
-        tag = kwargs["tag"] if "tag" in kwargs else None
+        image = kwargs.get("image")
+        tag = kwargs.get("tag")
         pwd = os.getcwd()
         if kwargs.get("working_dir") is not None:
             pwd = kwargs["working_dir"]
@@ -23,19 +23,19 @@ class Singularity(Backend):
         elif tag and isinstance(tag, str):  # pragma: no cover
             self.image = Client.pull(
                 f"docker://{image}:{tag}",
-                pull_folder=os.getcwd()
+                pull_folder=pwd
             )
         else:  # pragma: no cover
             try:
                 self.image = Client.pull(
                     "shub://FCP-INDI/C-PAC",
-                    pull_folder=os.getcwd()
+                    pull_folder=pwd
                 )
             except Exception:
                 try:
                     self.image = Client.pull(
                         f"docker://fcpindi/c-pac:latest",
-                        pull_folder=os.getcwd()
+                        pull_folder=pwd
                     )
                 except Exception:
                     raise OSError("Could not connect to Singularity")
