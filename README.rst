@@ -31,14 +31,14 @@ Usage
     usage: cpac [-h] [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
                 [--version] [-v] [-vv] [--working_dir PATH] [--temp_dir PATH]
                 [--output_dir PATH] [-o OPT [OPT ...]]
-                {run,utils} ...
+                {run,group,utils} ...
     
     cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io>
     containerized images. If no platform nor image is specified, cpac will try
     Docker first, then try Singularity if Docker fails.
     
     positional arguments:
-      {run,utils}
+      {run,group,utils}
     
     optional arguments:
       -h, --help            show this help message and exit
