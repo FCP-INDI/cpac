@@ -84,7 +84,7 @@ class Singularity(Backend):
         ))
         print("Logging messages will refer to the Singularity paths.")
 
-    def run(self, flags="", **kwargs):
+    def run(self, flags=[], **kwargs):
         self._load_logging()
         for o in Client.run(
             self.instance,
@@ -92,7 +92,7 @@ class Singularity(Backend):
                 kwargs['bids_dir'],
                 kwargs['output_dir'],
                 kwargs['level_of_analysis'],
-                flags
+                *flags
             ]).strip(' '),
             options=self.options,
             stream=True,
@@ -103,7 +103,7 @@ class Singularity(Backend):
             except CalledProcessError as e:  # pragma: no cover
                 print(e)
 
-    def clarg(self, clcommand, flags="", **kwargs):
+    def clarg(self, clcommand, flags=[], **kwargs):
         """
         Runs a commandline command
 
@@ -111,7 +111,7 @@ class Singularity(Backend):
         ----------
         clcommand: str
 
-        flags: str
+        flags: list
 
         kwargs: dict
         """
@@ -122,7 +122,7 @@ class Singularity(Backend):
                 kwargs.get('bids_dir', 'bids_dir'),
                 kwargs.get('output_dir', 'output_dir'),
                 f'cli -- {clcommand}',
-                *flags.split(' ')
+                *flags
             ]).strip(' '),
             options=self.options,
             stream=True,

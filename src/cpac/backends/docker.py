@@ -53,16 +53,16 @@ class Docker(Backend):
         ))
         print("Logging messages will refer to the Docker paths.\n")
 
-    def run(self, flags="", **kwargs):
+    def run(self, flags=[], **kwargs):
         kwargs['command'] = [i for i in [
             kwargs['bids_dir'],
             kwargs['output_dir'],
             kwargs['level_of_analysis'],
-            *flags.split(' ')
+            *flags
         ] if (i is not None and len(i))]
         self._execute(**kwargs)
 
-    def clarg(self, clcommand, flags="", **kwargs):
+    def clarg(self, clcommand, flags=[], **kwargs):
         """
         Runs a commandline command
 
@@ -70,7 +70,7 @@ class Docker(Backend):
         ----------
         clcommand: str
 
-        flags: str
+        flags: list
 
         kwargs: dict
         """
@@ -80,7 +80,7 @@ class Docker(Backend):
             'cli',
             '--',
             clcommand,
-            *flags.split(' ')
+            *flags
         ] if (i is not None and len(i))]
         self._execute(**kwargs)
 

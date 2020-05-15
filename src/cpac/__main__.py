@@ -248,14 +248,14 @@ def main(args):
                 if arg_vars.get(arg) is None:
                     arg_vars[arg] = pwd
         Backends(**arg_vars).run(
-            flags=' '.join(args.extra_args),
+            flags=args.extra_args,
             **arg_vars
         )
 
     if args.command in clargs:
         Backends(**arg_vars).clarg(
             args.command,
-            flags=' '.join(args.extra_args),
+            flags=args.extra_args,
             **arg_vars
         )
 
