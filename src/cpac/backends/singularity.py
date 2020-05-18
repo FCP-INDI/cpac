@@ -3,6 +3,7 @@ import os
 from itertools import chain
 from spython.main import Client
 from subprocess import CalledProcessError
+from sys import exc_info
 
 from cpac.backends.platform import Backend
 
@@ -83,25 +84,30 @@ class Singularity(Backend):
             '  '
         ))
         print("Logging messages will refer to the Singularity paths.")
-
-    def run(self, flags=[], **kwargs):
-        self._load_logging()
-        for o in Client.run(
+        
+    def _try_to_stream(self, args):
+        for line in Client.run(
             self.instance,
-            args=" ".join([
-                kwargs['bids_dir'],
-                kwargs['output_dir'],
-                kwargs['level_of_analysis'],
-                *flags
-            ]).strip(' '),
+            args=args,
             options=self.options,
             stream=True,
             return_result=True
         ):
             try:
-                print(o)
+                yield line
             except CalledProcessError as e:  # pragma: no cover
                 print(e)
+
+    def run(self, flags=[], **kwargs):
+        self._load_logging()
+        [print(o, end='') for o in self._try_to_stream(
+            args=' '.join([
+                kwargs['bids_dir'],
+                kwargs['output_dir'],
+                kwargs['level_of_analysis'],
+                *flags
+            ]).strip(' ')
+        )]
 
     def clarg(self, clcommand, flags=[], **kwargs):
         """
@@ -116,19 +122,11 @@ class Singularity(Backend):
         kwargs: dict
         """
         self._load_logging()
-        for o in Client.run(
-            self.instance,
-            args=" ".join([
+        [print(o, end='') for o in self._try_to_stream(
+            args=' '.join([
                 kwargs.get('bids_dir', 'bids_dir'),
                 kwargs.get('output_dir', 'output_dir'),
                 f'cli -- {clcommand}',
                 *flags
-            ]).strip(' '),
-            options=self.options,
-            stream=True,
-            return_result=True
-        ):
-            try:
-                print(o)
-            except CalledProcessError as e:  # pragma: no cover
-                print(e)
+            ]).strip(' ')
+        )]

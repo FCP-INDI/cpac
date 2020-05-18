@@ -53,12 +53,11 @@ class Backend(object):
             'working_dir',
             os.getcwd()
         )
-
-        for f in ['pipeline_file', 'group_file']:
-            if f in kwargs and isinstance(kwargs, str) and os.path.exists(
-                kwargs[f]
-            ):
-                d = os.path.dirname(kwargs[f])
+        
+        
+        for kwarg in kwargs.get('extra_args', []):
+            if os.path.exists(kwarg):
+                d = os.path.dirname(kwarg)
                 self._bind_volume(d, d, 'r')
         if 'data_config_file' in kwargs and isinstance(
             kwargs['data_config_file'], str
