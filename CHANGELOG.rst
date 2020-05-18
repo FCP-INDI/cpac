@@ -6,6 +6,7 @@ Version 0.2.3
 =============
 * ✨ Added ``group`` command
 * 🚑 Fixed a bug where pass-through flags were being mangled
+* 🖇️ Binds any directories necessary to access any paths found in pass-through CLI arguments
 
 `Version 0.2.2: Autobind <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.2>`_
 =================================================================================================
