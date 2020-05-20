@@ -1,20 +1,21 @@
 import docker
 
-from cpac.backends.platform import Backend
+from cpac.backends.platform import Backend, Platform_Meta
 
 
 class Docker(Backend):
     def __init__(self, **kwargs):
-        print("Loading 🐳 Docker")
+        self.platform = Platform_Meta('Docker', '🐳')
+        print(f"Loading {self.platform.symbol} {self.platform.name}")
         self.client = docker.from_env()
         try:
             self.client.ping()
         except docker.errors.APIError:  # pragma: no cover
-            raise OSError("Could not connect to Docker")
+            raise OSError(f"Could not connect to {self.platform.name}")
         self.volumes = {}
         self._set_bindings(**kwargs)
         self.docker_kwargs = {}
-        if isinstance(kwargs['container_options'], list):
+        if isinstance(kwargs.get('container_options'), list):
             for opt in kwargs['container_options']:
                 if '=' in opt or ' ' in opt:
                     delimiter = min([
@@ -32,26 +33,12 @@ class Docker(Backend):
                     else:
                         self.docker_kwargs[k] = v
 
-    def _load_logging(self, image):
-        import pandas as pd
-        import textwrap
-        from tabulate import tabulate
-
-        t = pd.DataFrame([
-            (i, j['bind'], j['mode']) for i in self.bindings['volumes'].keys(
-            ) for j in self.bindings['volumes'][i]
-        ])
-        t.columns = ['local', 'Docker', 'mode']
-        print(" ".join([
-            "Loading 🐳",
-            image,
-            "with these directory bindings:"
-        ]))
-        print(textwrap.indent(
-            tabulate(t, headers='keys', showindex=False),
-            '  '
-        ))
-        print("Logging messages will refer to the Docker paths.\n")
+    def read_crash(self, crashfile, flags=[], **kwargs):
+        for ckey in ["/wd/", "/crash/", "/log"]:
+            if ckey in crashfile:
+                self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'ro')
+        self.docker_kwargs['entrypoint'] = f'nipypecli crash {crashfile}'
+        self._execute(command=flags)
 
     def run(self, flags=[], **kwargs):
         kwargs['command'] = [i for i in [

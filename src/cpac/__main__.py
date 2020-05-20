@@ -11,6 +11,7 @@ from cpac.backends import Backends
 
 _logger = logging.getLogger(__name__)
 
+# commandline arguments to pass into container after `--`:
 clargs = {'group', 'utils'}
 
 
@@ -98,11 +99,21 @@ def parse_args(args):
     )
 
     parser.add_argument(
-        '-o', '--container_options',
-        dest='container_options',
+        '-o', '--container_option',
+        dest='container_option',
         nargs='+',
         help="parameters and flags to pass through to Docker or Singularity",
         metavar="OPT"
+    )
+    
+    parser.add_argument(
+        '-B', '--custom_binding',
+        dest="custom_binding",
+        nargs="+",
+        help="directory to bind to container with a different path than the "
+             "real path in the format real_path:container_path (eg, "
+             "/home/C-PAC/run5/outputs:/outputs). Use absolute paths for both "
+             "paths"
     )
 
     subparsers = parser.add_subparsers(dest='command')
@@ -153,6 +164,18 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     utils_parser.register('action', 'extend', ExtendAction)
+    
+    crash_parser = subparsers.add_parser(
+        'crash',
+        add_help=True,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    crash_parser.register('action', 'extend', ExtendAction)
+    
+    crash_parser.add_argument(
+        'crashfile',
+        help="path to crashfile"
+    )
 
     parsed, extras = parser.parse_known_args(args)
 
@@ -259,6 +282,11 @@ def main(args):
             **arg_vars
         )
 
+    if args.command == 'crash':
+        Backends(**arg_vars).read_crash(
+            flags=args.extra_args,
+            **arg_vars
+        )
 
 def run():
     main(sys.argv)

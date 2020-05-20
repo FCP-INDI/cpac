@@ -5,20 +5,21 @@ from spython.main import Client
 from subprocess import CalledProcessError
 from sys import exc_info
 
-from cpac.backends.platform import Backend
+from cpac.backends.platform import Backend, Platform_Meta
 
 BINDING_MODES = {'ro': 'ro', 'w': 'rw', 'rw': 'rw'}
 
 
 class Singularity(Backend):
     def __init__(self, **kwargs):
+        self.platform = Platform_Meta('Singularity', 'Ⓢ')
         image = kwargs.get("image")
         tag = kwargs.get("tag")
         pwd = os.getcwd()
         if kwargs.get("working_dir") is not None:
             pwd = kwargs["working_dir"]
             os.chdir(pwd)
-        print("Loading Ⓢ Singularity")
+        print(f"Loading {self.platform.symbol} {self.platform.name}")
         if image and isinstance(image, str) and os.path.exists(image):
             self.image = image
         elif tag and isinstance(tag, str):  # pragma: no cover
@@ -80,11 +81,11 @@ class Singularity(Backend):
             "with these directory bindings:"
         ]))
         print(textwrap.indent(
-            tabulate(t, headers='keys', showindex=False),
+            tabulate(t.applymap(lambda x: textwrap.wrap(x, 42)), headers='keys', showindex=False),
             '  '
         ))
         print("Logging messages will refer to the Singularity paths.")
-        
+
     def _try_to_stream(self, args):
         for line in Client.run(
             self.instance,
@@ -97,6 +98,14 @@ class Singularity(Backend):
                 yield line
             except CalledProcessError as e:  # pragma: no cover
                 print(e)
+
+    def read_crash(self, crashfile, flags=[], **kwargs):
+        raise NotImplementedError("crash not yet implemented for Singularity")
+        # for ckey in ["/wd/", "/crash/", "/log"]:
+        #     if ckey in crashfile:
+        #         self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'ro')
+        # self.docker_kwargs['entrypoint'] = f'nipypecli crash {crashfile}'
+        # self._execute(command=flags)
 
     def run(self, flags=[], **kwargs):
         self._load_logging()
