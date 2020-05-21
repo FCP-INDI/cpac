@@ -34,9 +34,7 @@ class Docker(Backend):
                         self.docker_kwargs[k] = v
 
     def read_crash(self, crashfile, flags=[], **kwargs):
-        for ckey in ["/wd/", "/crash/", "/log"]:
-            if ckey in crashfile:
-                self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'ro')
+        self._set_crashfile_binding(crashfile)
         self.docker_kwargs['entrypoint'] = f'nipypecli crash {crashfile}'
         self._execute(command=flags)
 
@@ -72,7 +70,7 @@ class Docker(Backend):
         self._execute(**kwargs)
 
     def _execute(self, command, **kwargs):
-        image = ':'.join([
+        self.image = ':'.join([
             kwargs['image'] if kwargs.get(
                 'image'
             ) is not None else 'fcpindi/c-pac',
@@ -81,10 +79,10 @@ class Docker(Backend):
             ) is not None else 'latest'
         ])
 
-        self._load_logging(image)
+        self._load_logging()
 
         self._run = DockerRun(self.client.containers.run(
-            image,
+            self.image,
             command=command,
             detach=True,
             user=':'.join([

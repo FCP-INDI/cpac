@@ -1,4 +1,5 @@
 import os
+import traceback
 
 from itertools import chain
 from spython.main import Client
@@ -41,7 +42,6 @@ class Singularity(Backend):
                     )
                 except Exception:
                     raise OSError("Could not connect to Singularity")
-        self.instance = Client.instance(self.image)
         self.volumes = {}
         self.options = list(chain.from_iterable(kwargs[
             "container_options"
@@ -62,50 +62,40 @@ class Singularity(Backend):
             ] for local in self.volumes])))]
         )
 
-    def _load_logging(self):
-        import pandas as pd
-        import textwrap
-        from tabulate import tabulate
-
-        t = pd.DataFrame([(
-                i,
-                j['bind'],
-                BINDING_MODES[str(j['mode'])]
-            ) for i in self.bindings['volumes'].keys(
-            ) for j in self.bindings['volumes'][i]
-        ])
-        t.columns = ['local', 'Singularity', 'mode']
-        print(" ".join([
-            "Loading Ⓢ",
-            self.image,
-            "with these directory bindings:"
-        ]))
-        print(textwrap.indent(
-            tabulate(t.applymap(lambda x: textwrap.wrap(x, 42)), headers='keys', showindex=False),
-            '  '
-        ))
-        print("Logging messages will refer to the Singularity paths.")
-
-    def _try_to_stream(self, args):
-        for line in Client.run(
-            self.instance,
-            args=args,
-            options=self.options,
-            stream=True,
-            return_result=True
-        ):
-            try:
-                yield line
-            except CalledProcessError as e:  # pragma: no cover
-                print(e)
+    def _try_to_stream(self, args, stream_command='run'):
+        self._bindings_as_option()
+        if stream_command=='run':
+            for line in Client.run(
+                Client.instance(self.image),
+                args=args,
+                options=self.options,
+                stream=True,
+                return_result=True
+            ):
+                try:
+                    yield line
+                except CalledProcessError as e:  # pragma: no cover
+                    print(e)
+        elif stream_command=='execute':
+            for line in Client.execute(
+                self.image,
+                command=args['command'].split(' '),
+                options=self.options,
+                stream=True,
+                quiet=False
+            ):
+                try:
+                    yield line
+                except CalledProcessError as e:  # pragma: no cover
+                    print(e)
 
     def read_crash(self, crashfile, flags=[], **kwargs):
-        raise NotImplementedError("crash not yet implemented for Singularity")
-        # for ckey in ["/wd/", "/crash/", "/log"]:
-        #     if ckey in crashfile:
-        #         self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'ro')
-        # self.docker_kwargs['entrypoint'] = f'nipypecli crash {crashfile}'
-        # self._execute(command=flags)
+        self._load_logging()
+        self._set_crashfile_binding(crashfile)
+        [print(o, end='') for o in self._try_to_stream(
+            args={'command': f'nipypecli crash {crashfile}'},
+            stream_command='execute'
+        )]
 
     def run(self, flags=[], **kwargs):
         self._load_logging()

@@ -37,7 +37,7 @@ class Backend(object):
         else:
             self.volumes[local] = [b]
 
-    def _load_logging(self, image):
+    def _load_logging(self):
         t = pd.DataFrame([
             (i, j['bind'], j['mode']) for i in self.bindings['volumes'].keys(
             ) for j in self.bindings['volumes'][i]
@@ -45,7 +45,7 @@ class Backend(object):
         t.columns = ['local', self.platform.name, 'mode']
         print(" ".join([
             f"Loading {self.platform.symbol}",
-            image,
+            self.image,
             "with these directory bindings:"
         ]))
         print(textwrap.indent(
@@ -135,6 +135,10 @@ class Backend(object):
             'volumes': self.volumes
         }
 
+    def _set_crashfile_binding(self, crashfile):
+        for ckey in ["/wd/", "/crash/", "/log"]:
+            if ckey in crashfile:
+                self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'ro')
 
 class Result(object):
 
