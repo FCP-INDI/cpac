@@ -8,7 +8,7 @@ pytest-runner
 pyyaml
 setuptools
 sphinx
-spython
+git+git://github.com/shnizzedy/singularity-cli.git@add/stderr-to-stream
 tabulate >= 0.8.6
 tornado
 websocket-client
