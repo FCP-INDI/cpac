@@ -4,7 +4,7 @@ Changelog
 
 Version 0.2.3
 =============
-* ✨ Added ``group`` command
+* ✨ Added ``group`` and ``crash`` commands
 * 🚑 Fixed a bug where pass-through flags were being mangled
 * 🖇️ Binds any directories necessary to access any paths found in pass-through CLI arguments
 
