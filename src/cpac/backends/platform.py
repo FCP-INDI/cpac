@@ -56,7 +56,9 @@ class Backend(object):
             ), headers='keys', showindex=False),
             '  '
         ))
-        print(f"Logging messages will refer to the {self.platform.name} paths.\n")
+        print(
+            f"Logging messages will refer to the {self.platform.name} paths.\n"
+        )
 
     def _prep_binding(self, binding_path_local, binding_path_remote):
         binding_path_local = os.path.abspath(
@@ -84,8 +86,6 @@ class Backend(object):
             'working_dir',
             os.getcwd()
         )
-
-
         for kwarg in [
             *kwargs.get('extra_args', []), kwargs.get('crashfile', '')
         ]:
@@ -118,9 +118,7 @@ class Backend(object):
                     kwargs[d],
                     'rw' if d == 'output_dir' else 'r'
                 )
-
         uid = os.getuid()
-
         self.bindings = {
             'gid': pwd.getpwuid(uid).pw_gid,
             'mounts': [
@@ -140,8 +138,8 @@ class Backend(object):
             if ckey in crashfile:
                 self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'ro')
 
-class Result(object):
 
+class Result(object):
     mime = None
 
     def __init__(self, name, value):

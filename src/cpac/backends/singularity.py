@@ -1,5 +1,4 @@
 import os
-import traceback
 
 from itertools import chain
 from spython.main import Client
@@ -64,30 +63,27 @@ class Singularity(Backend):
 
     def _try_to_stream(self, args, stream_command='run'):
         self._bindings_as_option()
-        if stream_command=='run':
-            for line in Client.run(
-                Client.instance(self.image),
-                args=args,
-                options=self.options,
-                stream=True,
-                return_result=True
-            ):
-                try:
+        try:
+            if stream_command == 'run':
+                for line in Client.run(
+                    Client.instance(self.image),
+                    args=args,
+                    options=self.options,
+                    stream=True,
+                    return_result=True
+                ):
                     yield line
-                except CalledProcessError as e:  # pragma: no cover
-                    print(e)
-        elif stream_command=='execute':
-            for line in Client.execute(
-                self.image,
-                command=args['command'].split(' '),
-                options=self.options,
-                stream=True,
-                quiet=False
-            ):
-                try:
+            elif stream_command == 'execute':
+                for line in Client.execute(
+                    self.image,
+                    command=args['command'].split(' '),
+                    options=self.options,
+                    stream=True,
+                    quiet=False
+                ):
                     yield line
-                except CalledProcessError as e:  # pragma: no cover
-                    print(e)
+        except CalledProcessError:  # pragma: no cover
+            return
 
     def read_crash(self, crashfile, flags=[], **kwargs):
         self._load_logging()

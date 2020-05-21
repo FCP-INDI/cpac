@@ -105,7 +105,7 @@ def parse_args(args):
         help="parameters and flags to pass through to Docker or Singularity",
         metavar="OPT"
     )
-    
+
     parser.add_argument(
         '-B', '--custom_binding',
         dest="custom_binding",
@@ -164,14 +164,14 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     utils_parser.register('action', 'extend', ExtendAction)
-    
+
     crash_parser = subparsers.add_parser(
         'crash',
         add_help=True,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     crash_parser.register('action', 'extend', ExtendAction)
-    
+
     crash_parser.add_argument(
         'crashfile',
         help="path to crashfile"
@@ -287,6 +287,7 @@ def main(args):
             flags=args.extra_args,
             **arg_vars
         )
+
 
 def run():
     main(sys.argv)

@@ -178,15 +178,15 @@ def ls_newest(directory, extensions):
         return(ls[-1])
     except IndexError:  # pragma: no cover
         return(None)
-        
+
+
 def render_crashfile(crash_path):
     """
     Parameter
     ---------
     crash_path: str
-    
+
     Returns
     -------
     str, contents of pickle
     """
-    
