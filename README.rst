@@ -31,14 +31,15 @@ Usage
     usage: cpac [-h] [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
                 [--version] [-v] [-vv] [--working_dir PATH] [--temp_dir PATH]
                 [--output_dir PATH] [-o OPT [OPT ...]]
-                {run,group,utils} ...
+                [-B CUSTOM_BINDING [CUSTOM_BINDING ...]]
+                {run,group,utils,crash} ...
     
     cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io>
     containerized images. If no platform nor image is specified, cpac will try
     Docker first, then try Singularity if Docker fails.
     
     positional arguments:
-      {run,group,utils}
+      {run,group,utils,crash}
     
     optional arguments:
       -h, --help            show this help message and exit
@@ -54,9 +55,15 @@ Usage
       --working_dir PATH    working directory
       --temp_dir PATH       directory for temporary files
       --output_dir PATH     directory where output files should be stored
-      -o OPT [OPT ...], --container_options OPT [OPT ...]
+      -o OPT [OPT ...], --container_option OPT [OPT ...]
                             parameters and flags to pass through to Docker or
                             Singularity
+      -B CUSTOM_BINDING [CUSTOM_BINDING ...], --custom_binding CUSTOM_BINDING [CUSTOM_BINDING ...]
+                            directory to bind to container with a different path
+                            than the real path in the format
+                            real_path:container_path (eg,
+                            /home/C-PAC/run5/outputs:/outputs). Use absolute paths
+                            for both paths
 
 .. END USAGE
 
