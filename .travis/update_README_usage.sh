@@ -13,3 +13,5 @@ if [[ $(git diff --numstat README.rst) ]]; then
     git commit -m ":books: Update usage from helpstring" -m "[skip travis]"
     git push origin HEAD:$TRAVIS_BRANCH
 fi
+
+exit 0

@@ -3,43 +3,44 @@ import os
 from itertools import chain
 from spython.main import Client
 from subprocess import CalledProcessError
+from sys import exc_info
 
-from cpac.backends.platform import Backend
+from cpac.backends.platform import Backend, Platform_Meta
 
 BINDING_MODES = {'ro': 'ro', 'w': 'rw', 'rw': 'rw'}
 
 
 class Singularity(Backend):
     def __init__(self, **kwargs):
-        image = kwargs["image"] if "image" in kwargs else None
-        tag = kwargs["tag"] if "tag" in kwargs else None
+        self.platform = Platform_Meta('Singularity', 'Ⓢ')
+        image = kwargs.get("image")
+        tag = kwargs.get("tag")
         pwd = os.getcwd()
         if kwargs.get("working_dir") is not None:
             pwd = kwargs["working_dir"]
             os.chdir(pwd)
-        print("Loading Ⓢ Singularity")
+        print(f"Loading {self.platform.symbol} {self.platform.name}")
         if image and isinstance(image, str) and os.path.exists(image):
             self.image = image
         elif tag and isinstance(tag, str):  # pragma: no cover
             self.image = Client.pull(
                 f"docker://{image}:{tag}",
-                pull_folder=os.getcwd()
+                pull_folder=pwd
             )
         else:  # pragma: no cover
             try:
                 self.image = Client.pull(
                     "shub://FCP-INDI/C-PAC",
-                    pull_folder=os.getcwd()
+                    pull_folder=pwd
                 )
             except Exception:
                 try:
                     self.image = Client.pull(
                         f"docker://fcpindi/c-pac:latest",
-                        pull_folder=os.getcwd()
+                        pull_folder=pwd
                     )
                 except Exception:
                     raise OSError("Could not connect to Singularity")
-        self.instance = Client.instance(self.image)
         self.volumes = {}
         self.options = list(chain.from_iterable(kwargs[
             "container_options"
@@ -60,64 +61,67 @@ class Singularity(Backend):
             ] for local in self.volumes])))]
         )
 
-    def _load_logging(self):
-        import pandas as pd
-        import textwrap
-        from tabulate import tabulate
+    def _try_to_stream(self, args, stream_command='run'):
+        self._bindings_as_option()
+        try:
+            if stream_command == 'run':
+                for line in Client.run(
+                    Client.instance(self.image),
+                    args=args,
+                    options=self.options,
+                    stream=True,
+                    return_result=True
+                ):
+                    yield line
+            elif stream_command == 'execute':
+                for line in Client.execute(
+                    self.image,
+                    command=args['command'].split(' '),
+                    options=self.options,
+                    stream=True,
+                    quiet=False
+                ):
+                    yield line
+        except CalledProcessError:  # pragma: no cover
+            return
 
-        t = pd.DataFrame([(
-                i,
-                j['bind'],
-                BINDING_MODES[str(j['mode'])]
-            ) for i in self.bindings['volumes'].keys(
-            ) for j in self.bindings['volumes'][i]
-        ])
-        t.columns = ['local', 'Singularity', 'mode']
-        print(" ".join([
-            "Loading Ⓢ",
-            self.image,
-            "with these directory bindings:"
-        ]))
-        print(textwrap.indent(
-            tabulate(t, headers='keys', showindex=False),
-            '  '
-        ))
-        print("Logging messages will refer to the Singularity paths.")
-
-    def run(self, flags="", **kwargs):
+    def read_crash(self, crashfile, flags=[], **kwargs):
         self._load_logging()
-        for o in Client.run(
-            self.instance,
-            args=" ".join([
+        self._set_crashfile_binding(crashfile)
+        [print(o, end='') for o in self._try_to_stream(
+            args={'command': f'nipypecli crash {crashfile}'},
+            stream_command='execute'
+        )]
+
+    def run(self, flags=[], **kwargs):
+        self._load_logging()
+        [print(o, end='') for o in self._try_to_stream(
+            args=' '.join([
                 kwargs['bids_dir'],
                 kwargs['output_dir'],
                 kwargs['level_of_analysis'],
-                flags
-            ]).strip(' '),
-            options=self.options,
-            stream=True,
-            return_result=True
-        ):
-            try:
-                print(o)
-            except CalledProcessError as e:  # pragma: no cover
-                print(e)
+                *flags
+            ]).strip(' ')
+        )]
 
-    def utils(self, flags="", **kwargs):
+    def clarg(self, clcommand, flags=[], **kwargs):
+        """
+        Runs a commandline command
+
+        Parameters
+        ----------
+        clcommand: str
+
+        flags: list
+
+        kwargs: dict
+        """
         self._load_logging()
-        for o in Client.run(
-            self.instance,
-            args=" ".join([
+        [print(o, end='') for o in self._try_to_stream(
+            args=' '.join([
                 kwargs.get('bids_dir', 'bids_dir'),
                 kwargs.get('output_dir', 'output_dir'),
-                'cli -- utils',
-                *flags.split(' ')
-            ]).strip(' '),
-            options=self.options,
-            stream=True,
-            return_result=True
-        ):
-            try:
-                print(o)
-            except CalledProcessError as e:  # pragma: no cover
-                print(e)
+                f'cli -- {clcommand}',
+                *flags
+            ]).strip(' ')
+        )]

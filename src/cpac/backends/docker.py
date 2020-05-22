@@ -1,20 +1,21 @@
 import docker
 
-from cpac.backends.platform import Backend
+from cpac.backends.platform import Backend, Platform_Meta
 
 
 class Docker(Backend):
     def __init__(self, **kwargs):
-        print("Loading 🐳 Docker")
+        self.platform = Platform_Meta('Docker', '🐳')
+        print(f"Loading {self.platform.symbol} {self.platform.name}")
         self.client = docker.from_env()
         try:
             self.client.ping()
         except docker.errors.APIError:  # pragma: no cover
-            raise OSError("Could not connect to Docker")
+            raise OSError(f"Could not connect to {self.platform.name}")
         self.volumes = {}
         self._set_bindings(**kwargs)
         self.docker_kwargs = {}
-        if isinstance(kwargs['container_options'], list):
+        if isinstance(kwargs.get('container_options'), list):
             for opt in kwargs['container_options']:
                 if '=' in opt or ' ' in opt:
                     delimiter = min([
@@ -32,49 +33,44 @@ class Docker(Backend):
                     else:
                         self.docker_kwargs[k] = v
 
-    def _load_logging(self, image):
-        import pandas as pd
-        import textwrap
-        from tabulate import tabulate
+    def read_crash(self, crashfile, flags=[], **kwargs):
+        self._set_crashfile_binding(crashfile)
+        self.docker_kwargs['entrypoint'] = f'nipypecli crash {crashfile}'
+        self._execute(command=flags)
 
-        t = pd.DataFrame([
-            (i, j['bind'], j['mode']) for i in self.bindings['volumes'].keys(
-            ) for j in self.bindings['volumes'][i]
-        ])
-        t.columns = ['local', 'Docker', 'mode']
-        print(" ".join([
-            "Loading 🐳",
-            image,
-            "with these directory bindings:"
-        ]))
-        print(textwrap.indent(
-            tabulate(t, headers='keys', showindex=False),
-            '  '
-        ))
-        print("Logging messages will refer to the Docker paths.\n")
-
-    def run(self, flags="", **kwargs):
+    def run(self, flags=[], **kwargs):
         kwargs['command'] = [i for i in [
             kwargs['bids_dir'],
             kwargs['output_dir'],
             kwargs['level_of_analysis'],
-            *flags.split(' ')
+            *flags
         ] if (i is not None and len(i))]
         self._execute(**kwargs)
 
-    def utils(self, flags="", **kwargs):
+    def clarg(self, clcommand, flags=[], **kwargs):
+        """
+        Runs a commandline command
+
+        Parameters
+        ----------
+        clcommand: str
+
+        flags: list
+
+        kwargs: dict
+        """
         kwargs['command'] = [i for i in [
             kwargs.get('bids_dir', kwargs.get('working_dir', '/tmp')),
             kwargs.get('output_dir', '/outputs'),
             'cli',
             '--',
-            'utils',
-            *flags.split(' ')
+            clcommand,
+            *flags
         ] if (i is not None and len(i))]
         self._execute(**kwargs)
 
     def _execute(self, command, **kwargs):
-        image = ':'.join([
+        self.image = ':'.join([
             kwargs['image'] if kwargs.get(
                 'image'
             ) is not None else 'fcpindi/c-pac',
@@ -83,10 +79,10 @@ class Docker(Backend):
             ) is not None else 'latest'
         ])
 
-        self._load_logging(image)
+        self._load_logging()
 
         self._run = DockerRun(self.client.containers.run(
-            image,
+            self.image,
             command=command,
             detach=True,
             user=':'.join([

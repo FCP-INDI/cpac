@@ -1,8 +1,16 @@
 import os
+import pandas as pd
 import pwd
 import tempfile
+import textwrap
+
+from collections import namedtuple
+from tabulate import tabulate
 
 from cpac.utils import Locals_to_bind, Permission_mode
+
+
+Platform_Meta = namedtuple('Platform_Meta', 'name symbol')
 
 
 class Backend(object):
@@ -29,8 +37,33 @@ class Backend(object):
         else:
             self.volumes[local] = [b]
 
+    def _load_logging(self):
+        t = pd.DataFrame([
+            (i, j['bind'], j['mode']) for i in self.bindings['volumes'].keys(
+            ) for j in self.bindings['volumes'][i]
+        ])
+        t.columns = ['local', self.platform.name, 'mode']
+        print(" ".join([
+            f"Loading {self.platform.symbol}",
+            self.image,
+            "with these directory bindings:"
+        ]))
+        print(textwrap.indent(
+            tabulate(t.applymap(
+                lambda x: (
+                    '\n'.join(textwrap.wrap(x, 42))
+                ) if isinstance(x, str) else x
+            ), headers='keys', showindex=False),
+            '  '
+        ))
+        print(
+            f"Logging messages will refer to the {self.platform.name} paths.\n"
+        )
+
     def _prep_binding(self, binding_path_local, binding_path_remote):
-        binding_path_local = os.path.abspath(binding_path_local)
+        binding_path_local = os.path.abspath(
+            os.path.expanduser(binding_path_local)
+        )
         os.makedirs(binding_path_local, exist_ok=True)
         return(
             os.path.realpath(binding_path_local),
@@ -53,12 +86,11 @@ class Backend(object):
             'working_dir',
             os.getcwd()
         )
-
-        for f in ['pipeline_file', 'group_file']:
-            if f in kwargs and isinstance(kwargs, str) and os.path.exists(
-                kwargs[f]
-            ):
-                d = os.path.dirname(kwargs[f])
+        for kwarg in [
+            *kwargs.get('extra_args', []), kwargs.get('crashfile', '')
+        ]:
+            if os.path.exists(kwarg):
+                d = kwarg if os.path.isdir(kwarg) else os.path.dirname(kwarg)
                 self._bind_volume(d, d, 'r')
         if 'data_config_file' in kwargs and isinstance(
             kwargs['data_config_file'], str
@@ -74,6 +106,9 @@ class Backend(object):
         self._bind_volume(temp_dir, temp_dir, 'rw')
         self._bind_volume(output_dir, output_dir, 'rw')
         self._bind_volume(working_dir, working_dir, 'rw')
+        if kwargs.get('custom_binding'):
+            for d in kwargs['custom_binding']:
+                self._bind_volume(*d.split(':'), 'r')
         for d in ['bids_dir', 'output_dir']:
             if d in kwargs and isinstance(kwargs[d], str) and os.path.exists(
                 kwargs[d]
@@ -83,9 +118,7 @@ class Backend(object):
                     kwargs[d],
                     'rw' if d == 'output_dir' else 'r'
                 )
-
         uid = os.getuid()
-
         self.bindings = {
             'gid': pwd.getpwuid(uid).pw_gid,
             'mounts': [
@@ -100,9 +133,13 @@ class Backend(object):
             'volumes': self.volumes
         }
 
+    def _set_crashfile_binding(self, crashfile):
+        for ckey in ["/wd/", "/crash/", "/log"]:
+            if ckey in crashfile:
+                self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'ro')
+
 
 class Result(object):
-
     mime = None
 
     def __init__(self, name, value):
