@@ -85,7 +85,7 @@ class Singularity(Backend):
         except CalledProcessError:  # pragma: no cover
             return
 
-    def read_crash(self, crashfile, flags=[], **kwargs):
+    def _read_crash(self, crashfile, flags=[], **kwargs):
         self._load_logging()
         self._set_crashfile_binding(crashfile)
         [print(o, end='') for o in self._try_to_stream(

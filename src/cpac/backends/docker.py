@@ -33,7 +33,7 @@ class Docker(Backend):
                     else:
                         self.docker_kwargs[k] = v
 
-    def read_crash(self, crashfile, flags=[], **kwargs):
+    def _read_crash(self, crashfile, flags=[], **kwargs):
         self._set_crashfile_binding(crashfile)
         self.docker_kwargs['entrypoint'] = f'nipypecli crash {crashfile}'
         self._execute(command=flags)

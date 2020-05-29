@@ -1,15 +1,17 @@
 import os
 import pandas as pd
 import pwd
+import re
 import tempfile
 import textwrap
 
 from collections import namedtuple
 from tabulate import tabulate
+from traits import TraitError
 
 from cpac.utils import Locals_to_bind, Permission_mode
 
-
+path_regex = re.compile("(?<=(a value of ')).*(?=(' <class))")
 Platform_Meta = namedtuple('Platform_Meta', 'name symbol')
 
 
@@ -19,6 +21,21 @@ class Backend(object):
 
     def start(self, pipeline_config, subject_config):
         raise NotImplementedError()
+
+    def read_crash(self, crashfile, flags=[], **kwargs):
+        try crash_message = self._read_crash(
+            self, crashfile, flags[], **kwargs
+        ):
+            if (
+                'TraitError' in crash_message and
+                'existing file' in crash_message
+            ):
+                self._touch_trait_error_path(crash_message)
+                self.read_crash(self, crashfile, flags=[], **kwargs)
+        except TraitError as e:
+            if 'existing file' in e:
+                self._touch_trait_error_path(e)
+                self.read_crash(self, crashfile, flags=[], **kwargs)
 
     def _bind_volume(self, local, remote, mode):
         local, remote = self._prep_binding(local, remote)
@@ -137,6 +154,13 @@ class Backend(object):
         for ckey in ["/wd/", "/crash/", "/log"]:
             if ckey in crashfile:
                 self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'ro')
+
+    def _touch_trait_error_path(self, crash_message):
+        match = path_regex.search(crash_message)
+        if match:
+            path_to_touch = match[0]
+            os.makedirs(match[0], exist_ok=True)
+            Path(match[0]).touch(exist_ok=True)
 
 
 class Result(object):
