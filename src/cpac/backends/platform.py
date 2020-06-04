@@ -1,17 +1,16 @@
 import os
 import pandas as pd
 import pwd
-import re
 import tempfile
 import textwrap
 
 from collections import namedtuple
+from contextlib import redirect_stderr
+from io import StringIO
 from tabulate import tabulate
-from traits import TraitError
 
 from cpac.utils import Locals_to_bind, Permission_mode
 
-path_regex = re.compile("(?<=(a value of ')).*(?=(' <class))")
 Platform_Meta = namedtuple('Platform_Meta', 'name symbol')
 
 
@@ -23,19 +22,16 @@ class Backend(object):
         raise NotImplementedError()
 
     def read_crash(self, crashfile, flags=[], **kwargs):
-        try crash_message = self._read_crash(
-            self, crashfile, flags[], **kwargs
-        ):
-            if (
-                'TraitError' in crash_message and
-                'existing file' in crash_message
-            ):
-                self._touch_trait_error_path(crash_message)
-                self.read_crash(self, crashfile, flags=[], **kwargs)
-        except TraitError as e:
-            if 'existing file' in e:
-                self._touch_trait_error_path(e)
-                self.read_crash(self, crashfile, flags=[], **kwargs)
+        self._set_crashfile_binding(crashfile)
+        self._load_logging()
+        stderr = StringIO()
+        with redirect_stderr(stderr):
+            crash_message = ''.join(list(self._read_crash(
+                crashfile
+            )))
+            crash_message += stderr.getvalue()
+            stderr.read()  # clear stderr
+            print(crash_message.strip())
 
     def _bind_volume(self, local, remote, mode):
         local, remote = self._prep_binding(local, remote)
@@ -153,14 +149,8 @@ class Backend(object):
     def _set_crashfile_binding(self, crashfile):
         for ckey in ["/wd/", "/crash/", "/log"]:
             if ckey in crashfile:
-                self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'ro')
-
-    def _touch_trait_error_path(self, crash_message):
-        match = path_regex.search(crash_message)
-        if match:
-            path_to_touch = match[0]
-            os.makedirs(match[0], exist_ok=True)
-            Path(match[0]).touch(exist_ok=True)
+                self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'rw')
+        self._bind_volume(tempfile.TemporaryDirectory().name, '/out', 'rw')
 
 
 class Result(object):

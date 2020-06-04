@@ -3,9 +3,9 @@ import os
 from itertools import chain
 from spython.main import Client
 from subprocess import CalledProcessError
-from sys import exc_info
 
 from cpac.backends.platform import Backend, Platform_Meta
+from cpac.helpers import cpac_read_crash
 
 BINDING_MODES = {'ro': 'ro', 'w': 'rw', 'rw': 'rw'}
 
@@ -85,13 +85,12 @@ class Singularity(Backend):
         except CalledProcessError:  # pragma: no cover
             return
 
-    def _read_crash(self, crashfile, flags=[], **kwargs):
-        self._load_logging()
-        self._set_crashfile_binding(crashfile)
-        [print(o, end='') for o in self._try_to_stream(
-            args={'command': f'nipypecli crash {crashfile}'},
+    def _read_crash(self, crashfile):
+        os.chmod(cpac_read_crash.__file__, 0o775)
+        return self._try_to_stream(
+            args={'command': f'{cpac_read_crash.__file__} {crashfile}'},
             stream_command='execute'
-        )]
+        )
 
     def run(self, flags=[], **kwargs):
         self._load_logging()
