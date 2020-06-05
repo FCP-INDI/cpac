@@ -13,7 +13,7 @@ C-PAC Python Package is a lightweight Python package that handles interfacing a 
 Dependencies
 ============
 
-* `Python <https://www.python.org>`_ ≥3.5
+* `Python <https://www.python.org>`_ ≥3.6
 * `pip <https://pip.pypa.io>`_
 * At least one of:
 

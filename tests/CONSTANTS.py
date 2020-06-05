@@ -8,3 +8,6 @@ def SINGULARITY_OPTION():
     return(f'--image {singularity_option}' if (
         singularity_option is not None
     ) else '--platform singularity')
+
+
+PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION()]

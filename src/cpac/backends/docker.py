@@ -33,10 +33,8 @@ class Docker(Backend):
                     else:
                         self.docker_kwargs[k] = v
 
-    def read_crash(self, crashfile, flags=[], **kwargs):
-        self._set_crashfile_binding(crashfile)
-        self.docker_kwargs['entrypoint'] = f'nipypecli crash {crashfile}'
-        self._execute(command=flags)
+    def _read_crash(self, read_crash_command):
+        return(self._execute(command=read_crash_command, run_type='exec'))
 
     def run(self, flags=[], **kwargs):
         kwargs['command'] = [i for i in [
@@ -69,30 +67,44 @@ class Docker(Backend):
         ] if (i is not None and len(i))]
         self._execute(**kwargs)
 
-    def _execute(self, command, **kwargs):
-        self.image = ':'.join([
-            kwargs['image'] if kwargs.get(
-                'image'
-            ) is not None else 'fcpindi/c-pac',
-            self.bindings['tag'] if self.bindings.get(
-                'tag'
-            ) is not None else 'latest'
-        ])
+    def _execute(self, command, run_type='run', **kwargs):
+        image = kwargs['image'] if kwargs.get(
+            'image'
+        ) is not None else 'fcpindi/c-pac'
+        tag = self.bindings['tag'] if self.bindings.get(
+            'tag'
+        ) is not None else 'latest'
+        self.image = ':'.join([image, tag])
+        try:
+            self.client.images.get(self.image)
+        except docker.errors.ImageNotFound:
+            [print(layer[k]) for layer in self.client.api.pull(
+                repository=image,
+                tag=tag,
+                stream=True,
+                decode=True
+            ) for k in layer if k in {'id', 'status', 'progress'}]
 
         self._load_logging()
-
-        self._run = DockerRun(self.client.containers.run(
+        self.container = self.client.containers.run(
             self.image,
-            command=command,
+            command=command if run_type == 'run' else None,
             detach=True,
             user=':'.join([
                 str(self.bindings['uid']),
                 str(self.bindings['gid'])
             ]),
-            volumes=self.bindings['mounts'],
+            volumes=self._volumes_to_docker_mounts(),
             working_dir=kwargs.get('working_dir', '/tmp'),
             **self.docker_kwargs
-        ))
+        )
+        if run_type == 'exec':
+            self._run = self.container.exec_run(
+                command, stream=True, demux=True
+            )
+            return(self._run.output)
+        else:
+            self._run = DockerRun(self.container)
 
 
 class DockerRun(object):

@@ -4,8 +4,7 @@ import sys
 from unittest import mock
 
 from cpac.__main__ import run
-from CONSTANTS import SINGULARITY_OPTION
-PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION()]
+from CONSTANTS import PLATFORM_ARGS
 
 
 @pytest.mark.parametrize('args,platform', [
