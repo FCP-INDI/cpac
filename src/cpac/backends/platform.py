@@ -5,10 +5,12 @@ import tempfile
 import textwrap
 
 from collections import namedtuple
+from contextlib import redirect_stderr
+from io import StringIO
 from tabulate import tabulate
 
+from cpac.helpers import cpac_read_crash
 from cpac.utils import Locals_to_bind, Permission_mode
-
 
 Platform_Meta = namedtuple('Platform_Meta', 'name symbol')
 
@@ -19,6 +21,27 @@ class Backend(object):
 
     def start(self, pipeline_config, subject_config):
         raise NotImplementedError()
+
+    def read_crash(self, crashfile, flags=[], **kwargs):
+        os.chmod(cpac_read_crash.__file__, 0o775)
+        self._set_crashfile_binding(crashfile)
+        if self.platform.name == 'Singularity':
+            self._load_logging()
+        stderr = StringIO()
+        with redirect_stderr(stderr):
+            crash_lines = list(self._read_crash(
+                f'{cpac_read_crash.__file__} {crashfile}'
+            ))
+            crash_message = ''.join([
+                l.decode('utf-8') if isinstance(l, bytes) else l for l in (
+                    [line[0] for line in crash_lines] if (
+                        len(crash_lines) and isinstance(crash_lines[0], tuple)
+                    ) else crash_lines
+                )
+            ])
+            crash_message += stderr.getvalue()
+            stderr.read()  # clear stderr
+            print(crash_message.strip())
 
     def _bind_volume(self, local, remote, mode):
         local, remote = self._prep_binding(local, remote)
@@ -121,22 +144,27 @@ class Backend(object):
         uid = os.getuid()
         self.bindings = {
             'gid': pwd.getpwuid(uid).pw_gid,
-            'mounts': [
-                '{}:{}:{}'.format(
-                    i,
-                    j['bind'],
-                    j['mode']
-                ) for i in self.volumes.keys() for j in self.volumes[i]
-            ],
             'tag': tag,
             'uid': uid,
             'volumes': self.volumes
         }
 
+    def _volumes_to_docker_mounts(self):
+        return([
+            '{}:{}:{}'.format(
+                i,
+                j['bind'],
+                j['mode']
+            ) for i in self.volumes.keys() for j in self.volumes[i]
+        ])
+
     def _set_crashfile_binding(self, crashfile):
         for ckey in ["/wd/", "/crash/", "/log"]:
             if ckey in crashfile:
-                self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'ro')
+                self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'rw')
+        self._bind_volume(tempfile.TemporaryDirectory().name, '/out', 'rw')
+        helper_dir = os.path.dirname(cpac_read_crash.__file__)
+        self._bind_volume(helper_dir, helper_dir, 'ro')
 
 
 class Result(object):
