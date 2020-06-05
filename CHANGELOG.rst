@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.2.4
+=============
+* 💪 Make ``crash`` command automatically touch (within a container) all missing files a crashfile requires to exist and print the underlying output
+* 🐳 Make Docker commands (especially ``pull`` and ``crash``) more robust
+
 `Version 0.2.3: Crashfile <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.3>`_
 ==================================================================================================
 * ✨ Added ``group`` and ``crash`` commands
