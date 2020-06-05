@@ -1,6 +1,8 @@
 import docker
 import subprocess
 
+from tabulate import tabulate
+
 from cpac.backends.platform import Backend, Platform_Meta
 from cpac.helpers import cpac_read_crash
 
@@ -69,19 +71,23 @@ class Docker(Backend):
         self._execute(**kwargs)
 
     def _execute(self, command, run_type='run', **kwargs):
-        self.image = ':'.join([
-            kwargs['image'] if kwargs.get(
-                'image'
-            ) is not None else 'fcpindi/c-pac',
-            self.bindings['tag'] if self.bindings.get(
-                'tag'
-            ) is not None else 'latest'
-        ])
-        try:
-            self.client.images.get(self.image)
-        except docker.errors.ImageNotFound:
-            print('aha')
-            pass
+        image = kwargs['image'] if kwargs.get(
+            'image'
+        ) is not None else 'fcpindi/c-pac'
+        tag = self.bindings['tag'] if self.bindings.get(
+            'tag'
+        ) is not None else 'latest'
+        self.image = ':'.join([image, tag])
+        try: 
+            self.client.images.get(self.image) 
+        except docker.errors.ImageNotFound: 
+            [print(layer[k]) for layer in self.client.api.pull(
+                repository=image,
+                tag=tag,
+                stream=True,
+                decode=True
+            ) for k in layer if k in {'id', 'status', 'progress'}]
+
         
         self._load_logging()
         self.container = self.client.containers.run(
@@ -100,7 +106,7 @@ class Docker(Backend):
             self._run = self.container.exec_run(
                 command, stream=True, demux=True
             )
-            return(list(self._run.output))
+            return(self._run.output)
         else:
             self._run = DockerRun(self.container)
 
