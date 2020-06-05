@@ -9,8 +9,7 @@ from CONSTANTS import PLATFORM_ARGS
 
 
 @pytest.mark.parametrize('args', PLATFORM_ARGS)
-def test_utils_new_settings_template(args, capsys, tmp_path):
-    wd = tmp_path
+def test_utils_new_settings_template(args, capsys):
     crashfile = os.path.join(
         os.path.dirname(__file__), 'test_data', 'test_pickle.pklz'
     )

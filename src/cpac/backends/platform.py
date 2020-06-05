@@ -148,7 +148,7 @@ class Backend(object):
             'uid': uid,
             'volumes': self.volumes
         }
-        
+
     def _volumes_to_docker_mounts(self):
         return([
             '{}:{}:{}'.format(

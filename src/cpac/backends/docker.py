@@ -1,10 +1,7 @@
 import docker
-import subprocess
-
-from tabulate import tabulate
 
 from cpac.backends.platform import Backend, Platform_Meta
-from cpac.helpers import cpac_read_crash
+
 
 class Docker(Backend):
     def __init__(self, **kwargs):
@@ -78,9 +75,9 @@ class Docker(Backend):
             'tag'
         ) is not None else 'latest'
         self.image = ':'.join([image, tag])
-        try: 
-            self.client.images.get(self.image) 
-        except docker.errors.ImageNotFound: 
+        try:
+            self.client.images.get(self.image)
+        except docker.errors.ImageNotFound:
             [print(layer[k]) for layer in self.client.api.pull(
                 repository=image,
                 tag=tag,
@@ -88,7 +85,6 @@ class Docker(Backend):
                 decode=True
             ) for k in layer if k in {'id', 'status', 'progress'}]
 
-        
         self._load_logging()
         self.container = self.client.containers.run(
             self.image,
