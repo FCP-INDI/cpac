@@ -1,6 +1,7 @@
 coveralls
 docker >= 4.2.1
 docker-pycreds
+nipype
 pandas >= 0.23.4
 pytest
 pytest-remotedata>=0.3.2
