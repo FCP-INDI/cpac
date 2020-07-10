@@ -1,5 +1,7 @@
 import docker
 
+from requests.exceptions import ConnectionError
+
 from cpac.backends.platform import Backend, Platform_Meta
 
 
@@ -10,8 +12,11 @@ class Docker(Backend):
         self.client = docker.from_env()
         try:
             self.client.ping()
-        except docker.errors.APIError:  # pragma: no cover
-            raise OSError(f"Could not connect to {self.platform.name}")
+        except (docker.errors.APIError, ConnectionError):  # pragma: no cover
+            raise OSError(
+                f"Could not connect to {self.platform.name}. "
+                "Is Docker running?"
+            )
         self.volumes = {}
         self._set_bindings(**kwargs)
         self.docker_kwargs = {}
@@ -86,29 +91,48 @@ class Docker(Backend):
             ) for k in layer if k in {'id', 'status', 'progress'}]
 
         self._load_logging()
-        self.container = self.client.containers.run(
-            self.image,
-            command=command if run_type == 'run' else None,
-            detach=True,
-            user=':'.join([
-                str(self.bindings['uid']),
-                str(self.bindings['gid'])
-            ]),
-            volumes=self._volumes_to_docker_mounts(),
-            working_dir=kwargs.get('working_dir', '/tmp'),
-            **self.docker_kwargs
-        )
-        if run_type == 'exec':
-            self._run = self.container.exec_run(
-                command, stream=True, demux=True
+
+        if run_type == 'run':
+            self.container = self.client.containers.run(
+                self.image,
+                command=command,
+                detach=True,
+                stderr=True,
+                stdout=True,
+                remove=True,
+                user=':'.join([
+                    str(self.bindings['uid']),
+                    str(self.bindings['gid'])
+                ]),
+                volumes=self._volumes_to_docker_mounts(),
+                working_dir=kwargs.get('working_dir', '/tmp'),
+                **self.docker_kwargs
             )
-            return(self._run.output)
-        else:
             self._run = DockerRun(self.container)
+        elif run_type == 'exec':
+            self.container = self.client.containers.create(
+                self.image,
+                auto_remove=True,
+                entrypoint='/bin/bash',
+                stdin_open=True,
+                user=':'.join([
+                    str(self.bindings['uid']),
+                    str(self.bindings['gid'])
+                ]),
+                volumes=self._volumes_to_docker_mounts(),
+                working_dir=kwargs.get('working_dir', '/tmp'),
+                **self.docker_kwargs
+            )
+            self.container.start()
+            return(self.container.exec_run(
+                cmd=command,
+                stdout=True,
+                stderr=True,
+                stream=True
+            )[1])
 
 
 class DockerRun(object):
-
     def __init__(self, container):
         self.container = container
         [print(l.decode('utf-8'), end='') for l in self.container.attach(
