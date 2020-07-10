@@ -70,9 +70,9 @@ Usage
 .. |github-version| image:: https://img.shields.io/github/tag/shnizzedy/cpac-python-package.svg
     :target: https://github.com/shnizzedy/cpac-python-package/releases
     :alt: GitHub version
-.. |build-status| image:: https://travis-ci.org/shnizzedy/cpac-python-package.svg?branch=master
+.. |build-status| image:: https://travis-ci.org/shnizzedy/cpac-python-package.svg?branch=trunk
     :target: https://travis-ci.org/shnizzedy/cpac-python-package
     :alt: Travis CI build status
-.. |coverage| image:: https://coveralls.io/repos/github/shnizzedy/cpac-python-package/badge.svg?branch=master
-    :target: https://coveralls.io/github/shnizzedy/cpac-python-package?branch=master
+.. |coverage| image:: https://coveralls.io/repos/github/shnizzedy/cpac-python-package/badge.svg?branch=trunk
+    :target: https://coveralls.io/github/shnizzedy/cpac-python-package?branch=trunk
     :alt: coverage badge
