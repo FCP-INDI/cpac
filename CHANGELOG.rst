@@ -1,6 +1,9 @@
 =========
 Changelog
 =========
+`Version 0.2.5 <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.5>`_
+=======================================================================================
+* 📢🐳 Provide a clearer error message if package cannot connect to Docker.
 
 `Version 0.2.4 <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.4>`_
 =======================================================================================

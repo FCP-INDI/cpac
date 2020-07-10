@@ -1,5 +1,7 @@
 import docker
 
+from requests.exceptions import ConnectionError
+
 from cpac.backends.platform import Backend, Platform_Meta
 
 
@@ -10,8 +12,11 @@ class Docker(Backend):
         self.client = docker.from_env()
         try:
             self.client.ping()
-        except docker.errors.APIError:  # pragma: no cover
-            raise OSError(f"Could not connect to {self.platform.name}")
+        except (docker.errors.APIError, ConnectionError):  # pragma: no cover
+            raise OSError(
+                f"Could not connect to {self.platform.name}. "
+                "Is Docker running?"
+            )
         self.volumes = {}
         self._set_bindings(**kwargs)
         self.docker_kwargs = {}
@@ -86,10 +91,14 @@ class Docker(Backend):
             ) for k in layer if k in {'id', 'status', 'progress'}]
 
         self._load_logging()
+        print(command)
         self.container = self.client.containers.run(
             self.image,
-            command=command if run_type == 'run' else None,
+            command=command,
             detach=True,
+            stderr=True,
+            stdout=True,
+            remove=True,
             user=':'.join([
                 str(self.bindings['uid']),
                 str(self.bindings['gid'])
@@ -99,10 +108,9 @@ class Docker(Backend):
             **self.docker_kwargs
         )
         if run_type == 'exec':
-            self._run = self.container.exec_run(
-                command, stream=True, demux=True
-            )
-            return(self._run.output)
+            return(self.container.attach(
+                logs=True, stdout=True, stderr=True, stream=True
+            ))
         else:
             self._run = DockerRun(self.container)
 
