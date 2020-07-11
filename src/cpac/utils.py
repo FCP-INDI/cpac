@@ -190,3 +190,26 @@ def render_crashfile(crash_path):
     -------
     str, contents of pickle
     """
+
+
+def traverse_deep(r, keys):
+    for i, k in enumerate(keys):
+        if type(r) == dict:
+            if k == '*':
+                return {
+                    kk: traverse_deep(r[kk], keys[i+1:])
+                    for kk in r.keys()
+                }
+
+            r = r[k]
+
+        elif type(r) == list:
+            if k == '*':
+                return [
+                    traverse_deep(rr, keys[i+1:])
+                    for rr in r
+                ]
+
+            r = r[int(k)]
+
+    return r

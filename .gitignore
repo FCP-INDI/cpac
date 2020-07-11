@@ -11,7 +11,7 @@
 __pycache__/*
 .cache/*
 .*.swp
-*/.ipynb_checkpoints/*
+.ipynb_checkpoints/*
 
 # Project files
 .ropeproject
@@ -20,12 +20,14 @@ __pycache__/*
 .settings
 .idea
 tags
+.vscode
 
 # Package files
 *.egg
 *.eggs/
 .installed.cfg
 *.egg-info
+pip-wheel-metadata
 
 # Unittest and coverage
 htmlcov/*
