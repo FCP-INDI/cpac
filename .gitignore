@@ -11,8 +11,12 @@
 __pycache__/*
 .cache/*
 .*.swp
+<<<<<<< HEAD
 */.ipynb_checkpoints/*
 tmp
+=======
+.ipynb_checkpoints/*
+>>>>>>> db1073c (add base for the API and a scheduler test)
 
 # Project files
 .ropeproject
@@ -21,12 +25,14 @@ tmp
 .settings
 .idea
 tags
+.vscode
 
 # Package files
 *.egg
 *.eggs/
 .installed.cfg
 *.egg-info
+pip-wheel-metadata
 
 # Unittest and coverage
 htmlcov/*

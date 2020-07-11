@@ -1,0 +1,2 @@
+dataFormat: BIDS
+bidsBaseDir: s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU
