@@ -9,10 +9,10 @@ class Schedule:
         self._uid = str(uuid.uuid4())
         self._results = {}
 
-    def pre_run(self):
+    def pre(self):
         raise NotImplementedError
 
-    def post_run(self):
+    def post(self):
         raise NotImplementedError
 
     def __hash__(self):
@@ -64,7 +64,7 @@ class DataConfigSchedule(Schedule):
         self.data_config = data_config
         self.pipeline = pipeline
 
-    def post_run(self):
+    def post(self):
 
         data_config = self['data_config']
 

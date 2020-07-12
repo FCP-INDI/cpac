@@ -16,7 +16,7 @@ SCHEDULER_ADDRESS = ('localhost', 3333)
 
 class ScheduleTree:
 
-    def __init__(self, name, children=None, parent=None, schedule=None):
+    def __init__(self, name, schedule=None, children=None, parent=None):
         self.name = name
         self.children = children or {}
         self.parent = parent
@@ -24,16 +24,12 @@ class ScheduleTree:
 
     @property
     def status(self):
-        status = {}
-        if self.schedule:
-            status['id'] = repr(self.schedule)
-            status['status'] = self.schedule.status
-        if self.children:
-            status['children'] = {}
-            for k, v in self.children.items():
-                status['children'][str(k)] = v.status
-        return status
+        return self.schedule.status
     
+    @property
+    def logs(self):
+        return self.schedule.logs
+
     def __getitem__(self, key):
         return self.children[key]
     
@@ -52,7 +48,7 @@ class Scheduler:
     def __getitem__(self, key):
         return self._schedules.children[key]
 
-    def schedule(self, schedule, parent=None, reference=None):
+    def schedule(self, schedule, parent=None, name=None):
 
         backend = self.backend
 
@@ -61,9 +57,9 @@ class Scheduler:
 
         schedule = self._mix_up(backend, schedule)
 
-        self._schedules.children[schedule] = ScheduleTree(name=reference or schedule.uid, parent=parent, schedule=schedule)
+        self._schedules.children[schedule] = ScheduleTree(name=name, parent=parent, schedule=schedule)
         if parent:
-            self._schedules[parent].children[reference or schedule] = self._schedules[schedule]
+            self._schedules[parent].children[schedule] = self._schedules[schedule]
 
         self.executor.submit(self.run_scheduled, schedule)
 
@@ -94,7 +90,7 @@ class Scheduler:
         sid = str(schedule)
 
         if isinstance(it, Iterable):
-            for ref, subschedule in it:
+            for name, subschedule in it:
 
                 if not isinstance(subschedule, Schedule):
                     logger.info(f'Not subclass')
@@ -105,7 +101,7 @@ class Scheduler:
                 self.schedule(
                     subschedule,
                     parent=schedule,
-                    reference=ref
+                    name=name
                 )
 
                 if sid in self._watchers:
@@ -133,18 +129,34 @@ class Scheduler:
 
     @property
     def statuses(self):
-        return self._schedules.status
+        root = self._schedules
+        nodes = {}
+        for schedule, child in root.children.items():
+            node = {}
+            node["id"] = repr(schedule)
+            node["status"] = schedule.status
+            if child.name:
+                node['name'] = child.name
+            if child.parent:
+                node["parent"] = repr(child.parent)
+            if child.children:
+                node["children"] = [repr(k) for k in child.children.keys()]
+            nodes[repr(schedule)] = node
+        return nodes
 
     @property
     def logs(self):
-
-        def __transverse_logs(root):
+        root = self._schedules
+        nodes = {}
+        for schedule, child in root.children.items():
             node = {}
-            if root["schedule"]:
-                node["logs"] = root["schedule"].logs
-            node["children"] = {}
-            for id, s in root["children"].items():
-                node["children"][id] = __transverse_logs(s)
-            return node
-
-        return __transverse_logs(self._schedules[None])
+            node["id"] = repr(schedule)
+            node["logs"] = schedule.logs
+            if child.name:
+                node['name'] = child.name
+            if child.parent:
+                node["parent"] = repr(child.parent)
+            if child.children:
+                node["children"] = [repr(k) for k in child.children.keys()]
+            nodes[repr(schedule)] = node
+        return nodes

@@ -33,8 +33,6 @@ class Backend:
 
 class BackendSchedule:
 
-    _run = None
-
     def __init__(self, backend):
         self.backend = backend
 
@@ -47,17 +45,17 @@ class BackendSchedule:
 
     @property
     def logs(self):
-        return {
-            'id': repr(self),
-            'hash': hash(self),
-        }
+        return {}
+
+    def run(self):
+        raise NotImplementedError
 
     def __call__(self):
-        
-        if hasattr(self, 'pre_run'):
+
+        if hasattr(self, 'pre'):
             try:
                 logger.info(f'[{self}] Pre-running')
-                it = self.pre_run()
+                it = self.pre()
                 if isinstance(it, Iterable):
                     yield from it
             except NotImplementedError:
@@ -68,14 +66,11 @@ class BackendSchedule:
         if isinstance(it, Iterable):
             yield from it
 
-        if hasattr(self, 'post_run'):
+        if hasattr(self, 'post'):
             try:
                 logger.info(f'[{self}] Post-running')
-                it = self.post_run()
+                it = self.post()
                 if isinstance(it, Iterable):
                     yield from it
             except NotImplementedError:
                 pass
-            
-    def run(self):
-        pass
