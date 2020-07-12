@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-    Dummy conftest.py for cpac.
 
-    If you don't know what this is for, just leave it empty.
-    Read more about conftest.py under:
-    https://pytest.org/latest/plugins.html
-"""
+import os
+import sys
 
-# import pytest
+sys.path.append(os.path.join(os.path.dirname(__file__), 'test_data'))
