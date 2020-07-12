@@ -11,12 +11,8 @@
 __pycache__/*
 .cache/*
 .*.swp
-<<<<<<< HEAD
 */.ipynb_checkpoints/*
 tmp
-=======
-.ipynb_checkpoints/*
->>>>>>> db1073c (add base for the API and a scheduler test)
 
 # Project files
 .ropeproject
