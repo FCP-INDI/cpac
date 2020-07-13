@@ -7,6 +7,7 @@ https://pytest.org/latest/plugins.html
 """
 import logging
 
+<<<<<<< HEAD
 import pytest  # pylint: disable=import-error
 
 LOGGER = logging.getLogger()
@@ -37,3 +38,11 @@ def pytest_generate_tests(metafunc):
         fixture = getattr(metafunc.config.option, option)
         if option in metafunc.fixturenames:
             metafunc.parametrize(option, fixture)
+=======
+class Constants:
+    TESTS_PATH = os.path.join(os.path.dirname(__file__))
+    TESTS_DATA_PATH = os.path.join(TESTS_PATH, 'test_data')
+
+
+sys.path.append(Constants.TESTS_DATA_PATH)
+>>>>>>> f1df845 (initial test for Docker, using data_settings)
