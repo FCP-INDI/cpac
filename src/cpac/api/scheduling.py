@@ -56,10 +56,11 @@ class Scheduler:
             raise ValueError(f"Schedule must be naive, got {schedule.__class__.__name__}")
 
         schedule = self._mix_up(backend, schedule)
+        schedule_id = repr(schedule)
 
-        self._schedules.children[schedule] = ScheduleTree(name=name, parent=parent, schedule=schedule)
+        self._schedules.children[schedule_id] = ScheduleTree(name=name, parent=parent, schedule=schedule)
         if parent:
-            self._schedules[parent].children[schedule] = self._schedules[schedule]
+            self._schedules[repr(parent)].children[schedule_id] = self._schedules[schedule_id]
 
         self.executor.submit(self.run_scheduled, schedule)
 
@@ -131,32 +132,37 @@ class Scheduler:
     def statuses(self):
         root = self._schedules
         nodes = {}
-        for schedule, child in root.children.items():
+        for schedule_id, child in root.children.items():
+            schedule = child.schedule
+
             node = {}
-            node["id"] = repr(schedule)
+            node["id"] = schedule_id
             node["status"] = schedule.status
             if child.name:
                 node['name'] = child.name
             if child.parent:
                 node["parent"] = repr(child.parent)
             if child.children:
-                node["children"] = [repr(k) for k in child.children.keys()]
-            nodes[repr(schedule)] = node
+                node["children"] = [k for k in child.children.keys()]
+            nodes[schedule_id] = node
+
         return nodes
 
     @property
     def logs(self):
         root = self._schedules
         nodes = {}
-        for schedule, child in root.children.items():
+        for schedule_id, child in root.children.items():
+            schedule = child.schedule
+
             node = {}
-            node["id"] = repr(schedule)
+            node["id"] = schedule_id
             node["logs"] = schedule.logs
             if child.name:
                 node['name'] = child.name
             if child.parent:
                 node["parent"] = repr(child.parent)
             if child.children:
-                node["children"] = [repr(k) for k in child.children.keys()]
-            nodes[repr(schedule)] = node
+                node["children"] = [k for k in child.children.keys()]
+            nodes[schedule_id] = node
         return nodes
