@@ -13,33 +13,8 @@ from tornado import httpclient
 
 import docker
 
-from ...utils import string_types
 from .base import Backend, RunStatus, BackendSchedule
-
 from ..schedules import Schedule, DataSettingsSchedule, DataConfigSchedule, ParticipantPipelineSchedule
-
-
-class Docker(Backend):
-
-    tag = 'nightly'
-
-    base_schedule_class = DockerSchedule
-
-    schedule_mapping = {
-        Schedule: DockerSchedule,
-        DataSettingsSchedule: DockerDataSettingsSchedule,
-        DataConfigSchedule: DockerDataConfigSchedule,
-        ParticipantPipelineSchedule: DockerParticipantPipelineSchedule,
-    }
-
-    def __init__(self, scheduler):
-        self.client = docker.from_env()
-        try:
-            self.client.ping()
-        except docker.errors.APIError:
-            raise "Could not connect to Docker"
-        self.scheduler = scheduler
-
 
 class DockerRun(object):
 
@@ -69,7 +44,7 @@ class DockerRun(object):
         return RunStatus.UNKNOWN
 
 
-class DockerSchedule(Schedule, BackendSchedule):
+class DockerSchedule(BackendSchedule):
 
     _run = None
 
@@ -85,7 +60,7 @@ class DockerSchedule(Schedule, BackendSchedule):
         mapping = {}
         subject = copy.deepcopy(subject)
 
-        if isinstance(subject, string_types):
+        if isinstance(subject, str):
             if '/' not in subject:
                 return subject, mapping
 
@@ -111,7 +86,7 @@ class DockerSchedule(Schedule, BackendSchedule):
             return subject, mapping
 
 
-class DockerDataSettingsSchedule(DataSettingsSchedule, BackendSchedule):
+class DockerDataSettingsSchedule(DockerSchedule, DataSettingsSchedule):
 
     def run(self):
         output_folder = tempfile.mkdtemp()
@@ -128,6 +103,7 @@ class DockerDataSettingsSchedule(DataSettingsSchedule, BackendSchedule):
             '/',
             '/output_folder',
             'cli',
+            '--',
             'utils',
             'data_config',
             'build',
@@ -148,12 +124,12 @@ class DockerDataSettingsSchedule(DataSettingsSchedule, BackendSchedule):
             files = glob.glob(os.path.join(output_folder, 'cpac_data_config_*.yml'))
             if files:
                 with open(files[0]) as f:
-                    self._results['data_config'] = yaml.load(f)
+                    self._results['data_config'] = yaml.safe_load(f)
         finally:
             shutil.rmtree(output_folder)
 
 
-class DockerDataConfigSchedule(DataConfigSchedule, BackendSchedule):
+class DockerDataConfigSchedule(DataConfigSchedule, DockerSchedule):
 
     def run(self):
         self._output_folder = tempfile.mkdtemp()
@@ -195,12 +171,12 @@ class DockerDataConfigSchedule(DataConfigSchedule, BackendSchedule):
             files = glob.glob(os.path.join(self._output_folder, 'cpac_data_config_*.yml'))
             if files:
                 with open(files[0]) as f:
-                    self._results['data_config'] = yaml.load(f)
+                    self._results['data_config'] = yaml.safe_load(f)
         finally:
             shutil.rmtree(self._output_folder)
 
 
-class DockerParticipantPipelineSchedule(ParticipantPipelineSchedule, BackendSchedule):
+class DockerParticipantPipelineSchedule(ParticipantPipelineSchedule, DockerSchedule):
 
     def run(self):
         config_folder = tempfile.mkdtemp()
@@ -269,3 +245,27 @@ class DockerParticipantPipelineSchedule(ParticipantPipelineSchedule, BackendSche
             http_client.close()
 
         return []
+
+
+class DockerBackend(Backend):
+
+    tag = 'nightly'
+
+    base_schedule_class = DockerSchedule
+
+    schedule_mapping = {
+        Schedule: DockerSchedule,
+        DataSettingsSchedule: DockerDataSettingsSchedule,
+        DataConfigSchedule: DockerDataConfigSchedule,
+        ParticipantPipelineSchedule: DockerParticipantPipelineSchedule,
+    }
+
+    def __init__(self, scheduler=None, tag=None):
+        self.client = docker.from_env()
+        try:
+            self.client.ping()
+        except docker.errors.APIError:
+            raise "Could not connect to Docker"
+
+        self.scheduler = scheduler
+        self.tag = tag or DockerBackend.tag
