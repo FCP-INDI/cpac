@@ -24,11 +24,15 @@ class Backend:
         ParticipantPipelineSchedule: None,
     }
 
-    def __init__(self, scheduler):
+    def __init__(self, scheduler=None):
         self.scheduler = scheduler
 
     def __getitem__(self, key):
         return self.schedule_mapping.get(key)
+
+    def __call__(self, scheduler):
+        self.scheduler = scheduler
+        return self
 
 
 class BackendSchedule:
