@@ -4,4 +4,9 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'test_data'))
+class Constants:
+    TESTS_PATH = os.path.join(os.path.dirname(__file__))
+    TESTS_DATA_PATH = os.path.join(TESTS_PATH, 'test_data')
+
+
+sys.path.append(Constants.TESTS_DATA_PATH)
