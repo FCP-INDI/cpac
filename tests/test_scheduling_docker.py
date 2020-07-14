@@ -18,12 +18,27 @@ def docker_image():
     build_image(tag='docker-test')
 
 
-def test_scheduler_docker(docker_image):
+@pytest.fixture(scope="module")
+def scheduler():
     scheduler = Scheduler(DockerBackend(tag='docker-test'), executor=DummyExecutor)
+    return scheduler
 
+
+def test_scheduler_docker_settings(docker_image, scheduler):
     schedule = scheduler.schedule(
         DataSettingsSchedule(
             data_settings=os.path.join(Constants.TESTS_DATA_PATH, 'data_settings_template.yml')
+        )
+    )
+
+    assert len(schedule['data_config']) == 4
+    assert all(s['site'] == 'NYU' for s in schedule['data_config'])
+
+
+def test_scheduler_docker_config(docker_image, scheduler):
+    schedule = scheduler.schedule(
+        DataConfigSchedule(
+            data_config='s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU/'
         )
     )
 

@@ -79,11 +79,7 @@ class DataConfigSchedule(Schedule):
 
             yield (
                 '/'.join(subject_id),
-                ParticipantPipelineSchedule,
-                {
-                    'pipeline': self.pipeline,
-                    'subject': subject,
-                }
+                ParticipantPipelineSchedule(pipeline=self.pipeline, subject=subject),
             )
 
 

@@ -6,15 +6,20 @@ import os
 import shutil
 import tempfile
 import time
+import zlib
 from base64 import b64decode, b64encode
+
+from ...utils import yaml_parse
 
 import yaml
 from tornado import httpclient
 
 import docker
 
-from .base import Backend, RunStatus, BackendSchedule
-from ..schedules import Schedule, DataSettingsSchedule, DataConfigSchedule, ParticipantPipelineSchedule
+from ..schedules import (DataConfigSchedule, DataSettingsSchedule,
+                         ParticipantPipelineSchedule, Schedule)
+from .base import Backend, BackendSchedule, RunStatus
+
 
 class DockerRun(object):
 
@@ -96,8 +101,9 @@ class DockerDataSettingsSchedule(DockerSchedule, DataSettingsSchedule):
             '/tmp': {'bind': '/scratch', 'mode': 'rw'},
         }
 
-        data_settings = self.data_settings
-        shutil.copy(data_settings, os.path.join(output_folder, 'data_settings.yml'))
+        data_settings = yaml_parse(self.data_settings)
+        with open(os.path.join(output_folder, 'data_settings.yml'), 'w') as f:
+            yaml.dump(data_settings, f)
 
         container_args = [
             '/',
@@ -129,34 +135,44 @@ class DockerDataSettingsSchedule(DockerSchedule, DataSettingsSchedule):
             shutil.rmtree(output_folder)
 
 
-class DockerDataConfigSchedule(DataConfigSchedule, DockerSchedule):
+class DockerDataConfigSchedule(DockerSchedule, DataConfigSchedule):
 
     def run(self):
-        self._output_folder = tempfile.mkdtemp()
+        run_folder = tempfile.mkdtemp()
+        config_folder = os.path.join(run_folder, 'config')
+        output_folder = os.path.join(run_folder, 'output')
+
+        os.makedirs(config_folder)
+        os.makedirs(output_folder)
 
         volumes = {
-            self._output_folder: {'bind': '/output_folder', 'mode': 'rw'},
             '/tmp': {'bind': '/scratch', 'mode': 'rw'},
+            config_folder: {'bind': '/config', 'mode': 'ro'},
+            output_folder: {'bind': '/output', 'mode': 'rw'},
         }
 
+        data_folder = None
         data_config = None
-        data_folder = '/'
-        if "\n" in self.data_config:
-            data_config = self.data_config
-        else:
+        try:
+            data_config_data = self.data_config
+            if isinstance(data_config_data, str):
+                data_config_data = yaml_parse(data_config_data)
+            
+            data_config = os.path.join(config_folder, 'data_config.yml')
+            with open(data_config, 'w') as f:
+                yaml.dump(data_config_data, f)
+
+        except ValueError:
             data_folder = self.data_config
 
         if data_folder and not data_folder.startswith('s3://'):
             volumes[data_folder] = {'bind': '/data_folder', 'mode': 'ro'}
             data_folder = '/data_folder'
 
-        container_args = [data_folder, '/output_folder', 'test_config']
+        container_args = [data_folder, '/output', 'test_config']
+
         if data_config:
-            if data_config.lower().startswith('data:'):
-                container_args += ['--data_config_file', data_config]
-            else:
-                container_args += ['--data_config_file', os.path.basename(data_config)]
-                volumes[os.path.dirname(data_config)] = {'bind': '/data_config_file', 'mode': 'ro'}
+            container_args += ['--data_config_file', '/config/data_config.yml']
 
         self._run = DockerRun(self.backend.client.containers.run(
             'fcpindi/c-pac:' + self.backend.tag,
@@ -168,23 +184,28 @@ class DockerDataConfigSchedule(DataConfigSchedule, DockerSchedule):
         self._run.container.wait()
 
         try:
-            files = glob.glob(os.path.join(self._output_folder, 'cpac_data_config_*.yml'))
+            files = glob.glob(os.path.join(output_folder, 'cpac_data_config_*.yml'))
             if files:
                 with open(files[0]) as f:
                     self._results['data_config'] = yaml.safe_load(f)
         finally:
-            shutil.rmtree(self._output_folder)
+            shutil.rmtree(output_folder)
 
 
-class DockerParticipantPipelineSchedule(ParticipantPipelineSchedule, DockerSchedule):
+class DockerParticipantPipelineSchedule(DockerSchedule, ParticipantPipelineSchedule):
 
     def run(self):
-        config_folder = tempfile.mkdtemp()
-        output_folder = tempfile.mkdtemp()
+        run_folder = tempfile.mkdtemp()
+        config_folder = os.path.join(run_folder, 'config')
+        output_folder = os.path.join(run_folder, 'output')
 
+        os.makedirs(config_folder)
+        os.makedirs(output_folder)
+
+        pipeline = None
         if self.pipeline is not None:
-            new_pipeline = os.path.join(config_folder, 'pipeline.yml')
-            shutil.copy(self.pipeline, new_pipeline)
+            pipeline = os.path.join(config_folder, 'pipeline.yml')
+            shutil.copy(self.pipeline, pipeline)
 
         volumes = {
             '/tmp': {'bind': '/scratch', 'mode': 'rw'},
@@ -192,21 +213,21 @@ class DockerParticipantPipelineSchedule(ParticipantPipelineSchedule, DockerSched
             output_folder: {'bind': '/output', 'mode':'rw'},
         }
 
-        subject = 'data:text/plain;base64,' + \
-            b64encode(yaml.dump([self.subject], default_flow_style=False).encode("utf-8")).decode("utf-8")
+        data_config = os.path.join(config_folder, 'data_config.yml')
+        with open(data_config, 'w') as f:
+            yaml.dump([self.subject], f)
 
-        # TODO handle local databases, transverse subject dict to get folder mappings
         command = [
             '/', '/output', 'participant',
             '--monitoring',
             '--skip_bids_validator',
             '--save_working_dir',
             '--data_config_file',
-            subject
+            data_config
         ]
 
-        if self.pipeline:
-            command += ['--pipeline_file', '/config/pipeline.yml']
+        if pipeline:
+            command += ['--pipeline_file', pipeline]
 
         self._run = DockerRun(self.backend.client.containers.run(
             'fcpindi/c-pac:' + self.backend.tag,
