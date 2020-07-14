@@ -50,7 +50,7 @@ before_script:
   - git config --global user.name "Travis"
   - singularity pull shub://FCP-INDI/C-PAC || singularity pull docker://fcpindi/c-pac:latest
 script:
-  - coverage run -m pytest --append
+  - coverage --append run -m pytest
   - coverage combine
   - coverage report -m
 after_success:
