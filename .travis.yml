@@ -51,7 +51,6 @@ before_script:
   - singularity pull shub://FCP-INDI/C-PAC || singularity pull docker://fcpindi/c-pac:latest
 script:
   - coverage run --append -m pytest
-  - coverage combine
   - coverage report -m
 after_success:
   - if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; fi
