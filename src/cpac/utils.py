@@ -1,5 +1,7 @@
 import os
 import yaml
+import zlib
+from base64 import b64decode
 
 from cpac import dist_name
 from itertools import permutations
@@ -213,3 +215,32 @@ def traverse_deep(r, keys):
             r = r[int(k)]
 
     return r
+
+
+def parse_data_url(data_url):
+    header, data = data_url.split(",", 1)
+    media_type, *encoding = header[5:].lower().split(';')
+    for enc in encoding:
+        if enc == 'zlib':
+            data = zlib.decompress(data)
+        elif enc == 'base64':
+            data = b64decode(data)
+    return data, media_type
+
+
+def yaml_parse(path_or_data_url):
+    if path_or_data_url.lower().startswith('s3:'):
+        raise ValueError('Cannot parse s3 URLs')
+
+    if path_or_data_url.lower().startswith('data:'):
+        data, _ = parse_data_url(path_or_data_url)
+        config_data = yaml.safe_load(data)
+        return config_data
+
+    config_filename = os.path.realpath(path_or_data_url)
+    if os.path.isdir(config_filename):
+        raise ValueError('BIDS dataset')
+
+    with open(config_filename, 'r') as f:
+        config_data = yaml.safe_load(f)
+        return config_data
