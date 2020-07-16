@@ -33,24 +33,35 @@ def parse_args(args):
 
     parser = argparse.ArgumentParser(
         description='cpac: a Python package that simplifies using C-PAC '
-                    '<http://fcp-indi.github.io> containerized images. If no '
-                    'platform nor image is specified, cpac will try Docker '
-                    'first, then try Singularity if Docker fails.',
-        conflict_handler='resolve'
+                    '<http://fcp-indi.github.io> containerized images. \n\n'
+                    'This commandline interface package is designed to ' 'minimize repetition.\nAs such, nearly all arguments are '
+                    'optional.\n\nWhen launching a container, this package will '
+                    'try to bind any paths mentioned in \n • the command\n • '
+                    'the data configuration\n\nAn example minimal run command '
+                    'example:\n\tcpac run /path/to/data /path/for/outputs',
+        conflict_handler='resolve',
+        formatter_class=argparse.RawTextHelpFormatter
     )
 
-    parser.add_argument('--platform', choices=['docker', 'singularity'])
+    parser.add_argument(
+        '--platform',
+        choices=['docker', 'singularity'],
+        help='If neither platform nor image is specified,\ncpac will try '
+        'Docker first, the try\nSingularity if Docker fails.'
+    )
 
     parser.add_argument(
         '--image',
         help='path to Singularity image file OR name of Docker image (eg, '
-             '"fcpindi/c-pac"). Will attempt to pull from Singularity Hub or '
-             'Docker Hub if not provided.'
+             '"fcpindi/c-pac").\nWill attempt to pull from Singularity Hub or '
+             'Docker Hub if not provided.\nIf image is specified but platform '
+             'is not, platform is\nassumed to be Singularity if image is a '
+             'path or \nDocker if image is an image name.'
     )
 
     parser.add_argument(
         '--tag',
-        help='tag of the Docker image to use (eg, "latest" or "nightly"). '
+        help='tag of the Docker image to use (eg, "latest" or "nightly").'
     )
 
     parser.add_argument(
@@ -80,40 +91,38 @@ def parse_args(args):
     parser.add_argument(
         '--working_dir',
         default=cwd,
-        help="working directory",
-        metavar="PATH"
+        help='working directory',
+        metavar='PATH'
     )
 
     parser.add_argument(
         '--temp_dir',
         default='/tmp',
-        help="directory for temporary files",
-        metavar="PATH"
-    )
-
-    parser.add_argument(
-        '--output_dir',
-        default=os.path.join(cwd, 'outputs'),
-        help="directory where output files should be stored",
-        metavar="PATH"
+        help='directory for temporary files',
+        metavar='PATH'
     )
 
     parser.add_argument(
         '-o', '--container_option',
         dest='container_option',
-        nargs='+',
-        help="parameters and flags to pass through to Docker or Singularity",
-        metavar="OPT"
+        nargs='*',
+        help='parameters and flags to pass through to Docker or Singularity\n'
+             '\nThis flag can take multiple arguments so cannot '
+             'be\nthe final argument before the command argument (i.e.,\nrun '
+             'or any other command that does not start with - or --)\n',
+        metavar='OPT'
     )
 
     parser.add_argument(
         '-B', '--custom_binding',
-        dest="custom_binding",
-        nargs="+",
-        help="directory to bind to container with a different path than the "
-             "real path in the format real_path:container_path (eg, "
-             "/home/C-PAC/run5/outputs:/outputs). Use absolute paths for both "
-             "paths"
+        dest='custom_binding',
+        nargs='*',
+        help='directories to bind with a different path in\nthe container '
+             'than the real path of the directory.\nOne or more pairs in the ' 'format:\n\treal_path:container_path\n(eg, '
+             '/home/C-PAC/run5/outputs:/outputs).\nUse absolute paths for '
+             'both paths.\n\nThis flag can take multiple arguments so cannot '
+             'be\nthe final argument before the command argument (i.e.,\nrun '
+             'or any other command that does not start with - or --)\n'
     )
 
     subparsers = parser.add_subparsers(dest='command')
