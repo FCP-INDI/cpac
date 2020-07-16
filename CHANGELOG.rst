@@ -2,18 +2,19 @@
 Changelog
 =========
 `Version 0.2.5 <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.5>`_
-=======================================================================================
+========================================================================================
+* 📚 Update the main usage string to better articulate functionality
 * 📢🐳 Provide a clearer error message if package cannot connect to Docker.
 * 🐳 Fix a bug introduced in `v0.2.4 <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.4>` where some crashfiles would print for ``cpac --platform singularity crash`` but not for ``cpac --platform docker crash`` 
 
 `Version 0.2.4 <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.4>`_
-=======================================================================================
+========================================================================================
 * 💪 Make ``crash`` command automatically touch (within a container) all missing files a crashfile requires to exist and print the underlying output
 * 🐳 Make Docker commands (especially ``pull`` and ``crash``) more robust
 * ⬆️ Require Python ≥3.6 (for fstrings)
 
 `Version 0.2.3: Crashfile <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.3>`_
-==================================================================================================
+=====================================================================================================
 * ✨ Added ``group`` and ``crash`` commands
 * 🚑 Fixed a bug where pass-through flags were being mangled
 * 🖇️ Binds any directories necessary to access any paths found in pass-through CLI arguments
