@@ -29,6 +29,11 @@ def test_requirements():
                 f'package {req} is in requirements.txt '
                 'but not installed'
             )
+            
+
+def test_version():
+    from cpac import __version__
+    assert __version__ != 'undefined', f'version is {__version__}'
 
 
 class Requirement():
