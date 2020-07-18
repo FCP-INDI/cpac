@@ -30,13 +30,20 @@ Usage
     cpac --help
     usage: cpac [-h] [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
                 [--version] [-v] [-vv] [--working_dir PATH] [--temp_dir PATH]
-                [--output_dir PATH] [-o OPT [OPT ...]]
-                [-B CUSTOM_BINDING [CUSTOM_BINDING ...]]
+                [-o [OPT [OPT ...]]] [-B [CUSTOM_BINDING [CUSTOM_BINDING ...]]]
                 {run,group,utils,crash} ...
     
-    cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io>
-    containerized images. If no platform nor image is specified, cpac will try
-    Docker first, then try Singularity if Docker fails.
+    cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io> containerized images. 
+    
+    This commandline interface package is designed to minimize repetition.
+    As such, nearly all arguments are optional.
+    
+    When launching a container, this package will try to bind any paths mentioned in 
+     • the command
+     • the data configuration
+    
+    An example minimal run command example:
+    	cpac run /path/to/data /path/for/outputs
     
     positional arguments:
       {run,group,utils,crash}
@@ -44,26 +51,37 @@ Usage
     optional arguments:
       -h, --help            show this help message and exit
       --platform {docker,singularity}
-      --image IMAGE         path to Singularity image file OR name of Docker image
-                            (eg, "fcpindi/c-pac"). Will attempt to pull from
-                            Singularity Hub or Docker Hub if not provided.
-      --tag TAG             tag of the Docker image to use (eg, "latest" or
-                            "nightly").
+                            If neither platform nor image is specified,
+                            cpac will try Docker first, the try
+                            Singularity if Docker fails.
+      --image IMAGE         path to Singularity image file OR name of Docker image (eg, "fcpindi/c-pac").
+                            Will attempt to pull from Singularity Hub or Docker Hub if not provided.
+                            If image is specified but platform is not, platform is
+                            assumed to be Singularity if image is a path or 
+                            Docker if image is an image name.
+      --tag TAG             tag of the Docker image to use (eg, "latest" or "nightly").
       --version             show program's version number and exit
       -v, --verbose         set loglevel to INFO
       -vv, --very-verbose   set loglevel to DEBUG
       --working_dir PATH    working directory
       --temp_dir PATH       directory for temporary files
-      --output_dir PATH     directory where output files should be stored
-      -o OPT [OPT ...], --container_option OPT [OPT ...]
-                            parameters and flags to pass through to Docker or
-                            Singularity
-      -B CUSTOM_BINDING [CUSTOM_BINDING ...], --custom_binding CUSTOM_BINDING [CUSTOM_BINDING ...]
-                            directory to bind to container with a different path
-                            than the real path in the format
-                            real_path:container_path (eg,
-                            /home/C-PAC/run5/outputs:/outputs). Use absolute paths
-                            for both paths
+      -o [OPT [OPT ...]], --container_option [OPT [OPT ...]]
+                            parameters and flags to pass through to Docker or Singularity
+                            
+                            This flag can take multiple arguments so cannot be
+                            the final argument before the command argument (i.e.,
+                            run or any other command that does not start with - or --)
+      -B [CUSTOM_BINDING [CUSTOM_BINDING ...]], --custom_binding [CUSTOM_BINDING [CUSTOM_BINDING ...]]
+                            directories to bind with a different path in
+                            the container than the real path of the directory.
+                            One or more pairs in the format:
+                            	real_path:container_path
+                            (eg, /home/C-PAC/run5/outputs:/outputs).
+                            Use absolute paths for both paths.
+                            
+                            This flag can take multiple arguments so cannot be
+                            the final argument before the command argument (i.e.,
+                            run or any other command that does not start with - or --)
 
 .. END USAGE
 
