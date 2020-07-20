@@ -5,6 +5,9 @@ Changelog
 =======================================================================================
 * 📢🐳 Provide a clearer error message if package cannot connect to Docker.
 * 🐳 Fix a bug introduced in `v0.2.4 <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.4>` where some crashfiles would print for ``cpac --platform singularity crash`` but not for ``cpac --platform docker crash`` 
+* 🚑 Fix some installation issues: 
+   * All required packages are now installed with ``pip install cpac-py``
+   * Version is now set correctly
 
 `Version 0.2.4 <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.4>`_
 =======================================================================================
