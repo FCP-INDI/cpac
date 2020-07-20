@@ -1,6 +1,7 @@
-===============================================================
-C-PAC Python Package |github-version| |build-status| |coverage|
-===============================================================
+========================================================================
+C-PAC Python Package |build-status| |github-version| |upload| |coverage|
+========================================================================
+
 
 A Python package that wraps `C-PAC <http://fcp-indi.github.io>`_, enabling users to install cpac with `pip <https://pip.pypa.io>`_ and run from the command line.
 
@@ -76,3 +77,7 @@ Usage
 .. |coverage| image:: https://coveralls.io/repos/github/shnizzedy/cpac-python-package/badge.svg?branch=trunk
     :target: https://coveralls.io/github/shnizzedy/cpac-python-package?branch=trunk
     :alt: coverage badge
+.. |upload| image:: https://github.com/shnizzedy/cpac-python-package/workflows/Upload%20Python%20Package/badge.svg
+    :target: https://pypi.org/project/cpac-py/
+    :alt: upload Python package
+
