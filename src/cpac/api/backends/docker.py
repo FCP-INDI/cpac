@@ -16,6 +16,7 @@ from base64 import b64decode, b64encode
 
 from tornado.websocket import websocket_connect
 
+from .utils import merge_async_iters
 from ...utils import yaml_parse
 
 import yaml
@@ -237,79 +238,26 @@ class DockerParticipantPipelineSchedule(DockerSchedule, ParticipantPipelineSched
         self._run_logs_port = 8008
         self._run_logs_last = None
         self._run_logs_messages = asyncio.Queue()
+
         self._logs_messages = []
 
-        async def logger_listener():
-
-            while self._run_status is None:
-                await asyncio.sleep(0.1)
-
-            while self._run_status not in ['running']:
-                logger.info("Waiting container to start")
-                await asyncio.sleep(0.5)
-
-            port = int(self._run_logs_port)
-            uri = f"ws://localhost:{port}/log"
-            while True:
-                try:
-                    ws = await websocket_connect(uri)
-                    await ws.write_message(json.dumps({
-                        "time": time.time(),
-                        "message": {
-                            "last_log": self._run_logs_last,
-                        }
-                    }))
-                    while True:
-                        msg = await ws.read_message()
-                        if msg is None:
-                            break
-                        msg = json.loads(msg)
-                        self._run_logs_messages.put_nowait(msg["message"])
-                        self._run_logs_last = msg["time"]
-                except:
-                    logger.info("Waiting monitoring to start")
-                    await asyncio.sleep(1)
-                finally:
-                    ws.close()
-
-        async def runner():
-            container = self.backend.client.containers.run(
-                'fcpindi/c-pac:' + self.backend.tag,
-                command=command,
-                detach=True,
-                # remove=True,
-                # stdin_open=False,
-                ports={'8008/tcp': None},
-                volumes=volumes,
-            )
-            await asyncio.sleep(3)
-            container.reload()
-            self._run_logs_port = int(container.attrs['NetworkSettings']['Ports']['8008/tcp'][0]['HostPort'])
-            while True:
-                try:
-                    container.reload()
-                    self._run_status = container.status
-                    if self._run_status not in ['running', 'created']:
-                        break
-                    await asyncio.sleep(1)
-                except:
-                    break
-
-        _, pending = await asyncio.wait({
-            asyncio.create_task(runner()),
-            asyncio.create_task(logger_listener()),
-        }, return_when=asyncio.FIRST_COMPLETED)
-
-        for task in pending:
-            task.cancel()
+        async for item in merge_async_iters(
+            self._logger_listener(),
+            self._runner(command, volumes)
+        ):
+            if item["type"] == "log":
+                self._logs_messages.append(item["content"])
+                yield BackendSchedule.Log(
+                    timestamp=item["time"],
+                    content=item["content"],
+                )
+            elif item["type"] == "status":
+                yield BackendSchedule.Status(
+                    timestamp=item["time"],
+                    status=item["status"],
+                )
 
         self._run_status = None
-
-        # Consume the remaining logs
-        while not self._run_logs_messages.empty():
-            log = await self._run_logs_messages.get()
-            self._logs_messages += [log]
-            self._run_logs_messages.task_done()
 
     @property
     async def logs(self):
@@ -324,6 +272,89 @@ class DockerParticipantPipelineSchedule(DockerSchedule, ParticipantPipelineSched
         else:
             for log in self._logs_messages:
                 yield log
+
+    async def _runner(self, command, volumes):
+        container = self.backend.client.containers.run(
+            'fcpindi/c-pac:' + self.backend.tag,
+            command=command,
+            detach=True,
+            stdin_open=False,
+            ports={'8008/tcp': None},
+            volumes=volumes,
+        )
+
+        await asyncio.sleep(3)
+        container.reload()
+
+        self._run_logs_port = int(container.attrs['NetworkSettings']['Ports']['8008/tcp'][0]['HostPort'])
+
+        while True:
+            try:
+                await asyncio.sleep(0.5)
+
+                container.reload()
+                status = container.status
+                if self._run_status == status:
+                    continue
+
+                self._run_status = status
+                logger.info(f"Got status {status}")
+
+                yield {
+                    "type": "status",
+                    "time": time.time(),
+                    "status": container.status,
+                }
+
+                if status not in ['running', 'created']:
+                    break
+            except docker.errors.NotFound:
+                break
+
+        try:
+            container.remove(v=True, force=True)
+        except:
+            pass
+
+
+    async def _logger_listener(self):
+
+        while self._run_status is None:
+            await asyncio.sleep(0.1)
+
+        while self._run_status not in ['running']:
+            logger.info("Waiting container to start")
+            await asyncio.sleep(0.5)
+
+        port = int(self._run_logs_port)
+        uri = f"ws://localhost:{port}/log"
+
+        while True:
+            try:
+                ws = await websocket_connect(uri)
+                await ws.write_message(json.dumps({
+                    "time": time.time(),
+                    "message": {
+                        "last_log": self._run_logs_last,
+                    }
+                }))
+                while True:
+                    msg = await ws.read_message()
+                    if msg is None:
+                        break
+                    msg = json.loads(msg)
+                    self._run_logs_last = msg["time"]
+                    yield {
+                        "type": "log",
+                        "time": msg["time"],
+                        "content": msg["message"],
+                    }
+            except:
+                logger.info("Waiting monitoring to start")
+                await asyncio.sleep(1)
+                yield
+            finally:
+                ws.close()
 
 
 class DockerBackend(Backend):

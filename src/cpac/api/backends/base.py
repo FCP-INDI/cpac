@@ -61,6 +61,11 @@ class BackendSchedule:
         timestamp: float
         content: dict
 
+    @dataclass
+    class Status:
+        timestamp: float
+        status: str
+
     @property
     async def status(self):
         raise NotImplementedError
