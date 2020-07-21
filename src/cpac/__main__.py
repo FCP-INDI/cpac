@@ -35,10 +35,18 @@ def parse_args(args):
         description='cpac: a Python package that simplifies using C-PAC '
                     '<http://fcp-indi.github.io> containerized images. \n\n'
                     'This commandline interface package is designed to ' 'minimize repetition.\nAs such, nearly all arguments are '
-                    'optional.\n\nWhen launching a container, this package will '
-                    'try to bind any paths mentioned in \n • the command\n • '
-                    'the data configuration\n\nAn example minimal run command '
-                    'example:\n\tcpac run /path/to/data /path/for/outputs',
+                    'optional.\n\nWhen launching a container, this package '
+                    'will try to bind any paths mentioned in \n • the command'
+                    '\n • the data configuration\n\nAn example minimal run '
+                    'command:\n\tcpac run /path/to/data /path/for/outputs'
+                    '\n\nAn example run command with optional arguments:\n\t'
+                    'cpac -B /path/to/data/configs:/configs \\\n\t\t'
+                    '--image fcpindi/c-pac --tag latest \\\n\t\t'
+                    'run /path/to/data /path/for/outputs \\\n\t\t'
+                    '--data_config_file /configs/data_config.yml \\\n\t\t'
+                    '--save_working_dir\n\n'
+                    'Each command can take "--help" to provide additonal '
+                    'usage information, e.g.,\n\n\tcpac run --help',
         conflict_handler='resolve',
         formatter_class=argparse.RawTextHelpFormatter
     )
