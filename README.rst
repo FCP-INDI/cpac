@@ -29,9 +29,10 @@ Usage
 .. code-block:: shell
 
     cpac --help
-    usage: cpac [-h] [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
-                [--version] [-v] [-vv] [--working_dir PATH] [--temp_dir PATH]
-                [-o [OPT [OPT ...]]] [-B [CUSTOM_BINDING [CUSTOM_BINDING ...]]]
+    usage: cpac [-h] [--version] [-o [OPT [OPT ...]]]
+                [-B [CUSTOM_BINDING [CUSTOM_BINDING ...]]]
+                [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
+                [--working_dir PATH] [--temp_dir PATH] [-v] [-vv]
                 {run,group,utils,crash} ...
     
     cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io> containerized images. 
@@ -43,29 +44,26 @@ Usage
      • the command
      • the data configuration
     
-    An example minimal run command example:
+    An example minimal run command:
     	cpac run /path/to/data /path/for/outputs
+    
+    An example run command with optional arguments:
+    	cpac -B /path/to/data/configs:/configs \
+    		--image fcpindi/c-pac --tag latest \
+    		run /path/to/data /path/for/outputs \
+    		--data_config_file /configs/data_config.yml \
+    		--save_working_dir
+    
+    Each command can take "--help" to provide additonal usage information, e.g.,
+    
+    	cpac run --help
     
     positional arguments:
       {run,group,utils,crash}
     
     optional arguments:
       -h, --help            show this help message and exit
-      --platform {docker,singularity}
-                            If neither platform nor image is specified,
-                            cpac will try Docker first, the try
-                            Singularity if Docker fails.
-      --image IMAGE         path to Singularity image file OR name of Docker image (eg, "fcpindi/c-pac").
-                            Will attempt to pull from Singularity Hub or Docker Hub if not provided.
-                            If image is specified but platform is not, platform is
-                            assumed to be Singularity if image is a path or 
-                            Docker if image is an image name.
-      --tag TAG             tag of the Docker image to use (eg, "latest" or "nightly").
       --version             show program's version number and exit
-      -v, --verbose         set loglevel to INFO
-      -vv, --very-verbose   set loglevel to DEBUG
-      --working_dir PATH    working directory
-      --temp_dir PATH       directory for temporary files
       -o [OPT [OPT ...]], --container_option [OPT [OPT ...]]
                             parameters and flags to pass through to Docker or Singularity
                             
@@ -83,6 +81,20 @@ Usage
                             This flag can take multiple arguments so cannot be
                             the final argument before the command argument (i.e.,
                             run or any other command that does not start with - or --)
+      --platform {docker,singularity}
+                            If neither platform nor image is specified,
+                            cpac will try Docker first, then try
+                            Singularity if Docker fails.
+      --image IMAGE         path to Singularity image file OR name of Docker image (eg, "fcpindi/c-pac").
+                            Will attempt to pull from Singularity Hub or Docker Hub if not provided.
+                            If image is specified but platform is not, platform is
+                            assumed to be Singularity if image is a path or 
+                            Docker if image is an image name.
+      --tag TAG             tag of the Docker image to use (eg, "latest" or "nightly").
+      --working_dir PATH    working directory
+      --temp_dir PATH       directory for temporary files
+      -v, --verbose         set loglevel to INFO
+      -vv, --very-verbose   set loglevel to DEBUG
 
 .. END USAGE
 
