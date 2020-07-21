@@ -84,7 +84,7 @@ def parse_args(args):
         '--platform',
         choices=['docker', 'singularity'],
         help='If neither platform nor image is specified,\ncpac will try '
-        'Docker first, the try\nSingularity if Docker fails.'
+        'Docker first, then try\nSingularity if Docker fails.'
     )
 
     parser.add_argument(
