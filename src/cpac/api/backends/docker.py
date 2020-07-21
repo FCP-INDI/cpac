@@ -3,17 +3,22 @@ import glob
 import hashlib
 import json
 import os
+import sys
 import shutil
 import tempfile
 import time
 import zlib
+import asyncio
+import logging
+import websockets
+import datetime
 from base64 import b64decode, b64encode
+
+from tornado.websocket import websocket_connect
 
 from ...utils import yaml_parse
 
 import yaml
-from tornado import httpclient
-
 import docker
 
 from ..schedules import (DataConfigSchedule, DataSettingsSchedule,
@@ -21,44 +26,39 @@ from ..schedules import (DataConfigSchedule, DataSettingsSchedule,
 from .base import Backend, BackendSchedule, RunStatus
 
 
-class DockerRun(object):
+logger = logging.getLogger('cpac.api.backends.docker')
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler())
 
-    def __init__(self, container):
-        self.container = container
-
-    @property
-    def status(self):
-        try:
-            self.container.reload()
-        except Exception:
-            return RunStatus.UNKNOWN
-
-        status = self.container.status
-        status_map = {
-            'created': RunStatus.STARTING,
-            'restarting': RunStatus.RUNNING,
-            'running': RunStatus.RUNNING,
-            'removing': RunStatus.RUNNING,
-            'paused': RunStatus.RUNNING,
-            'exited': RunStatus.SUCCESS,
-            'dead': RunStatus.FAILED,
-        }
-        if status in status_map:
-            return status_map[status]
-
-        return RunStatus.UNKNOWN
-
+docker_statuses = {
+    'created': RunStatus.STARTING,
+    'restarting': RunStatus.RUNNING,
+    'running': RunStatus.RUNNING,
+    'removing': RunStatus.RUNNING,
+    'paused': RunStatus.RUNNING,
+    'exited': RunStatus.SUCCESS,
+    'dead': RunStatus.FAILED,
+}
 
 class DockerSchedule(BackendSchedule):
 
     _run = None
 
     @property
-    def status(self):
+    async def status(self):
         if not self._run:
             return RunStatus.UNSTARTED
-        else:
-            return self._run.status
+
+        try:
+            self._run.reload()
+        except Exception:
+            return RunStatus.UNKNOWN
+
+        status = self._run.status
+        if status in docker_statuses:
+            return docker_statuses[status]
+
+        return RunStatus.UNKNOWN
 
     @staticmethod
     def _remap_files(subject):
@@ -93,7 +93,7 @@ class DockerSchedule(BackendSchedule):
 
 class DockerDataSettingsSchedule(DockerSchedule, DataSettingsSchedule):
 
-    def run(self):
+    async def run(self):
         output_folder = tempfile.mkdtemp()
 
         volumes = {
@@ -116,16 +116,16 @@ class DockerDataSettingsSchedule(DockerSchedule, DataSettingsSchedule):
             '/output_folder/data_settings.yml',
         ]
 
-        self._run = DockerRun(self.backend.client.containers.run(
+        self._run = self.backend.client.containers.run(
             'fcpindi/c-pac:' + self.backend.tag,
             command=container_args,
             detach=True,
             working_dir='/output_folder',
             volumes=volumes
-        ))
+        )
 
-        self._run.container.wait()
-        
+        self._run.wait()
+
         try:
             files = glob.glob(os.path.join(output_folder, 'cpac_data_config_*.yml'))
             if files:
@@ -137,7 +137,7 @@ class DockerDataSettingsSchedule(DockerSchedule, DataSettingsSchedule):
 
 class DockerDataConfigSchedule(DockerSchedule, DataConfigSchedule):
 
-    def run(self):
+    async def run(self):
         run_folder = tempfile.mkdtemp()
         config_folder = os.path.join(run_folder, 'config')
         output_folder = os.path.join(run_folder, 'output')
@@ -157,7 +157,7 @@ class DockerDataConfigSchedule(DockerSchedule, DataConfigSchedule):
             data_config_data = self.data_config
             if isinstance(data_config_data, str):
                 data_config_data = yaml_parse(data_config_data)
-            
+
             data_config = os.path.join(config_folder, 'data_config.yml')
             with open(data_config, 'w') as f:
                 yaml.dump(data_config_data, f)
@@ -174,14 +174,14 @@ class DockerDataConfigSchedule(DockerSchedule, DataConfigSchedule):
         if data_config:
             container_args += ['--data_config_file', '/config/data_config.yml']
 
-        self._run = DockerRun(self.backend.client.containers.run(
+        self._run = self.backend.client.containers.run(
             'fcpindi/c-pac:' + self.backend.tag,
             command=container_args,
             detach=True,
             volumes=volumes
-        ))
+        )
 
-        self._run.container.wait()
+        self._run.wait()
 
         try:
             files = glob.glob(os.path.join(output_folder, 'cpac_data_config_*.yml'))
@@ -194,7 +194,7 @@ class DockerDataConfigSchedule(DockerSchedule, DataConfigSchedule):
 
 class DockerParticipantPipelineSchedule(DockerSchedule, ParticipantPipelineSchedule):
 
-    def run(self):
+    async def run(self):
         run_folder = tempfile.mkdtemp()
         config_folder = os.path.join(run_folder, 'config')
         output_folder = os.path.join(run_folder, 'output')
@@ -214,8 +214,12 @@ class DockerParticipantPipelineSchedule(DockerSchedule, ParticipantPipelineSched
         }
 
         data_config = os.path.join(config_folder, 'data_config.yml')
-        with open(data_config, 'w') as f:
-            yaml.dump([self.subject], f)
+        mapped_data_config = '/config/data_config.yml'
+        if isinstance(self.subject, str):
+            shutil.copy(self.subject, data_config)
+        else:
+            with open(data_config, 'w') as f:
+                yaml.dump([self.subject], f)
 
         command = [
             '/', '/output', 'participant',
@@ -223,49 +227,103 @@ class DockerParticipantPipelineSchedule(DockerSchedule, ParticipantPipelineSched
             '--skip_bids_validator',
             '--save_working_dir',
             '--data_config_file',
-            data_config
+            mapped_data_config
         ]
 
         if pipeline:
             command += ['--pipeline_file', pipeline]
 
-        self._run = DockerRun(self.backend.client.containers.run(
-            'fcpindi/c-pac:' + self.backend.tag,
-            command=command,
-            detach=True,
-            ports={'8080/tcp': None},
-            volumes=volumes,
-            working_dir='/pwd'
-        ))
+        self._run_status = None
+        self._run_logs_port = 8008
+        self._run_logs_last = None
+        self._run_logs_messages = asyncio.Queue()
+        self._logs_messages = []
 
-        self._run.container.wait()
+        async def logger_listener():
+
+            while self._run_status is None:
+                await asyncio.sleep(0.1)
+
+            while self._run_status not in ['running']:
+                logger.info("Waiting container to start")
+                await asyncio.sleep(0.5)
+
+            port = int(self._run_logs_port)
+            uri = f"ws://localhost:{port}/log"
+            while True:
+                try:
+                    ws = await websocket_connect(uri)
+                    await ws.write_message(json.dumps({
+                        "time": time.time(),
+                        "message": {
+                            "last_log": self._run_logs_last,
+                        }
+                    }))
+                    while True:
+                        msg = await ws.read_message()
+                        if msg is None:
+                            break
+                        msg = json.loads(msg)
+                        self._run_logs_messages.put_nowait(msg["message"])
+                        self._run_logs_last = msg["time"]
+                except:
+                    logger.info("Waiting monitoring to start")
+                    await asyncio.sleep(1)
+                finally:
+                    ws.close()
+
+        async def runner():
+            container = self.backend.client.containers.run(
+                'fcpindi/c-pac:' + self.backend.tag,
+                command=command,
+                detach=True,
+                # remove=True,
+                # stdin_open=False,
+                ports={'8008/tcp': None},
+                volumes=volumes,
+            )
+            await asyncio.sleep(3)
+            container.reload()
+            self._run_logs_port = int(container.attrs['NetworkSettings']['Ports']['8008/tcp'][0]['HostPort'])
+            while True:
+                try:
+                    container.reload()
+                    self._run_status = container.status
+                    if self._run_status not in ['running', 'created']:
+                        break
+                    await asyncio.sleep(1)
+                except:
+                    break
+
+        _, pending = await asyncio.wait({
+            asyncio.create_task(runner()),
+            asyncio.create_task(logger_listener()),
+        }, return_when=asyncio.FIRST_COMPLETED)
+
+        for task in pending:
+            task.cancel()
+
+        self._run_status = None
+
+        # Consume the remaining logs
+        while not self._run_logs_messages.empty():
+            log = await self._run_logs_messages.get()
+            self._logs_messages += [log]
+            self._run_logs_messages.task_done()
 
     @property
-    def logs(self):
-
-        if not self._run:
-            return []
-
-        try:
-            self._run.container.reload()
-        except Exception as e:
-            return []
-
-        if '8080/tcp' not in self._run.container.attrs['NetworkSettings']['Ports']:
-            return []
-
-        port = int(self._run.container.attrs['NetworkSettings']['Ports']['8080/tcp'][0]['HostPort'])
-
-        try:
-            http_client = httpclient.HTTPClient()
-            response = json.loads(http_client.fetch("http://localhost:%d/" % port).body.decode('utf-8'))
-            return response
-        except Exception as e:
-            print(e)  # TODO handle reading error
-        finally:
-            http_client.close()
-
-        return []
+    async def logs(self):
+        if self._run_status in ['running', 'created']:
+            for log in self._logs_messages:
+                yield log
+            while True:
+                log = await self._run_logs_messages.get()
+                self._logs_messages += [log]
+                yield log
+                self._run_logs_messages.task_done()
+        else:
+            for log in self._logs_messages:
+                yield log
 
 
 class DockerBackend(Backend):

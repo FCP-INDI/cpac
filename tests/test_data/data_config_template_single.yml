@@ -1,0 +1,8 @@
+- anat: s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU/sub-0050952/anat/sub-0050952_T1w.nii.gz
+  func:
+    rest_run-1:
+      scan: s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU/sub-0050952/func/sub-0050952_task-rest_run-1_bold.nii.gz
+      scan_parameters: s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU/task-rest_bold.json
+  site: NYU
+  subject_id: 0050952
+  unique_id: ses-1
