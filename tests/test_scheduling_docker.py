@@ -92,7 +92,7 @@ async def test_scheduler_docker_pipeline_solo(backend):
         )
     )
 
-    await schedule.run()
+    messages = [message async for message in schedule.run()]
 
     logs = [log async for log in schedule.logs]
 
