@@ -50,6 +50,35 @@ def parse_args(args):
         conflict_handler='resolve',
         formatter_class=argparse.RawTextHelpFormatter
     )
+    
+    parser.add_argument(
+        '--version',
+        action='version',
+        version='cpac {ver}'.format(ver=__version__)
+    )
+    
+    parser.add_argument(
+        '-o', '--container_option',
+        dest='container_option',
+        nargs='*',
+        help='parameters and flags to pass through to Docker or Singularity\n'
+             '\nThis flag can take multiple arguments so cannot '
+             'be\nthe final argument before the command argument (i.e.,\nrun '
+             'or any other command that does not start with - or --)\n',
+        metavar='OPT'
+    )
+
+    parser.add_argument(
+        '-B', '--custom_binding',
+        dest='custom_binding',
+        nargs='*',
+        help='directories to bind with a different path in\nthe container '
+             'than the real path of the directory.\nOne or more pairs in the ' 'format:\n\treal_path:container_path\n(eg, '
+             '/home/C-PAC/run5/outputs:/outputs).\nUse absolute paths for '
+             'both paths.\n\nThis flag can take multiple arguments so cannot '
+             'be\nthe final argument before the command argument (i.e.,\nrun '
+             'or any other command that does not start with - or --)\n'
+    )
 
     parser.add_argument(
         '--platform',
@@ -73,9 +102,17 @@ def parse_args(args):
     )
 
     parser.add_argument(
-        '--version',
-        action='version',
-        version='cpac {ver}'.format(ver=__version__)
+        '--working_dir',
+        default=cwd,
+        help='working directory',
+        metavar='PATH'
+    )
+
+    parser.add_argument(
+        '--temp_dir',
+        default='/tmp',
+        help='directory for temporary files',
+        metavar='PATH'
     )
 
     parser.add_argument(
@@ -94,43 +131,6 @@ def parse_args(args):
         help='set loglevel to DEBUG',
         action='store_const',
         const=logging.DEBUG
-    )
-
-    parser.add_argument(
-        '--working_dir',
-        default=cwd,
-        help='working directory',
-        metavar='PATH'
-    )
-
-    parser.add_argument(
-        '--temp_dir',
-        default='/tmp',
-        help='directory for temporary files',
-        metavar='PATH'
-    )
-
-    parser.add_argument(
-        '-o', '--container_option',
-        dest='container_option',
-        nargs='*',
-        help='parameters and flags to pass through to Docker or Singularity\n'
-             '\nThis flag can take multiple arguments so cannot '
-             'be\nthe final argument before the command argument (i.e.,\nrun '
-             'or any other command that does not start with - or --)\n',
-        metavar='OPT'
-    )
-
-    parser.add_argument(
-        '-B', '--custom_binding',
-        dest='custom_binding',
-        nargs='*',
-        help='directories to bind with a different path in\nthe container '
-             'than the real path of the directory.\nOne or more pairs in the ' 'format:\n\treal_path:container_path\n(eg, '
-             '/home/C-PAC/run5/outputs:/outputs).\nUse absolute paths for '
-             'both paths.\n\nThis flag can take multiple arguments so cannot '
-             'be\nthe final argument before the command argument (i.e.,\nrun '
-             'or any other command that does not start with - or --)\n'
     )
 
     subparsers = parser.add_subparsers(dest='command')
