@@ -1,8 +1,13 @@
+import inspect
 import logging
 from collections.abc import Iterable
-from ..schedules import Schedule, DataSettingsSchedule, DataConfigSchedule, ParticipantPipelineSchedule
+from dataclasses import dataclass
+
+from ..schedules import (DataConfigSchedule, DataSettingsSchedule,
+                         ParticipantPipelineSchedule, Schedule)
 
 logger = logging.getLogger(__name__)
+
 
 class RunStatus:
     UNSTARTED = 'UNSTARTED'
@@ -34,6 +39,14 @@ class Backend:
         self.scheduler = scheduler
         return self
 
+    def specialize(self, schedule):
+        if self[schedule.__class__] is None:
+            raise ValueError(f"Mapped scheduled class for {schedule.__class__.__name__} does not exist.")
+
+        backend_schedule = self[schedule.__class__](backend=self)
+        backend_schedule.__setstate__(schedule.__getstate__())
+        return backend_schedule
+
 
 class BackendSchedule:
 
@@ -43,38 +56,52 @@ class BackendSchedule:
     def __setstate__(self, state):
         self.__dict__.update(state)
 
+    @dataclass
+    class Log:
+        timestamp: float
+        content: dict
+
     @property
-    def status(self):
+    async def status(self):
         raise NotImplementedError
 
     @property
-    def logs(self):
+    async def logs(self):
         return {}
 
-    def run(self):
+    async def run(self):
         raise NotImplementedError
 
-    def __call__(self):
+    async def __call__(self):
 
         if hasattr(self, 'pre'):
             try:
+                pre = self.pre()
                 logger.info(f'[{self}] Pre-running')
-                it = self.pre()
-                if isinstance(it, Iterable):
-                    yield from it
+                if inspect.isasyncgen(pre):
+                    async for i in pre:
+                        yield i
+                else:
+                    await pre
             except NotImplementedError:
                 pass
 
+        run = self.run()
         logger.info(f'[{self}] Running')
-        it = self.run()
-        if isinstance(it, Iterable):
-            yield from it
+        if inspect.isasyncgen(run):
+            async for i in run:
+                yield i
+        else:
+            await run
 
         if hasattr(self, 'post'):
             try:
+                post = self.post()
                 logger.info(f'[{self}] Post-running')
-                it = self.post()
-                if isinstance(it, Iterable):
-                    yield from it
+                if inspect.isasyncgen(post):
+                    async for i in post:
+                        yield i
+                else:
+                    await post
             except NotImplementedError:
                 pass

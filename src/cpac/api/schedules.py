@@ -1,5 +1,6 @@
 import uuid
 from ..utils import traverse_deep
+from dataclasses import dataclass
 
 
 class Schedule:
@@ -9,10 +10,15 @@ class Schedule:
         self._uid = str(uuid.uuid4())
         self._results = {}
 
-    def pre(self):
+    @dataclass
+    class Spawn:
+        name: str
+        schedule: 'Schedule'
+
+    async def pre(self):
         raise NotImplementedError
 
-    def post(self):
+    async def post(self):
         raise NotImplementedError
 
     def __hash__(self):
@@ -27,15 +33,15 @@ class Schedule:
     def __eq__(self, other):
         return isinstance(other, (type(self), str)) and str(self) == str(other)
 
-    def result(self, key):
-        keys = key.split('/')
-        return traverse_deep(self._results, keys)
-
     def __getitem__(self, key):
         return self.result(key)
 
     def __getstate__(self):
         return self.__dict__
+
+    def result(self, key):
+        keys = key.split('/')
+        return traverse_deep(self._results, keys)
 
     @property
     def uid(self):
@@ -59,14 +65,18 @@ class DataSettingsSchedule(Schedule):
 
 class DataConfigSchedule(Schedule):
 
-    def __init__(self, data_config, pipeline=None, parent=None):
+    def __init__(self, data_config, pipeline=None, schedule_participants=True, parent=None):
         super().__init__(parent=parent)
         self.data_config = data_config
         self.pipeline = pipeline
+        self.schedule_participants = schedule_participants
 
-    def post(self):
+    async def post(self):
 
         data_config = self['data_config']
+
+        if not self.schedule_participants:
+            return
 
         for subject in data_config:
             subject_id = []
@@ -77,9 +87,9 @@ class DataConfigSchedule(Schedule):
             if 'unique_id' in subject:
                 subject_id += [subject['unique_id']]
 
-            yield (
-                '/'.join(subject_id),
-                ParticipantPipelineSchedule(pipeline=self.pipeline, subject=subject),
+            yield Schedule.Spawn(
+                name='/'.join(subject_id),
+                schedule=ParticipantPipelineSchedule(pipeline=self.pipeline, subject=subject),
             )
 
 

@@ -7,14 +7,14 @@ class DataSplitterSchedule(Schedule):
         super().__init__(parent=parent)
         self.data = data
 
-    def pre(self):
+    async def pre(self):
         self.pieces = self.data.split(' ')
 
-    def post(self):
+    async def post(self):
         for piece in self['text/pieces']:
-            yield (
-                piece,
-                DataUppererSchedule(data=piece)
+            yield Schedule.Spawn(
+                name=piece,
+                schedule=DataUppererSchedule(data=piece)
             )
             
 
@@ -30,17 +30,17 @@ class DummySchedule(BackendSchedule):
 
 class DummyDataSplitterSchedule(DummySchedule, DataSplitterSchedule):
 
-    def run(self):
+    async def run(self):
         self._results['text'] = {
             'pieces': self.pieces
         }
     
     @property
-    def status(self):
+    async def status(self):
         return RunStatus.SUCCESS
 
     @property
-    def logs(self):
+    async def logs(self):
         return {
             'length': len(self['text/pieces'])
         }
@@ -48,17 +48,17 @@ class DummyDataSplitterSchedule(DummySchedule, DataSplitterSchedule):
 
 class DummyDataUppererSchedule(DummySchedule, DataUppererSchedule):
 
-    def run(self):
+    async def run(self):
         self._results['text'] = self.data.upper()
 
     @property
-    def status(self):
+    async def status(self):
         if self.data.upper() == 'CRAZY':
             return RunStatus.FAILED
         return RunStatus.SUCCESS
 
     @property
-    def logs(self):
+    async def logs(self):
         return {
             'length': len(self['text'])
         }
@@ -71,10 +71,3 @@ class DummyBackend(Backend):
         DataSplitterSchedule: DummyDataSplitterSchedule,
         DataUppererSchedule: DummyDataUppererSchedule,
     }
-
-
-class DummyExecutor:
-    def __init__(self, *args, **kwargs):
-        pass
-    def submit(self, fn, param):
-        fn(param)
