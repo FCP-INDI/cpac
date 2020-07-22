@@ -98,16 +98,16 @@ Usage
 
 .. END USAGE
 
-.. |github-version| image:: https://img.shields.io/github/tag/shnizzedy/cpac-python-package.svg
-    :target: https://github.com/shnizzedy/cpac-python-package/releases
+.. |github-version| image:: https://img.shields.io/github/tag/FCP-INDI/cpac.svg
+    :target: https://github.com/FCP-INDI/cpac/releases
     :alt: GitHub version
-.. |build-status| image:: https://travis-ci.org/shnizzedy/cpac-python-package.svg?branch=trunk
-    :target: https://travis-ci.org/shnizzedy/cpac-python-package
+.. |build-status| image:: https://travis-ci.org/FCP-INDI/cpac.svg?branch=trunk
+    :target: https://travis-ci.org/FCP-INDI/cpac
     :alt: Travis CI build status
-.. |coverage| image:: https://coveralls.io/repos/github/shnizzedy/cpac-python-package/badge.svg?branch=trunk
-    :target: https://coveralls.io/github/shnizzedy/cpac-python-package?branch=trunk
+.. |coverage| image:: https://coveralls.io/repos/github/FCP-INDI/cpac/badge.svg?branch=trunk
+    :target: https://coveralls.io/github/FCP-INDI/cpac?branch=trunk
     :alt: coverage badge
-.. |upload| image:: https://github.com/shnizzedy/cpac-python-package/workflows/Upload%20Python%20Package/badge.svg
+.. |upload| image:: https://github.com/FCP-INDI/cpac/workflows/Upload%20Python%20Package/badge.svg
     :target: https://pypi.org/project/cpac-py/
     :alt: upload Python package
 
