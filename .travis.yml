@@ -45,13 +45,13 @@ install:
   - pip install -r requirements.txt
   - pip install -r requirements-dev.txt
   - pip install twine
-  - pip install .
+  - pip install -e .
 before_script:
   - git config --global user.email "support@travis-ci.org"
   - git config --global user.name "Travis"
   - singularity pull shub://FCP-INDI/C-PAC || singularity pull docker://fcpindi/c-pac:latest
 script:
-  - coverage run -m pytest
+  - coverage run --append -m pytest
   - coverage report -m
 after_success:
   - if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; fi
