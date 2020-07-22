@@ -2,8 +2,13 @@
 Changelog
 =========
 `Version 0.2.5 <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.5>`_
-=======================================================================================
+========================================================================================
+* 📚 Update the main usage string to better articulate functionality
 * 📢🐳 Provide a clearer error message if package cannot connect to Docker.
+* 🐳 Fix a bug introduced in `v0.2.4 <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.4>` where some crashfiles would print for ``cpac --platform singularity crash`` but not for ``cpac --platform docker crash`` 
+* 🚑 Fix some installation issues: 
+   * All required packages are now installed with ``pip install cpac-py``
+   * Version is now set correctly
 * 🐳 Fix a bug introduced in `v0.2.4 <https://github.com/shnizzedy/cpac-python-package/releases/tag/v0.2.4>`_ where some crashfiles would print for ``cpac --platform singularity crash`` but not for ``cpac --platform docker crash`` 
 * 🔬 Set `coverage reports <http://coveralls.io/github/shnizzedy/cpac-python-package>`_ to report local paths
 
