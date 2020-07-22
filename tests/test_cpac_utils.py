@@ -27,7 +27,7 @@ def test_utils_help(args, capsys, platform):
 def test_utils_new_settings_template(args, tmp_path):
     wd = tmp_path
     argv = (
-        f'cpac {args} --working_dir {wd} --temp_dir {wd} --output_dir {wd} '
+        f'cpac {args} --working_dir {wd} --temp_dir {wd} '
         f'utils data_config new_settings_template'
     ).split(' ')
     with mock.patch.object(sys, 'argv', argv):
