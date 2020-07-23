@@ -27,60 +27,59 @@ def backend(docker_tag):
 
 
 @pytest.fixture
-def scheduler(backend):
-    return Scheduler(backend)
+async def scheduler(backend):
+    async with Scheduler(backend) as scheduler:
+        yield scheduler
+        await scheduler
 
 
 @pytest.mark.asyncio
 async def test_scheduler_docker_settings(scheduler):
 
-    async with scheduler as scheduler:
-        schedule = scheduler.schedule(
-            DataSettingsSchedule(
-                data_settings=os.path.join(Constants.TESTS_DATA_PATH, 'data_settings_template.yml')
-            )
+    schedule = scheduler.schedule(
+        DataSettingsSchedule(
+            data_settings=os.path.join(Constants.TESTS_DATA_PATH, 'data_settings_template.yml')
         )
+    )
 
-        await scheduler
+    await scheduler
 
-        assert len(schedule['data_config']) == 4
-        assert all(s['site'] == 'NYU' for s in schedule['data_config'])
+    assert len(schedule['data_config']) == 4
+    assert all(s['site'] == 'NYU' for s in schedule['data_config'])
 
 
 @pytest.mark.asyncio
 async def test_scheduler_docker_config(scheduler):
 
-    async with scheduler as scheduler:
-        schedule = scheduler.schedule(
-            DataConfigSchedule(
-                data_config='s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU/',
-                schedule_participants=False,
-            )
+    schedule = scheduler.schedule(
+        DataConfigSchedule(
+            data_config='s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU/',
+            schedule_participants=False,
         )
+    )
 
-        await scheduler
+    await scheduler
 
-        assert len(schedule['data_config']) == 4
-        assert all(s['site'] == 'NYU' for s in schedule['data_config'])
+    assert len(schedule['data_config']) == 4
+    assert all(s['site'] == 'NYU' for s in schedule['data_config'])
 
 
 @pytest.mark.asyncio
 async def test_scheduler_docker_pipeline(scheduler):
 
-    async with scheduler as scheduler:
-        schedule = scheduler.schedule(
-            ParticipantPipelineSchedule(
-                subject=os.path.join(Constants.TESTS_DATA_PATH, 'data_config_template_single.yml')
-            )
+    schedule = scheduler.schedule(
+        ParticipantPipelineSchedule(
+            subject=os.path.join(Constants.TESTS_DATA_PATH, 'data_config_template_single.yml')
         )
+    )
 
-        await scheduler
+    await scheduler
 
-        logs = [log async for log in schedule.logs]
+    logs = [log async for log in schedule.logs]
 
-        assert len(logs) == 6
-        for log_older, log_newer in zip(logs[:-1], logs[1:]):
-            assert log_newer['finish'] > log_older['finish']
+    assert len(logs) == 6
+    for log_older, log_newer in zip(logs[:-1], logs[1:]):
+        assert log_newer['finish'] > log_older['finish']
 
 
 @pytest.mark.asyncio
