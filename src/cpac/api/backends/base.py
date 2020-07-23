@@ -79,6 +79,10 @@ class BackendSchedule:
 
     async def __call__(self):
 
+        yield Schedule.Start(
+            schedule=self,
+        )
+
         if hasattr(self, 'pre'):
             try:
                 pre = self.pre()
@@ -110,3 +114,7 @@ class BackendSchedule:
                     await post
             except NotImplementedError:
                 pass
+        
+        yield Schedule.End(
+            schedule=self,
+        )

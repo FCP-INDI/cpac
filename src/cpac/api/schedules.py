@@ -15,6 +15,14 @@ class Schedule:
         name: str
         schedule: 'Schedule'
 
+    @dataclass
+    class Start:
+        schedule: 'Schedule'
+
+    @dataclass
+    class End:
+        schedule: 'Schedule'
+
     async def pre(self):
         raise NotImplementedError
 
@@ -75,22 +83,21 @@ class DataConfigSchedule(Schedule):
 
         data_config = self['data_config']
 
-        if not self.schedule_participants:
-            return
+        if self.schedule_participants:
 
-        for subject in data_config:
-            subject_id = []
-            if 'site_id' in subject:
-                subject_id += [subject['site_id']]
-            if 'subject_id' in subject:
-                subject_id += [subject['subject_id']]
-            if 'unique_id' in subject:
-                subject_id += [subject['unique_id']]
+            for subject in data_config:
+                subject_id = []
+                if 'site_id' in subject:
+                    subject_id += [subject['site_id']]
+                if 'subject_id' in subject:
+                    subject_id += [subject['subject_id']]
+                if 'unique_id' in subject:
+                    subject_id += [subject['unique_id']]
 
-            yield Schedule.Spawn(
-                name='/'.join(subject_id),
-                schedule=ParticipantPipelineSchedule(pipeline=self.pipeline, subject=subject),
-            )
+                yield Schedule.Spawn(
+                    name='/'.join(subject_id),
+                    schedule=ParticipantPipelineSchedule(pipeline=self.pipeline, subject=subject),
+                )
 
 
 class ParticipantPipelineSchedule(Schedule):
