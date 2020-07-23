@@ -66,6 +66,8 @@ args = parser.parse_args(
 
 print(args)
 
+time.sleep(3)
+
 if args.analysis_level == "cli":
     more_options = sys.argv[sys.argv.index('--') + 1:]
     if more_options[0:3] == ['utils', 'data_config', 'build']:
@@ -77,7 +79,7 @@ if args.analysis_level == "cli":
 
 elif args.analysis_level == "test_config":
     shutil.copy(
-        '/code/data_config_template.yml',
+        args.data_config_file,
         os.path.join(args.output_dir, 'cpac_data_config_test.yml')
     )
     sys.exit(0)
