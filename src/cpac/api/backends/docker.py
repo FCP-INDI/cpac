@@ -27,9 +27,7 @@ from ..schedules import (DataConfigSchedule, DataSettingsSchedule,
 from .base import Backend, BackendSchedule, RunStatus
 
 
-logger = logging.getLogger('cpac.api.backends.docker')
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler())
+logger = logging.getLogger(__name__)
 
 docker_statuses = {
     'created': RunStatus.STARTING,
@@ -43,23 +41,61 @@ docker_statuses = {
 
 class DockerSchedule(BackendSchedule):
 
-    _run = None
+    _run_status = None
 
     @property
     async def status(self):
-        if not self._run:
+        if not self._run_status:
             return RunStatus.UNSTARTED
 
-        try:
-            self._run.reload()
-        except Exception:
-            return RunStatus.UNKNOWN
-
-        status = self._run.status
+        status = self._run_status
         if status in docker_statuses:
             return docker_statuses[status]
 
         return RunStatus.UNKNOWN
+
+    async def _runner(self, command, volumes, ports={'8008/tcp': None}):
+        container = self.backend.client.containers.run(
+            'fcpindi/c-pac:' + self.backend.tag,
+            command=command,
+            detach=True,
+            stdin_open=False,
+            ports=ports,
+            volumes=volumes,
+        )
+
+        if ports:
+            await asyncio.sleep(3)
+            container.reload()
+            self._run_logs_port = int(container.attrs['NetworkSettings']['Ports']['8008/tcp'][0]['HostPort'])
+
+        while True:
+            try:
+                await asyncio.sleep(0.5)
+
+                container.reload()
+                status = container.status
+                if self._run_status == status:
+                    continue
+
+                self._run_status = status
+                # logger.info(f"Got status {status}")
+
+                yield {
+                    "type": "status",
+                    "time": time.time(),
+                    "status": container.status,
+                }
+
+                if status not in ['running', 'created']:
+                    break
+            except docker.errors.NotFound:
+                break
+
+        try:
+            container.remove(v=True, force=True)
+        except:
+            pass
 
     @staticmethod
     def _remap_files(subject):
@@ -106,7 +142,7 @@ class DockerDataSettingsSchedule(DockerSchedule, DataSettingsSchedule):
         with open(os.path.join(output_folder, 'data_settings.yml'), 'w') as f:
             yaml.dump(data_settings, f)
 
-        container_args = [
+        command = [
             '/',
             '/output_folder',
             'cli',
@@ -117,15 +153,11 @@ class DockerDataSettingsSchedule(DockerSchedule, DataSettingsSchedule):
             '/output_folder/data_settings.yml',
         ]
 
-        self._run = self.backend.client.containers.run(
-            'fcpindi/c-pac:' + self.backend.tag,
-            command=container_args,
-            detach=True,
-            working_dir='/output_folder',
-            volumes=volumes
-        )
-
-        self._run.wait()
+        async for item in self._runner(command, volumes, None):
+            yield BackendSchedule.Status(
+                timestamp=item["time"],
+                status=item["status"],
+            )
 
         try:
             files = glob.glob(os.path.join(output_folder, 'cpac_data_config_*.yml'))
@@ -170,19 +202,15 @@ class DockerDataConfigSchedule(DockerSchedule, DataConfigSchedule):
             volumes[data_folder] = {'bind': '/data_folder', 'mode': 'ro'}
             data_folder = '/data_folder'
 
-        container_args = [data_folder, '/output', 'test_config']
-
+        command = [data_folder, '/output', 'test_config']
         if data_config:
-            container_args += ['--data_config_file', '/config/data_config.yml']
+            command += ['--data_config_file', '/config/data_config.yml']
 
-        self._run = self.backend.client.containers.run(
-            'fcpindi/c-pac:' + self.backend.tag,
-            command=container_args,
-            detach=True,
-            volumes=volumes
-        )
-
-        self._run.wait()
+        async for item in self._runner(command, volumes, None):
+            yield BackendSchedule.Status(
+                timestamp=item["time"],
+                status=item["status"],
+            )
 
         try:
             files = glob.glob(os.path.join(output_folder, 'cpac_data_config_*.yml'))
@@ -193,7 +221,8 @@ class DockerDataConfigSchedule(DockerSchedule, DataConfigSchedule):
             shutil.rmtree(output_folder)
 
 
-class DockerParticipantPipelineSchedule(DockerSchedule, ParticipantPipelineSchedule):
+class DockerParticipantPipelineSchedule(DockerSchedule,
+                                        ParticipantPipelineSchedule):
 
     async def run(self):
         run_folder = tempfile.mkdtemp()
@@ -273,63 +302,20 @@ class DockerParticipantPipelineSchedule(DockerSchedule, ParticipantPipelineSched
             for log in self._logs_messages:
                 yield log
 
-    async def _runner(self, command, volumes):
-        container = self.backend.client.containers.run(
-            'fcpindi/c-pac:' + self.backend.tag,
-            command=command,
-            detach=True,
-            stdin_open=False,
-            ports={'8008/tcp': None},
-            volumes=volumes,
-        )
-
-        await asyncio.sleep(3)
-        container.reload()
-
-        self._run_logs_port = int(container.attrs['NetworkSettings']['Ports']['8008/tcp'][0]['HostPort'])
-
-        while True:
-            try:
-                await asyncio.sleep(0.5)
-
-                container.reload()
-                status = container.status
-                if self._run_status == status:
-                    continue
-
-                self._run_status = status
-                logger.info(f"Got status {status}")
-
-                yield {
-                    "type": "status",
-                    "time": time.time(),
-                    "status": container.status,
-                }
-
-                if status not in ['running', 'created']:
-                    break
-            except docker.errors.NotFound:
-                break
-
-        try:
-            container.remove(v=True, force=True)
-        except:
-            pass
-
-
     async def _logger_listener(self):
 
         while self._run_status is None:
             await asyncio.sleep(0.1)
 
         while self._run_status not in ['running']:
-            logger.info("Waiting container to start")
+            # logger.info("Waiting container to start")
             await asyncio.sleep(0.5)
 
         port = int(self._run_logs_port)
         uri = f"ws://localhost:{port}/log"
 
         while True:
+            ws = None
             try:
                 ws = await websocket_connect(uri)
                 await ws.write_message(json.dumps({
@@ -350,11 +336,11 @@ class DockerParticipantPipelineSchedule(DockerSchedule, ParticipantPipelineSched
                         "content": msg["message"],
                     }
             except:
-                logger.info("Waiting monitoring to start")
-                await asyncio.sleep(1)
+                await asyncio.sleep(0.5)
                 yield
             finally:
-                ws.close()
+                if ws:
+                    ws.close()
 
 
 class DockerBackend(Backend):
