@@ -124,7 +124,7 @@ class Scheduler:
                 name = message.name
                 subschedule = message.schedule
 
-                logger.info(f'Scheduling {subschedule} from {schedule}')
+                logger.info(f'[Scheduler] Scheduling {subschedule} from {schedule}')
 
                 for watcher_class in self._watchers:
                     for watcher in self._watchers[watcher_class].get(sid, []):
