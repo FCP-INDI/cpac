@@ -59,7 +59,7 @@ async def test_data_config_logs(app, http_client, base_url, scheduler):
     assert welcome['connected']
 
 
-    with open(os.path.join(Constants.TESTS_DATA_PATH, 'data_config_template_single.yml'), 'r') as f:
+    with open(os.path.join(Constants.TESTS_DATA_PATH, 'data_config_template.yml'), 'r') as f:
         data_config = f.read()
 
     body = json.dumps({
@@ -90,17 +90,20 @@ async def test_data_config_logs(app, http_client, base_url, scheduler):
     try:
         while len(schedules_alive):
             message = json.loads(await ws_client.read_message())
+            messages += [message]
+
             if message['type'] != 'watch':
                 continue
 
             data = message['data']
-            messages += [data]
 
-            message_type, message = data['type'], data['message']
-            if message_type in ('Start', 'Spawn'):
+            schedule_id, message_type, message = data['id'], data['type'], data['message']
+            if message_type in ('Start'):
+                schedules_alive |= set([schedule_id])
+            if message_type in ('Spawn'):
                 schedules_alive |= set([message['schedule']])
             if message_type == 'End':
-                schedules_alive ^= set([message['schedule']])
+                schedules_alive ^= set([schedule_id])
 
             print("schedules_alive", schedules_alive)
 

@@ -17,11 +17,11 @@ class Schedule:
 
     @dataclass
     class Start:
-        schedule: 'Schedule'
+        pass
 
     @dataclass
     class End:
-        schedule: 'Schedule'
+        pass
 
     async def pre(self):
         raise NotImplementedError
