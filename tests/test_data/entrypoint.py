@@ -78,8 +78,14 @@ if args.analysis_level == "cli":
         sys.exit(0)
 
 elif args.analysis_level == "test_config":
+    data_config_file = args.data_config_file
+    if args.bids_dir.startswith('s3://'):
+        data_config_file = '/code/data_config_template.yml'
+    if data_config_file.startswith('s3://'):
+        data_config_file = '/code/data_config_template.yml'
+
     shutil.copy(
-        args.data_config_file,
+        data_config_file,
         os.path.join(args.output_dir, 'cpac_data_config_test.yml')
     )
     sys.exit(0)
