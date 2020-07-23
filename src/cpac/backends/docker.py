@@ -91,32 +91,48 @@ class Docker(Backend):
             ) for k in layer if k in {'id', 'status', 'progress'}]
 
         self._load_logging()
-        print(command)
-        self.container = self.client.containers.run(
-            self.image,
-            command=command,
-            detach=True,
-            stderr=True,
-            stdout=True,
-            remove=True,
-            user=':'.join([
-                str(self.bindings['uid']),
-                str(self.bindings['gid'])
-            ]),
-            volumes=self._volumes_to_docker_mounts(),
-            working_dir=kwargs.get('working_dir', '/tmp'),
-            **self.docker_kwargs
-        )
-        if run_type == 'exec':
-            return(self.container.attach(
-                logs=True, stdout=True, stderr=True, stream=True
-            ))
-        else:
+
+        if run_type == 'run':
+            self.container = self.client.containers.run(
+                self.image,
+                command=command,
+                detach=True,
+                stderr=True,
+                stdout=True,
+                remove=True,
+                user=':'.join([
+                    str(self.bindings['uid']),
+                    str(self.bindings['gid'])
+                ]),
+                volumes=self._volumes_to_docker_mounts(),
+                working_dir=kwargs.get('working_dir', '/tmp'),
+                **self.docker_kwargs
+            )
             self._run = DockerRun(self.container)
+        elif run_type == 'exec':
+            self.container = self.client.containers.create(
+                self.image,
+                auto_remove=True,
+                entrypoint='/bin/bash',
+                stdin_open=True,
+                user=':'.join([
+                    str(self.bindings['uid']),
+                    str(self.bindings['gid'])
+                ]),
+                volumes=self._volumes_to_docker_mounts(),
+                working_dir=kwargs.get('working_dir', '/tmp'),
+                **self.docker_kwargs
+            )
+            self.container.start()
+            return(self.container.exec_run(
+                cmd=command,
+                stdout=True,
+                stderr=True,
+                stream=True
+            )[1])
 
 
 class DockerRun(object):
-
     def __init__(self, container):
         self.container = container
         [print(l.decode('utf-8'), end='') for l in self.container.attach(
