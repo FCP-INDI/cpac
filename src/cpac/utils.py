@@ -1,7 +1,7 @@
 import os
 import yaml
 import zlib
-from base64 import b64decode
+from base64 import b64encode, b64decode
 
 from cpac import dist_name
 from itertools import permutations
@@ -226,6 +226,13 @@ def parse_data_url(data_url):
         elif enc == 'base64':
             data = b64decode(data)
     return data, media_type
+
+
+def generate_data_url(content, mime, compress=False):
+    content = content.encode('utf-8')
+    if compress:
+        content = zlib.compress(content)
+    return f"data:{mime};base64{';zlib' if compress else ''}," + b64encode(content).decode()
 
 
 def yaml_parse(path_or_data_url):
