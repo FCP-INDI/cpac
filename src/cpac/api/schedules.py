@@ -49,7 +49,10 @@ class Schedule:
 
     def result(self, key):
         keys = key.split('/')
-        return traverse_deep(self._results, keys)
+        try:
+            return traverse_deep(self._results, keys)
+        except KeyError as e:
+            raise KeyError(*e.args)
 
     @property
     def uid(self):
