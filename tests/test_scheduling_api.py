@@ -187,5 +187,6 @@ async def test_data_config(http_client, base_url, scheduler):
     child = children[0]
     response = await http_client.fetch(f'{base_url}/schedule/{child}/result', raise_error=False)
 
-    body = json_decode(response.body)
-    print(body)
+    # TODO add a result for participant run
+    # body = json_decode(response.body)
+    # print(body)
