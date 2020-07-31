@@ -101,13 +101,12 @@ Usage
 .. |github-version| image:: https://img.shields.io/github/tag/FCP-INDI/cpac.svg
     :target: https://github.com/FCP-INDI/cpac/releases
     :alt: GitHub version
-.. |build-status| image:: https://travis-ci.org/FCP-INDI/cpac.svg?branch=trunk
+.. |build-status| image:: https://travis-ci.org/FCP-INDI/cpac.svg
     :target: https://travis-ci.org/FCP-INDI/cpac
     :alt: Travis CI build status
-.. |coverage| image:: https://coveralls.io/repos/github/FCP-INDI/cpac/badge.svg?branch=trunk
-    :target: https://coveralls.io/github/FCP-INDI/cpac?branch=trunk
+.. |coverage| image:: https://coveralls.io/repos/github/FCP-INDI/cpac/badge.svg
+    :target: https://coveralls.io/github/FCP-INDI/cpac
     :alt: coverage badge
 .. |upload| image:: https://github.com/FCP-INDI/cpac/workflows/Upload%20Python%20Package/badge.svg
     :target: https://pypi.org/project/cpac-py/
     :alt: upload Python package
-
