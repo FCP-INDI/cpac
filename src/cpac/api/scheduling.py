@@ -1,16 +1,20 @@
-import time
+import os
 import yaml
+import sqlite3
 import collections
 import logging
 import asyncio
 from collections.abc import Iterable
 from concurrent.futures import ThreadPoolExecutor
+from appdirs import AppDirs
 
 from .schedules import Schedule
 from .backends.base import BackendSchedule
 
 logger = logging.getLogger(__name__)
 
+
+MAX_PARALLEL = 10
 SCHEDULER_ADDRESS = ('localhost', 3333)
 
 
@@ -47,18 +51,55 @@ class Scheduler:
         BackendSchedule.Status,
     ]
 
-    def __init__(self, backend):
+    def __init__(self, backend, persistent=False):
         self.backend = backend(self)
+        self.persistent = persistent
+        self._db_connection = None
         self._schedules = ScheduleTree(name='ROOT')
         self._futures = {}
         self._watchers = {c: {} for c in Scheduler.events}
         self._loop = asyncio.get_event_loop()
-        self._executor = ThreadPoolExecutor()
+        self._semaphore = asyncio.Semaphore(MAX_PARALLEL)
+
+    @property
+    def config_dir(self):
+        from cpac import __version__
+        dirs = AppDirs(
+            appname='cpac',
+            appauthor=False,
+            version=__version__
+        )
+        return dirs.user_config_dir
+
+    @property
+    def config_file(self):
+        return os.path.join(self.config_dir, 'cpacpy.yml')
+
+    @property
+    def database_file(self):
+        if not self._db_connection:
+            return ':memory:'
+        return os.path.join(self.config_dir, 'cpacpy.db')
+
+    @property
+    def database(self):
+        if self._db_connection is None:
+            self._db_connection = sqlite3.connect(self.database_file)
+        return self._db_connection
+
+    def load_config(self):
+        with open(self.config_file, 'r') as f:
+            self._config = yaml.load(f)
+
+    def save_config(self):
+        with open(self.config_file, 'w') as f:
+            yaml.dump(self._config, f)
 
     def __getitem__(self, key):
         return self._schedules.children[key if isinstance(key, str) else repr(str)]
 
     async def __aenter__(self):
+        self.database
         return self
 
     def __await__(self):
@@ -69,7 +110,9 @@ class Scheduler:
             pending = self._futures.values()
 
     async def __aexit__(self, exc_type, exc, tb):
-        self._executor.shutdown(wait=True)
+        if self._db_connection:
+            self._db_connection.close()
+        self.save_config()
 
     def schedule(self, schedule, parent=None, name=None):
 
@@ -85,12 +128,6 @@ class Scheduler:
         if parent:
             self._schedules[repr(parent)].children[schedule_id] = self._schedules[schedule_id]
 
-        # self._futures[schedule_id] = self._loop.run_in_executor(
-        #     self._executor,
-        #     self.run_scheduled,
-        #     schedule
-        # )
-
         self._futures[schedule_id] = self._loop.create_task(
             self.run_scheduled(schedule)
         )
@@ -99,8 +136,9 @@ class Scheduler:
 
     def watch(self, schedule, function, children=False, watcher_classes=None):
         sid = repr(schedule)
-        logger.info(f"[Scheduler] Scheduling watcher on schedule {schedule}")
-        for watcher_class in (watcher_classes or self._watchers):
+        watcher_classes = watcher_classes or self.events
+        logger.info(f"[Scheduler] Scheduling watcher on schedule {schedule} for watchers {[w.__name__ for w in watcher_classes]}")
+        for watcher_class in watcher_classes:
             if sid not in self._watchers[watcher_class]:
                 self._watchers[watcher_class][sid] = []
             self._watchers[watcher_class][sid] += [{
@@ -110,53 +148,55 @@ class Scheduler:
 
     async def run_scheduled(self, schedule):
 
-        it = schedule()
-        sid = repr(schedule)
+        async with self._semaphore:
 
-        async for message in it:
+            it = schedule()
+            sid = repr(schedule)
 
-            watchers = self._watchers[message.__class__].get(sid, [])
+            async for message in it:
 
-            logger.info(f"[Scheduler] Got message {message.__class__.__name__} to schedule {schedule} ({len(watchers)})")
+                watchers = self._watchers[message.__class__].get(sid, [])
 
-            if isinstance(message, Schedule.Spawn):
+                logger.info(f"[Scheduler] Got message {message.__class__.__name__} to schedule {schedule} ({len(watchers)})")
 
-                name = message.name
-                subschedule = message.schedule
+                if isinstance(message, Schedule.Spawn):
 
-                logger.info(f'[Scheduler] Scheduling {subschedule} from {schedule}')
+                    name = message.name
+                    subschedule = message.schedule
 
-                for watcher_class in self._watchers:
-                    for watcher in self._watchers[watcher_class].get(sid, []):
-                        children = watcher["children"]
-                        if not children:
-                            continue
+                    logger.info(f'[Scheduler] Scheduling {subschedule} from {schedule}')
 
-                        self.watch(
-                            schedule=subschedule,
-                            function=watcher["function"],
-                            children=watcher["children"],
-                            watcher_classes=[watcher_class],
-                        )
+                    for watcher_class in self._watchers:
+                        for watcher in self._watchers[watcher_class].get(sid, []):
+                            children = watcher["children"]
+                            if not children:
+                                continue
 
-                self.schedule(
-                    subschedule,
-                    parent=schedule,
-                    name=name
-                )
+                            self.watch(
+                                schedule=subschedule,
+                                function=watcher["function"],
+                                children=watcher["children"],
+                                watcher_classes=[watcher_class],
+                            )
 
-            for watcher in watchers:
-                function = watcher["function"]
-                try:
-                    function(schedule, message)
-                except Exception as e:
-                    logger.exception(e)
+                    self.schedule(
+                        subschedule,
+                        parent=schedule,
+                        name=name
+                    )
 
-        for watcher_class in self._watchers:
-            if sid in self._watchers[watcher_class]:
-                del self._watchers[watcher_class][sid]
+                for watcher in watchers:
+                    function = watcher["function"]
+                    try:
+                        function(schedule, message)
+                    except Exception as e:
+                        logger.exception(e)
 
-        return schedule
+            for watcher_class in self._watchers:
+                if sid in self._watchers[watcher_class]:
+                    del self._watchers[watcher_class][sid]
+
+            return schedule
 
 
     @property

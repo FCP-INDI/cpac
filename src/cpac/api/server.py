@@ -1,3 +1,4 @@
+import asyncio
 import tornado.escape
 import tornado.web
 import tornado.websocket
@@ -55,8 +56,13 @@ class BaseHandler(tornado.web.RequestHandler):
 class MainHandler(BaseHandler):
     def get(self):
         self.finish({
-            "api": "C-PAC",
+            "api": "cpacpy",
             "version": __version__,
+            "backends": [
+                {"id": "docker", "backend": "docker", "tags": ["docker"]},
+                {"id": "singularity", "backend": "singularity", "tags": ["singularity"]},
+                {"id": "slurm", "backend": "slurm", "tags": ["slurm", "ssh", "singularity"]},
+            ]
         })
 
 
@@ -92,24 +98,41 @@ class ScheduleHandler(BaseHandler):
 
         elif self.json["type"] == "pipeline":
 
-            if not self.json.get("data_config"):
+            data_config = self.json.get("data_config")
+            if not data_config:
                 return self.bad_request()
 
-            if self.json["data_config"].startswith('s3:'):
-                data_config_file = self.json["data_config"]
-            elif self.json["data_config"].startswith('data:'):
-                data_config_file = self.json["data_config"]
+            upload_folder = None
+
+            if data_config.startswith('s3:'):
+                data_config_file = data_config
+            elif data_config.startswith('data:'):
+                data_config_file = data_config
             else:
-                upload_folder = tempfile.mkdtemp()
+                upload_folder = upload_folder or tempfile.mkdtemp()
                 data_config_file = os.path.join(upload_folder, "data_config.yml")
                 with open(data_config_file, "wb") as f:
-                    f.write(self.json["data_config"].encode("utf-8"))
+                    f.write(data_config.encode("utf-8"))
 
+            pipeline = self.json.get("pipeline")
             pipeline_file = None
-            if self.json.get("pipeline"):
-                pipeline_file = os.path.join(upload_folder, "pipeline.yml")
+            if pipeline:
+                if pipeline.startswith('s3:'):
+                    pipeline_file = pipeline
+                elif pipeline.startswith('data:'):
+                    pipeline_file = pipeline
+                else:
+                    upload_folder = upload_folder or tempfile.mkdtemp()
+                    pipeline_file = os.path.join(upload_folder, "pipeline.yml")
+                    with open(pipeline_file, "wb") as f:
+                        f.write(pipeline.encode("utf-8"))
 
-            _logger.info(f"Scheduling for data config {data_config_file}")
+            data_config_file_repr = \
+                data_config_file.split(',', 2)[0] \
+                if data_config_file.startswith('data:') \
+                else data_config_file
+
+            _logger.info(f"Scheduling for data config {data_config_file_repr}")
 
             schedule = scheduler.schedule(
                 DataConfigSchedule(
@@ -154,8 +177,9 @@ class ResultScheduleHandler(BaseHandler):
             # for chunk in schedule_results[result]():
             #     self.write(chunk)
 
-            self.write(schedule_result)
-            return self.finish()
+            return self.finish({
+                "result": schedule_results,
+            })
 
         return self.finish({
             "result": schedule_results,
@@ -183,7 +207,7 @@ def schedule_watch_wrapper(scheduler, socket, message_id):
         }
 
         if message_id:
-            content['__gui_message_id'] = message_id
+            content['__cpacpy_message_id'] = message_id
 
         socket.write_message(json.dumps(content, cls=ScheduleEncoder))
 
@@ -211,17 +235,26 @@ class WatchScheduleHandler(tornado.websocket.WebSocketHandler):
         _logger.debug("Websocket message of type %s", message["type"])
 
         message_id = None
-        if '__gui_message_id' in message:
-            message_id = message['__gui_message_id']
+        if '__cpacpy_message_id' in message:
+            message_id = message['__cpacpy_message_id']
 
         scheduler = self.application.settings.get('scheduler')
 
         if message["type"] == "watch":
+            watchers = None
+            if "watchers" in message:
+                watchers = [
+                    kls
+                    for kls in scheduler.events
+                    if kls.__name__ in message["watchers"]
+                ]
+                
             schedule = scheduler[message["schedule"]].schedule
             scheduler.watch(
                 schedule,
                 schedule_watch_wrapper(scheduler, self, message_id),
-                children="children" in message and message["children"]
+                children="children" in message and message["children"],
+                watcher_classes=watchers
             )
 
     def on_close(self):
@@ -235,16 +268,20 @@ app = tornado.web.Application(
         (r"/", MainHandler),
         (r"/schedule/(?P<schedule>[^/]+)/status", StatusScheduleHandler),  # TODO uuid regex
         (r"/schedule/(?P<schedule>[^/]+)/result", ResultScheduleHandler),  # TODO uuid regex
-        (r"/schedule/(?P<schedule>[^/]+)/result/(?P<result>)", ResultScheduleHandler),  # TODO uuid regex
+        (r"/schedule/(?P<schedule>[^/]+)/result/(?P<result>.+)", ResultScheduleHandler),  # TODO uuid regex
         (r"/schedule/connect", WatchScheduleHandler),
         (r"/schedule", ScheduleHandler),
-        (r"/backends", BackendsHandler),
     ],
 )
 
-def start(address, scheduler):
+async def start(address, scheduler):
     app.settings['scheduler'] = scheduler
     address, port = address
-    app.listen(address=address, port=port)
+    server = app.listen(address=address, port=port)
     tornado.autoreload.start()
-    tornado.ioloop.IOLoop.current().start()
+
+    print(f"Listening to {address}:{port}")
+
+    while True:
+        await scheduler
+        await asyncio.sleep(5)

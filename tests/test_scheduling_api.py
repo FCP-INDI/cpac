@@ -51,7 +51,7 @@ def app(scheduler):
 async def test_version(http_client, base_url):
     response = await http_client.fetch(base_url, raise_error=False)
     assert response.code == 200
-    assert json_decode(response.body) == {'api': 'C-PAC', 'version': __version__}
+    assert json_decode(response.body) == {'api': 'cpacpy', 'version': __version__}
 
 
 @pytest.mark.asyncio

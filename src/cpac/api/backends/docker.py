@@ -57,6 +57,7 @@ class DockerSchedule(BackendSchedule):
     async def _runner(self, command, volumes, ports={'8008/tcp': None}):
         container = self.backend.client.containers.run(
             'fcpindi/c-pac:' + self.backend.tag,
+            name=f'cpacpy-{repr(self)}',
             command=command,
             detach=True,
             stdin_open=False,
@@ -65,8 +66,9 @@ class DockerSchedule(BackendSchedule):
         )
 
         if ports:
-            await asyncio.sleep(3)
-            container.reload()
+            while not container.attrs['NetworkSettings']['Ports']:
+                await asyncio.sleep(1)
+                container.reload()
             self._run_logs_port = int(container.attrs['NetworkSettings']['Ports']['8008/tcp'][0]['HostPort'])
 
         while True:
@@ -79,7 +81,6 @@ class DockerSchedule(BackendSchedule):
                     continue
 
                 self._run_status = status
-                # logger.info(f"Got status {status}")
 
                 yield {
                     "type": "status",
@@ -138,9 +139,11 @@ class DockerDataSettingsSchedule(DockerSchedule, DataSettingsSchedule):
             '/tmp': {'bind': '/scratch', 'mode': 'rw'},
         }
 
-        data_settings = yaml_parse(self.data_settings)
+        # TODO test for strings
         with open(os.path.join(output_folder, 'data_settings.yml'), 'w') as f:
-            yaml.dump(data_settings, f)
+            f.write(self.data_settings)
+
+        # open(os.path.join(output_folder, 'data_settings.yml'), 'a').close()
 
         command = [
             '/',
@@ -156,7 +159,7 @@ class DockerDataSettingsSchedule(DockerSchedule, DataSettingsSchedule):
         async for item in self._runner(command, volumes, None):
             yield BackendSchedule.Status(
                 timestamp=item["time"],
-                status=item["status"],
+                status=docker_statuses[item["status"]],
             )
 
         try:
@@ -209,7 +212,7 @@ class DockerDataConfigSchedule(DockerSchedule, DataConfigSchedule):
         async for item in self._runner(command, volumes, None):
             yield BackendSchedule.Status(
                 timestamp=item["time"],
-                status=item["status"],
+                status=docker_statuses[item["status"]],
             )
 
         try:
@@ -283,7 +286,7 @@ class DockerParticipantPipelineSchedule(DockerSchedule,
             elif item["type"] == "status":
                 yield BackendSchedule.Status(
                     timestamp=item["time"],
-                    status=item["status"],
+                    status=docker_statuses[item["status"]],
                 )
 
         self._run_status = None
@@ -308,8 +311,7 @@ class DockerParticipantPipelineSchedule(DockerSchedule,
             await asyncio.sleep(0.1)
 
         while self._run_status not in ['running']:
-            # logger.info("Waiting container to start")
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.1)
 
         port = int(self._run_logs_port)
         uri = f"ws://localhost:{port}/log"
@@ -336,7 +338,7 @@ class DockerParticipantPipelineSchedule(DockerSchedule,
                         "content": msg["message"],
                     }
             except:
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(0.1)
                 yield
             finally:
                 if ws:

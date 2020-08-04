@@ -15,19 +15,6 @@ _logger = logging.getLogger(__name__)
 clargs = {'group', 'utils'}
 
 
-class ExtendAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        items = (getattr(namespace, self.dest) or []) + values
-        items = [x for n, x in enumerate(items) if x not in items[:n]]
-        setattr(namespace, self.dest, items)
-
-
-def address(str):  # pragma: no cover
-    addr, port = str.split(':')
-    port = int(port)
-    return addr, port
-
-
 def parse_args(args):
     cwd = os.getcwd()
 
@@ -142,8 +129,6 @@ def parse_args(args):
     )
 
     help_call = '--help' in sys.argv or '-h' in sys.argv
-    run_parser.register('action', 'extend', ExtendAction)
-    # run_parser.add_argument('--address', action='store', type=address)
 
     if not help_call:
         # These positional arguments are required unless we're just getting
@@ -173,21 +158,18 @@ def parse_args(args):
         add_help=False,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    group_parser.register('action', 'extend', ExtendAction)
 
     utils_parser = subparsers.add_parser(
         'utils',
         add_help=False,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    utils_parser.register('action', 'extend', ExtendAction)
 
     crash_parser = subparsers.add_parser(
         'crash',
         add_help=True,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    crash_parser.register('action', 'extend', ExtendAction)
 
     crash_parser.add_argument(
         'crashfile',

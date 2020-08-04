@@ -21,7 +21,7 @@ class Schedule:
 
     @dataclass
     class End:
-        pass
+        status: str
 
     async def pre(self):
         raise NotImplementedError
@@ -87,7 +87,6 @@ class DataConfigSchedule(Schedule):
         data_config = self['data_config']
 
         if self.schedule_participants:
-
             for subject in data_config:
                 subject_id = []
                 if 'site_id' in subject:
