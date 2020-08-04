@@ -79,7 +79,7 @@ async def test_scheduler_docker_pipeline(scheduler):
 
     assert len(logs) == 6
     for log_older, log_newer in zip(logs[:-1], logs[1:]):
-        assert log_newer['finish'] > log_older['finish']
+        assert log_newer['end'] > log_older['end']
 
 
 @pytest.mark.asyncio
@@ -97,4 +97,4 @@ async def test_scheduler_docker_pipeline_solo(backend):
 
     assert len(logs) == 6
     for log_older, log_newer in zip(logs[:-1], logs[1:]):
-        assert log_newer['finish'] > log_older['finish']
+        assert log_newer['end'] > log_older['end']

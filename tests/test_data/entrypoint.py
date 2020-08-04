@@ -71,13 +71,21 @@ time.sleep(3)
 if args.analysis_level == "cli":
     more_options = sys.argv[sys.argv.index('--') + 1:]
     if more_options[0:3] == ['utils', 'data_config', 'build']:
+        
+        data_settings = yaml.safe_load(open(more_options[3]))
+        data_config_file = '/code/data_config_template.yml'
+
+        if str(data_settings.get('bidsBaseDir')).startswith('s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS'):
+            data_config_file = '/code/data_config_template_large.yml'
+
         shutil.copy(
-            '/code/data_config_template.yml',
+            data_config_file,
             os.path.join(args.output_dir, 'cpac_data_config_test.yml')
         )
         sys.exit(0)
 
 elif args.analysis_level == "test_config":
+
     data_config_file = args.data_config_file
     if args.bids_dir.startswith('s3://'):
         data_config_file = '/code/data_config_template.yml'
@@ -94,15 +102,15 @@ elif args.analysis_level == "participant":
     data_config = yaml.safe_load(open(args.data_config_file))[0]
 
     nodes = [
-        f"resting_preproc_sub-{data_config['subject_id']}.anat_pipeline.normalize",
-        f"resting_preproc_sub-{data_config['subject_id']}.anat_pipeline.skullstrip",
-        f"resting_preproc_sub-{data_config['subject_id']}.anat_pipeline.segmentation",
-        f"resting_preproc_sub-{data_config['subject_id']}.func_pipeline.skullstrip",
-        f"resting_preproc_sub-{data_config['subject_id']}.func_pipeline.registration",
-        f"resting_preproc_sub-{data_config['subject_id']}.func_pipeline.nuisance_regression",
+        f"resting_preproc_sub-{data_config['subject_id']}.1_anat_pipeline.1_normalize",
+        f"resting_preproc_sub-{data_config['subject_id']}.1_anat_pipeline.2_skullstrip",
+        f"resting_preproc_sub-{data_config['subject_id']}.1_anat_pipeline.3_segmentation",
+        f"resting_preproc_sub-{data_config['subject_id']}.2_func_pipeline.4_skullstrip",
+        f"resting_preproc_sub-{data_config['subject_id']}.2_func_pipeline.5_registration",
+        f"resting_preproc_sub-{data_config['subject_id']}.2_func_pipeline.6_nuisance_regression",
     ]
 
-    sleep_between_nodes = 0.5
+    sleep_between_nodes = 1.0
 
     async def socketee(websocket, path):
         if path != '/log':
@@ -112,7 +120,7 @@ elif args.analysis_level == "participant":
 
         for i, node in enumerate(nodes):
             start = time.time()
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(sleep_between_nodes)
 
             await websocket.send(json.dumps({
                 "time": time.time(),
@@ -120,7 +128,7 @@ elif args.analysis_level == "participant":
                     "id": node,
                     "hash": f"{i:032}",
                     "start": start,
-                    "finish": time.time(),
+                    "end": time.time(),
                 }
             }))
 
@@ -138,7 +146,9 @@ elif args.analysis_level == "participant":
             server.close()
 
     async def wait_some():
-        await asyncio.sleep(len(nodes) * sleep_between_nodes * 5)
+        await asyncio.sleep(3)
+        await asyncio.sleep(len(nodes) * sleep_between_nodes)
+        await asyncio.sleep(1)
 
     async def main():
         task = asyncio.create_task(serve())
