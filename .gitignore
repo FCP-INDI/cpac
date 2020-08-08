@@ -23,6 +23,8 @@ tmp
 tags
 .vscode
 
+output
+
 # Package files
 *.egg
 *.eggs/

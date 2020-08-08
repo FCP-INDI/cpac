@@ -3,6 +3,7 @@ import glob
 import hashlib
 import json
 import os
+import pwd
 import sys
 import shutil
 import tempfile
@@ -30,14 +31,17 @@ from .base import Backend, BackendSchedule, RunStatus
 logger = logging.getLogger(__name__)
 
 docker_statuses = {
-    'created': RunStatus.STARTING,
+    'created': RunStatus.RUNNING,
     'restarting': RunStatus.RUNNING,
     'running': RunStatus.RUNNING,
     'removing': RunStatus.RUNNING,
     'paused': RunStatus.RUNNING,
     'exited': RunStatus.SUCCESS,
-    'dead': RunStatus.FAILED,
+    'dead': RunStatus.FAILURE,
 }
+
+uid = os.getuid()
+gid = pwd.getpwuid(uid).pw_gid
 
 class DockerSchedule(BackendSchedule):
 
@@ -63,6 +67,7 @@ class DockerSchedule(BackendSchedule):
             stdin_open=False,
             ports=ports,
             volumes=volumes,
+            user=f'{uid}:{gid}',
         )
 
         if ports:
@@ -81,17 +86,29 @@ class DockerSchedule(BackendSchedule):
                     continue
 
                 self._run_status = status
-
-                yield {
-                    "type": "status",
-                    "time": time.time(),
-                    "status": container.status,
-                }
-
                 if status not in ['running', 'created']:
                     break
+
+                if status == 'running':
+                    yield {
+                        "type": "status",
+                        "time": time.time(),
+                        "status": RunStatus.RUNNING,
+                    }
             except docker.errors.NotFound:
                 break
+
+        container.reload()
+        status_code = container.attrs['State']['ExitCode']
+        dead = container.attrs['State']['Paused'] or container.attrs['State']['OOMKilled'] or container.attrs['State']['Dead']
+
+        self._status = RunStatus.SUCCESS if status_code == 0 and not dead else RunStatus.FAILURE
+
+        yield {
+            "type": "status",
+            "time": time.time(),
+            "status": self._status
+        }
 
         try:
             container.remove(v=True, force=True)
@@ -132,18 +149,23 @@ class DockerSchedule(BackendSchedule):
 class DockerDataSettingsSchedule(DockerSchedule, DataSettingsSchedule):
 
     async def run(self):
-        output_folder = tempfile.mkdtemp()
+        output_folder = tempfile.mkdtemp(prefix='cpacpy-docker_')
 
         volumes = {
             output_folder: {'bind': '/output_folder', 'mode': 'rw'},
             '/tmp': {'bind': '/scratch', 'mode': 'rw'},
         }
 
-        # TODO test for strings
-        with open(os.path.join(output_folder, 'data_settings.yml'), 'w') as f:
-            f.write(self.data_settings)
+        data_settings_file = os.path.join(output_folder, 'data_settings.yml')
 
-        # open(os.path.join(output_folder, 'data_settings.yml'), 'a').close()
+        if isinstance(self.data_settings, str):
+            if '\n' in self.data_settings:
+                self.data_settings = yaml.safe_load(self.data_settings)
+            else:
+                self.data_settings = yaml_parse(self.data_settings)
+
+        with open(data_settings_file, 'w') as f:
+            yaml.dump(self.data_settings, f)
 
         command = [
             '/',
@@ -159,7 +181,7 @@ class DockerDataSettingsSchedule(DockerSchedule, DataSettingsSchedule):
         async for item in self._runner(command, volumes, None):
             yield BackendSchedule.Status(
                 timestamp=item["time"],
-                status=docker_statuses[item["status"]],
+                status=item["status"],
             )
 
         try:
@@ -174,7 +196,7 @@ class DockerDataSettingsSchedule(DockerSchedule, DataSettingsSchedule):
 class DockerDataConfigSchedule(DockerSchedule, DataConfigSchedule):
 
     async def run(self):
-        run_folder = tempfile.mkdtemp()
+        run_folder = tempfile.mkdtemp(prefix='cpacpy-docker_')
         config_folder = os.path.join(run_folder, 'config')
         output_folder = os.path.join(run_folder, 'output')
 
@@ -212,7 +234,7 @@ class DockerDataConfigSchedule(DockerSchedule, DataConfigSchedule):
         async for item in self._runner(command, volumes, None):
             yield BackendSchedule.Status(
                 timestamp=item["time"],
-                status=docker_statuses[item["status"]],
+                status=item["status"],
             )
 
         try:
@@ -228,7 +250,7 @@ class DockerParticipantPipelineSchedule(DockerSchedule,
                                         ParticipantPipelineSchedule):
 
     async def run(self):
-        run_folder = tempfile.mkdtemp()
+        run_folder = tempfile.mkdtemp(prefix='cpacpy-docker_')
         config_folder = os.path.join(run_folder, 'config')
         output_folder = os.path.join(run_folder, 'output')
 
@@ -286,7 +308,7 @@ class DockerParticipantPipelineSchedule(DockerSchedule,
             elif item["type"] == "status":
                 yield BackendSchedule.Status(
                     timestamp=item["time"],
-                    status=docker_statuses[item["status"]],
+                    status=item["status"],
                 )
 
         self._run_status = None
