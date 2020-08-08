@@ -117,7 +117,7 @@ async def test_data_config_logs(app, http_client, base_url, scheduler):
         [
             {
                 'schedule': m['data']['id'],
-                **m['data']['message']['content']
+                **m['data']['message']
             }
             for m in messages
             if m['data']['type'] in ('Start', 'End')
@@ -168,6 +168,6 @@ async def test_data_config_logs(app, http_client, base_url, scheduler):
 
     assert latest_first_log < earliest_last_log
     
-    assert np.std([last_logs[sid] - start for sid, start in first_logs.items()]) < 0.01
+    assert np.std([last_logs[sid] - start for sid, start in first_logs.items()]) < 0.05
     
     ws_client.close()

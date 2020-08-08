@@ -12,6 +12,7 @@ from cpac.api.backends.docker import DockerBackend
 from cpac.api.scheduling import Scheduler
 from cpac.api.server import app as app_obj
 from cpac.utils import generate_data_url
+from cpac.api.backends.base import RunStatus
 
 try:
     from test_data.docker import build_image
@@ -51,7 +52,11 @@ def app(scheduler):
 async def test_version(http_client, base_url):
     response = await http_client.fetch(base_url, raise_error=False)
     assert response.code == 200
-    assert json_decode(response.body) == {'api': 'cpacpy', 'version': __version__}
+
+    content = json_decode(response.body)
+    assert content['api'] == 'cpacpy'
+    assert content['version'] == __version__
+    assert len(content['backends']) == 3  # @TODO create a custom config for the scheduler on test env
 
 
 @pytest.mark.asyncio
@@ -162,7 +167,7 @@ async def test_data_config(http_client, base_url, scheduler):
 
     response = await http_client.fetch(f'{base_url}/schedule/{schedule}/status', raise_error=False)
     body = json_decode(response.body)
-    assert body['status'] == 'RUNNING'
+    assert body['status'] == RunStatus.RUNNING
 
     await scheduler
 

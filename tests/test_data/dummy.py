@@ -34,6 +34,7 @@ class DummyDataSplitterSchedule(DummySchedule, DataSplitterSchedule):
         self._results['text'] = {
             'pieces': self.pieces
         }
+        self._status = RunStatus.SUCCESS
     
     @property
     async def status(self):
@@ -50,11 +51,12 @@ class DummyDataUppererSchedule(DummySchedule, DataUppererSchedule):
 
     async def run(self):
         self._results['text'] = self.data.upper()
+        self._status = RunStatus.SUCCESS
 
     @property
     async def status(self):
         if self.data.upper() == 'CRAZY':
-            return RunStatus.FAILED
+            return RunStatus.FAILURE
         return RunStatus.SUCCESS
 
     @property

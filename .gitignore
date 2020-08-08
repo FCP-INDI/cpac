@@ -22,6 +22,8 @@ __pycache__/*
 tags
 .vscode
 
+output
+
 # Package files
 *.egg
 *.eggs/

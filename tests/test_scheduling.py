@@ -24,7 +24,7 @@ async def test_scheduler():
         logs = await scheduler.logs
 
         assert len(statuses) == 4
-        assert statuses[sid]['status'] == 'SUCCESS'
+        assert statuses[sid]['status'] == RunStatus.SUCCESS
         assert 'parent' not in statuses[sid]
         assert len(statuses[sid]['children']) == 3
 
@@ -34,9 +34,9 @@ async def test_scheduler():
         assert statuses[sid1]['parent'] == sid
         assert statuses[sid2]['parent'] == sid
         assert statuses[sid3]['parent'] == sid
-        assert statuses[sid1]['status'] == 'SUCCESS'
-        assert statuses[sid2]['status'] == 'FAILED'
-        assert statuses[sid3]['status'] == 'SUCCESS'
+        assert statuses[sid1]['status'] == RunStatus.SUCCESS
+        assert statuses[sid2]['status'] == RunStatus.FAILURE
+        assert statuses[sid3]['status'] == RunStatus.SUCCESS
 
 
         assert len(logs) == 4

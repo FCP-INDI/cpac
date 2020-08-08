@@ -11,10 +11,9 @@ logger = logging.getLogger(__name__)
 
 class RunStatus:
     UNSTARTED = 'unstarted'
-    STARTING = 'starting'
     RUNNING = 'running'
     SUCCESS = 'success'
-    FAILED = 'failed'
+    FAILURE = 'failure'
     UNKNOWN = 'unknown'
 
 
@@ -113,4 +112,4 @@ class BackendSchedule:
             except NotImplementedError:
                 pass
         
-        yield Schedule.End(status=RunStatus.SUCCESS)
+        yield Schedule.End(status=self._status)
