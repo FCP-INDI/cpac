@@ -8,48 +8,13 @@ from tornado.escape import json_decode
 
 from conftest import Constants
 from cpac import __version__
-from cpac.api.backends.docker import DockerBackend
-from cpac.api.scheduling import Scheduler
-from cpac.api.server import app as app_obj
 from cpac.utils import generate_data_url
 from cpac.api.backends.base import RunStatus
 
-try:
-    from test_data.docker import build_image
-except:
-    pytest.skip("Skipping docker tests", allow_module_level=True)
-
-
-@pytest.fixture(scope='function')
-def event_loop(io_loop):
-    loop = io_loop.current().asyncio_loop
-    yield loop
-    loop.stop()
-
-@pytest.fixture
-def docker_tag():
-    build_image(tag='docker-test')
-    return 'docker-test'
-
-@pytest.fixture
-def backend(docker_tag):
-    return DockerBackend(tag=docker_tag)
-
-@pytest.fixture
-async def scheduler(backend):
-    async with Scheduler(backend) as scheduler:
-        yield scheduler
-        await scheduler
-
-@pytest.fixture
-def app(scheduler):
-    app_obj.settings['scheduler'] = scheduler
-    return app_obj
-
+from fixtures import event_loop, scheduler, app
 
 @pytest.mark.asyncio
-@pytest.mark.gen_test(timeout=2)
-async def test_version(http_client, base_url):
+async def test_version(app, http_client, base_url):
     response = await http_client.fetch(base_url, raise_error=False)
     assert response.code == 200
 
@@ -60,8 +25,7 @@ async def test_version(http_client, base_url):
 
 
 @pytest.mark.asyncio
-@pytest.mark.gen_test(timeout=2)
-async def test_data_settings(http_client, base_url, scheduler):
+async def test_data_settings(http_client, base_url, app, scheduler):
 
     with open(os.path.join(Constants.TESTS_DATA_PATH, 'data_settings_template.yml'), 'r') as f:
         data_settings = f.read()
@@ -98,8 +62,7 @@ async def test_data_settings(http_client, base_url, scheduler):
 
 
 @pytest.mark.asyncio
-@pytest.mark.gen_test(timeout=2)
-async def test_data_settings(http_client, base_url, scheduler):
+async def test_data_settings(http_client, base_url, app, scheduler):
 
     with open(os.path.join(Constants.TESTS_DATA_PATH, 'data_settings_template.yml'), 'r') as f:
         data_settings = f.read()
@@ -136,8 +99,7 @@ async def test_data_settings(http_client, base_url, scheduler):
 
 
 @pytest.mark.asyncio
-@pytest.mark.gen_test(timeout=2)
-async def test_data_config(http_client, base_url, scheduler):
+async def test_data_config(http_client, base_url, app, scheduler):
 
     with open(os.path.join(Constants.TESTS_DATA_PATH, 'data_config_template_single.yml'), 'r') as f:
         data_config = f.read()
@@ -163,7 +125,7 @@ async def test_data_config(http_client, base_url, scheduler):
     response = await http_client.fetch(f'{base_url}/schedule/{schedule}/result', raise_error=False)
     assert response.code == 425
 
-    await asyncio.sleep(1)
+    await asyncio.sleep(3)
 
     response = await http_client.fetch(f'{base_url}/schedule/{schedule}/status', raise_error=False)
     body = json_decode(response.body)

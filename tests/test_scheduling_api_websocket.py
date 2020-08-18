@@ -12,45 +12,11 @@ from tornado.escape import json_decode
 
 from conftest import Constants
 from cpac import __version__
-from cpac.api.backends.docker import DockerBackend
-from cpac.api.scheduling import Scheduler
-from cpac.api.server import app as app_obj
 from cpac.utils import generate_data_url
 
-try:
-    from test_data.docker import build_image
-except:
-    pytest.skip("Skipping docker tests", allow_module_level=True)
-
-
-@pytest.fixture(scope='function')
-def event_loop(io_loop):
-    loop = io_loop.current().asyncio_loop
-    yield loop
-    loop.stop()
-
-@pytest.fixture
-def docker_tag():
-    build_image(tag='docker-test')
-    return 'docker-test'
-
-@pytest.fixture
-def backend(docker_tag):
-    return DockerBackend(tag=docker_tag)
-
-@pytest.fixture
-async def scheduler(backend):
-    async with Scheduler(backend) as scheduler:
-        yield scheduler
-        await scheduler
-
-@pytest.fixture
-def app(scheduler):
-    app_obj.settings['scheduler'] = scheduler
-    return app_obj
+from fixtures import event_loop, scheduler, app
 
 @pytest.mark.asyncio
-@pytest.mark.gen_test(timeout=2)
 async def test_data_config_logs(app, http_client, base_url, scheduler):
 
     ws_base_url = base_url.replace('http', 'ws')

@@ -1,20 +1,29 @@
 import os
-from spython.main import Client
+import subprocess
 
 this_dir = os.path.dirname(__file__)
 
+image = None
+
 def build_image():
-    owd = os.getcwd()
-    try:
-        os.chdir(this_dir)
-        out = Client.build(
-            build_folder=this_dir,
-            image='/tmp/cpacpy-test.sif',
-            recipe=os.path.join(this_dir, 'Singularity'),
-            sudo=False,
-            force=True,
-            options=['--fakeroot'],
-        )
-    finally:
-        os.chdir(owd)
-    return '/tmp/cpacpy-test.sif'
+    global image
+    if image is None:
+        owd = os.getcwd()
+        try:
+            os.chdir(this_dir)
+            proc_command = [
+                'singularity',
+                'build',
+                '--fakeroot',
+                '--force',
+                '/tmp/cpacpy-singularity_test.sif',
+                os.path.join(this_dir, 'Singularity'),
+            ]
+            process = subprocess.Popen(proc_command)
+            process.wait()
+
+            image = '/tmp/cpacpy-singularity_test.sif'
+        finally:
+            os.chdir(owd)
+            
+    return image
