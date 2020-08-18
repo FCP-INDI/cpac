@@ -4,32 +4,14 @@ import asyncio
 import logging
 from cpac.api.scheduling import Scheduler
 from cpac.api.schedules import Schedule, DataSettingsSchedule, DataConfigSchedule, ParticipantPipelineSchedule
-from cpac.api.backends.singularity import SingularityBackend, SingularityParticipantPipelineSchedule
 from cpac.api.backends.utils import consume
 
 from conftest import Constants
-
-try:
-    from test_data.singularity import build_image
-except:
-    pytest.skip("Skipping singularity tests", allow_module_level=True)
-
-
-@pytest.fixture(scope="module")
-def backend():
-    image = build_image()
-    return SingularityBackend(image=image)
-
-
-@pytest.fixture
-async def scheduler(backend):
-    async with Scheduler(backend) as scheduler:
-        yield scheduler
-        await scheduler
+from fixtures import event_loop, backend, scheduler, app
 
 
 @pytest.mark.asyncio
-async def test_scheduler_singularity_settings(scheduler):
+async def test_scheduler_settings(scheduler):
 
     schedule = scheduler.schedule(
         DataSettingsSchedule(
@@ -44,7 +26,7 @@ async def test_scheduler_singularity_settings(scheduler):
 
 
 @pytest.mark.asyncio
-async def test_scheduler_singularity_config(scheduler):
+async def test_scheduler_config(scheduler):
 
     schedule = scheduler.schedule(
         DataConfigSchedule(
@@ -58,8 +40,9 @@ async def test_scheduler_singularity_config(scheduler):
     assert len(schedule['data_config']) == 4
     assert all(s['site'] == 'NYU' for s in schedule['data_config'])
 
+
 @pytest.mark.asyncio
-async def test_scheduler_singularity_pipeline(scheduler):
+async def test_scheduler_pipeline(scheduler):
 
     schedule = scheduler.schedule(
         ParticipantPipelineSchedule(
@@ -77,7 +60,7 @@ async def test_scheduler_singularity_pipeline(scheduler):
 
 
 @pytest.mark.asyncio
-async def test_scheduler_singularity_pipeline_solo(backend):
+async def test_scheduler_pipeline_solo(backend):
 
     schedule = backend.specialize(
         ParticipantPipelineSchedule(
@@ -95,7 +78,7 @@ async def test_scheduler_singularity_pipeline_solo(backend):
 
 
 @pytest.mark.asyncio
-async def test_scheduler_singularity_pipeline_error(backend):
+async def test_scheduler_pipeline_error(backend):
 
     schedule = backend.specialize(
         ParticipantPipelineSchedule(
