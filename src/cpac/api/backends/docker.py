@@ -33,7 +33,7 @@ class DockerSchedule(ContainerSchedule):
 
     async def _runner(self, command, volumes, port=None):
         container = self.backend.client.containers.run(
-            'fcpindi/c-pac:' + self.backend.tag,
+            self.backend.image,
             name=f'cpacpy-{repr(self)}',
             command=command,
             detach=True,
@@ -82,10 +82,10 @@ class DockerSchedule(ContainerSchedule):
             "status": self._status
         }
 
-        try:
-            container.remove(v=True, force=True)
-        except:
-            pass
+        # try:
+        #     container.remove(v=True, force=True)
+        # except:
+        #     pass
 
 class DockerDataSettingsSchedule(ContainerDataSettingsSchedule,
                                  DockerSchedule,
@@ -106,7 +106,7 @@ class DockerParticipantPipelineSchedule(ContainerParticipantPipelineSchedule,
 
 class DockerBackend(ContainerBackend):
 
-    tag = 'nightly'
+    image = 'fcpindi/c-pac:nightly'
 
     base_schedule_class = DockerSchedule
 
@@ -117,7 +117,7 @@ class DockerBackend(ContainerBackend):
         ParticipantPipelineSchedule: DockerParticipantPipelineSchedule,
     }
 
-    def __init__(self, scheduler=None, tag=None):
+    def __init__(self, scheduler=None, image=None):
         self.client = docker.from_env()
         try:
             self.client.ping()
@@ -125,4 +125,4 @@ class DockerBackend(ContainerBackend):
             raise "Could not connect to Docker"
 
         self.scheduler = scheduler
-        self.tag = tag or DockerBackend.tag
+        self.image = image or DockerBackend.image
