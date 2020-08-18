@@ -79,12 +79,13 @@ def setup_logging(loglevel):
 
 async def start(args):
     from cpac.api.server import start
-    from cpac.api.backends.docker import DockerBackend
+    from cpac.api.backends import available_backends
     from cpac.api.scheduling import Scheduler
 
     print("Running server")
 
-    backend = DockerBackend(tag='docker-test')
+    # backend = DockerBackend(tag='docker-test')
+    backend = available_backends['singularity']()
     async with Scheduler(backend) as scheduler:
         await start(args.address, scheduler)
         await scheduler

@@ -1,0 +1,14 @@
+Bootstrap: docker
+From: python:3-alpine
+
+%post
+    pip install pyyaml websockets
+
+%files
+    . /code
+
+%environment
+    export PYTHONASYNCIODEBUG=1
+
+%runscript
+    python -X dev /code/entrypoint.py "$@"
