@@ -54,6 +54,8 @@ parser.add_argument('--anat_only', action='store_true')
 parser.add_argument('--tracking_opt-out', default=False)
 parser.add_argument('--monitoring', action='store_true')
 
+print(sys.argv)
+
 args = parser.parse_args(
     sys.argv[
         1:(
@@ -64,7 +66,13 @@ args = parser.parse_args(
     ]
 )
 
-print(args)
+try:
+    more_options = sys.argv[sys.argv.index('--') + 1:]
+except:
+    more_options = []
+
+
+print(args, more_options)
 
 time.sleep(3)
 
@@ -72,17 +80,18 @@ if args.analysis_level == "cli":
     more_options = sys.argv[sys.argv.index('--') + 1:]
     if more_options[0:3] == ['utils', 'data_config', 'build']:
         
-        data_settings = yaml.safe_load(open(more_options[3]))
-        data_config_file = '/code/data_config_template.yml'
+        with open(more_options[3]) as f:
+            data_settings = yaml.safe_load(f)
+            data_config_file = '/code/data_config_template.yml'
 
-        if str(data_settings.get('bidsBaseDir')).startswith('s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS'):
-            data_config_file = '/code/data_config_template_large.yml'
+            if str(data_settings.get('bidsBaseDir')).startswith('s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS'):
+                data_config_file = '/code/data_config_template_large.yml'
 
-        shutil.copy(
-            data_config_file,
-            os.path.join(args.output_dir, 'cpac_data_config_test.yml')
-        )
-        sys.exit(0)
+            shutil.copy(
+                data_config_file,
+                os.path.join(args.output_dir, 'cpac_data_config_test.yml')
+            )
+            sys.exit(0)
 
 elif args.analysis_level == "test_config":
 
@@ -99,7 +108,9 @@ elif args.analysis_level == "test_config":
     sys.exit(0)
 
 elif args.analysis_level == "participant":
-    data_config = yaml.safe_load(open(args.data_config_file))[0]
+    with open(args.data_config_file) as f:
+        data_config = yaml.safe_load(f)[0]
+
 
     nodes = [
         f"resting_preproc_sub-{data_config['subject_id']}.1_anat_pipeline.1_normalize",
@@ -156,5 +167,8 @@ elif args.analysis_level == "participant":
         await asyncio.wait([task, wait], return_when=asyncio.FIRST_COMPLETED)
 
     asyncio.run(main(), debug=True)
+
+    if data_config['subject_id'] in ('0050959', '0051558'):
+        sys.exit(1)
 
     sys.exit(0)

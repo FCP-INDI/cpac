@@ -4,26 +4,21 @@ import asyncio
 import logging
 from cpac.api.scheduling import Scheduler
 from cpac.api.schedules import Schedule, DataSettingsSchedule, DataConfigSchedule, ParticipantPipelineSchedule
-from cpac.api.backends.docker import DockerBackend, DockerParticipantPipelineSchedule
+from cpac.api.backends.singularity import SingularityBackend, SingularityParticipantPipelineSchedule
 from cpac.api.backends.utils import consume
 
 from conftest import Constants
 
 try:
-    from test_data.docker import build_image
+    from test_data.singularity import build_image
 except:
-    pytest.skip("Skipping docker tests", allow_module_level=True)
+    pytest.skip("Skipping singularity tests", allow_module_level=True)
 
 
-@pytest.fixture
-def docker_tag():
-    build_image(tag='docker-test')
-    return 'docker-test'
-
-
-@pytest.fixture
-def backend(docker_tag):
-    return DockerBackend(tag=docker_tag)
+@pytest.fixture(scope="module")
+def backend():
+    image = build_image()
+    return SingularityBackend(image=image)
 
 
 @pytest.fixture
@@ -34,7 +29,7 @@ async def scheduler(backend):
 
 
 @pytest.mark.asyncio
-async def test_scheduler_docker_settings(scheduler):
+async def test_scheduler_singularity_settings(scheduler):
 
     schedule = scheduler.schedule(
         DataSettingsSchedule(
@@ -49,7 +44,7 @@ async def test_scheduler_docker_settings(scheduler):
 
 
 @pytest.mark.asyncio
-async def test_scheduler_docker_config(scheduler):
+async def test_scheduler_singularity_config(scheduler):
 
     schedule = scheduler.schedule(
         DataConfigSchedule(
@@ -63,9 +58,8 @@ async def test_scheduler_docker_config(scheduler):
     assert len(schedule['data_config']) == 4
     assert all(s['site'] == 'NYU' for s in schedule['data_config'])
 
-
 @pytest.mark.asyncio
-async def test_scheduler_docker_pipeline(scheduler):
+async def test_scheduler_singularity_pipeline(scheduler):
 
     schedule = scheduler.schedule(
         ParticipantPipelineSchedule(
@@ -83,7 +77,7 @@ async def test_scheduler_docker_pipeline(scheduler):
 
 
 @pytest.mark.asyncio
-async def test_scheduler_docker_pipeline_solo(backend):
+async def test_scheduler_singularity_pipeline_solo(backend):
 
     schedule = backend.specialize(
         ParticipantPipelineSchedule(
@@ -101,7 +95,7 @@ async def test_scheduler_docker_pipeline_solo(backend):
 
 
 @pytest.mark.asyncio
-async def test_scheduler_docker_pipeline_error(backend):
+async def test_scheduler_singularity_pipeline_error(backend):
 
     schedule = backend.specialize(
         ParticipantPipelineSchedule(
