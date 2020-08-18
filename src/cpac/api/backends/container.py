@@ -142,7 +142,7 @@ class ContainerDataConfigSchedule(ContainerSchedule, DataConfigSchedule):
             volumes[data_folder] = {'bind': '/data_folder', 'mode': 'ro'}
             data_folder = '/data_folder'
 
-        command = [data_folder, '/output', 'test_config']
+        command = [data_folder or '/dev/null', '/output', 'test_config']
         if data_config:
             command += ['--data_config_file', '/config/data_config.yml']
 
