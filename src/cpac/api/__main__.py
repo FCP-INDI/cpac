@@ -56,6 +56,9 @@ def parse_args(args):
 
     scheduler_parser = subparsers.add_parser('scheduler')
     scheduler_parser.add_argument('--address', action='store', type=address, default='localhost:3333')
+    scheduler_parser.add_argument('--backend', choices=['docker', 'singularity'], default='singularity')
+    scheduler_parser.add_argument('--singularity-image', nargs='?')
+    scheduler_parser.add_argument('--docker-image', nargs='?')
     # scheduler_parser.register('action', 'extend', ExtendAction)
     # scheduler_parser.add_argument('--backend', nargs='+', action='extend', choices=['docker', 'singularity'])
 
@@ -84,8 +87,15 @@ async def start(args):
 
     print("Running server")
 
-    # backend = DockerBackend(tag='docker-test')
-    backend = available_backends['singularity']()
+    backend = args.backend
+    cmd_args = vars(args)
+
+    backend = available_backends[backend](**{
+        arg.split('_', 1)[1]: val
+        for arg, val in cmd_args.items()
+        if arg.startswith(backend)
+    })
+
     async with Scheduler(backend) as scheduler:
         await start(args.address, scheduler)
         await scheduler
