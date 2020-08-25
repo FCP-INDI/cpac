@@ -66,13 +66,6 @@ class MainHandler(BaseHandler):
         })
 
 
-class BackendsHandler(BaseHandler):
-    def get(self):
-        self.finish({
-            "backends": self.application.settings.get('backends')
-        })
-
-
 class ScheduleHandler(BaseHandler):
     def post(self):
 
@@ -137,7 +130,8 @@ class ScheduleHandler(BaseHandler):
             schedule = scheduler.schedule(
                 DataConfigSchedule(
                     data_config=data_config_file,
-                    pipeline=pipeline_file
+                    pipeline=pipeline_file,
+                    schedule_participants=bool(self.json.get("data_config"))
                 )
             )
 
