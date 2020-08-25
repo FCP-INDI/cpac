@@ -23,9 +23,11 @@ class Schedule:
     class End:
         status: str
 
+    # TODO how to call all the supers from multiple inheritance
     async def pre(self):
         raise NotImplementedError
 
+    # TODO how to call all the supers from multiple inheritance
     async def post(self):
         raise NotImplementedError
 
@@ -66,12 +68,20 @@ class Schedule:
     def results(self):
         return self._results
 
+    def __json__(self):
+        raise NotImplementedError
+
 
 class DataSettingsSchedule(Schedule):
 
     def __init__(self, data_settings, parent=None):
         super().__init__(parent=parent)
         self.data_settings = data_settings
+
+    def __json__(self):
+        return {
+            "data_settings": self.data_settings,
+        }
 
 
 class DataConfigSchedule(Schedule):
@@ -81,6 +91,13 @@ class DataConfigSchedule(Schedule):
         self.data_config = data_config
         self.pipeline = pipeline
         self.schedule_participants = schedule_participants
+
+    def __json__(self):
+        return {
+            "data_config": self.data_config,
+            "pipeline": self.pipeline,
+            "schedule_participants": self.schedule_participants,
+        }
 
     async def post(self):
 
@@ -106,5 +123,11 @@ class ParticipantPipelineSchedule(Schedule):
 
     def __init__(self, subject, pipeline=None, parent=None):
         super().__init__(parent=parent)
-        self.subject = subject
+        self.subject = subject  # TODO rename to participant
         self.pipeline = pipeline
+
+    def __json__(self):
+        return {
+            "subject": self.subject,
+            "pipeline": self.pipeline,
+        }
