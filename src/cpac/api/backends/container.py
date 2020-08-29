@@ -210,10 +210,12 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
 
         self._logs_messages = []
 
-        async for item in merge_async_iters(
+        merged, _, cancel_tasks = merge_async_iters(
             self._logger_listener(),
             self._runner(command, volumes)
-        ):
+        )
+
+        async for item in merged:
             if item["type"] == "log":
                 self._logs_messages.append(item["content"])
                 yield BackendSchedule.Log(
@@ -225,6 +227,8 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
                     timestamp=item["time"],
                     status=item["status"],
                 )
+
+        await cancel_tasks()
 
         self._run_status = None
 
@@ -264,16 +268,19 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
                     }
                 }))
                 while True:
-                    msg = await ws.read_message()
-                    if msg is None:
-                        break
-                    msg = json.loads(msg)
-                    self._run_logs_last = msg["time"]
-                    yield {
-                        "type": "log",
-                        "time": msg["time"],
-                        "content": msg["message"],
-                    }
+                    try:
+                        msg = await asyncio.wait_for(ws.read_message(), timeout=1)
+                        if msg is None:
+                            break
+                        msg = json.loads(msg)
+                        self._run_logs_last = msg["time"]
+                        yield {
+                            "type": "log",
+                            "time": msg["time"],
+                            "content": msg["message"],
+                        }
+                    except asyncio.TimeoutError:
+                        await asyncio.sleep(0.1)
             except:
                 await asyncio.sleep(0.1)
                 yield

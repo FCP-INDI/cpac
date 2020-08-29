@@ -54,11 +54,14 @@ def merge_async_iters(*aiters):
         finally:
             cancel_tasks()
 
-    def cancel_tasks():
+    async def cancel_tasks():
         nonlocal cancelling
         cancelling = True
         for t in tasks:
             t.cancel()
 
+        while not all([t.done() for t in tasks]):
+            await asyncio.sleep(0.1)
+
     tasks = [asyncio.create_task(drain(aiter)) for aiter in aiters]
-    return merged()
+    return merged(), tasks, cancel_tasks
