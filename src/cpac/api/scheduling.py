@@ -162,7 +162,7 @@ class Scheduler:
                 if isinstance(message, Schedule.Spawn):
 
                     name = message.name
-                    subschedule = message.schedule
+                    subschedule = message.child
 
                     logger.info(f'[Scheduler] Scheduling {subschedule} from {schedule}')
 

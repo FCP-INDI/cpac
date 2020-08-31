@@ -12,15 +12,17 @@ class Schedule:
 
     @dataclass
     class Spawn:
-        name: str
         schedule: 'Schedule'
+        name: str
+        child: 'Schedule'
 
     @dataclass
     class Start:
-        pass
+        schedule: 'Schedule'
 
     @dataclass
     class End:
+        schedule: 'Schedule'
         status: str
 
     # TODO how to call all the supers from multiple inheritance
@@ -114,8 +116,9 @@ class DataConfigSchedule(Schedule):
                     subject_id += [subject['unique_id']]
 
                 yield Schedule.Spawn(
+                    schedule=self,
                     name='/'.join(subject_id),
-                    schedule=ParticipantPipelineSchedule(pipeline=self.pipeline, subject=subject),
+                    child=ParticipantPipelineSchedule(pipeline=self.pipeline, subject=subject),
                 )
 
 
