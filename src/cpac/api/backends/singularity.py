@@ -32,9 +32,9 @@ class SingularitySchedule(ContainerSchedule):
             'singularity',
             'run',
             '--fakeroot',
-            '--net',
+            '--network', 'bridge',
             '--network-args',
-            f'portmap=8008:{port}/tcp'
+            f'portmap=8008:{port}/tcp',
         ]
 
         for host_dir, container_dir in volumes.items():

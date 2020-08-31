@@ -1,3 +1,4 @@
+import asyncio
 import inspect
 import logging
 from collections.abc import Iterable
@@ -15,6 +16,8 @@ class RunStatus:
     SUCCESS = 'success'
     FAILURE = 'failure'
     UNKNOWN = 'unknown'
+
+    finished = [SUCCESS, FAILURE]
 
 
 class Backend:
@@ -57,11 +60,13 @@ class BackendSchedule:
 
     @dataclass
     class Log:
+        schedule: Schedule
         timestamp: float
         content: dict
 
     @dataclass
     class Status:
+        schedule: Schedule
         timestamp: float
         status: str
 
@@ -76,9 +81,13 @@ class BackendSchedule:
     async def run(self):
         raise NotImplementedError
 
+    def __await__(self):
+        while self.status not in self.finished:
+            yield from asyncio.sleep(0.5).__await__()
+
     async def __call__(self):
 
-        yield Schedule.Start()
+        yield Schedule.Start(schedule=self)
 
         if hasattr(self, 'pre'):
             try:
@@ -112,4 +121,4 @@ class BackendSchedule:
             except NotImplementedError:
                 pass
         
-        yield Schedule.End(status=self._status)
+        yield Schedule.End(schedule=self, status=self._status)

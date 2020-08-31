@@ -117,7 +117,7 @@ class DockerBackend(ContainerBackend):
         ParticipantPipelineSchedule: DockerParticipantPipelineSchedule,
     }
 
-    def __init__(self, scheduler=None, image=None):
+    def __init__(self, image=None, scheduler=None):
         self.client = docker.from_env()
         try:
             self.client.ping()

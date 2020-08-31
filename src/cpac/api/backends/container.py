@@ -95,6 +95,7 @@ class ContainerDataSettingsSchedule(ContainerSchedule, DataSettingsSchedule):
 
         async for item in self._runner(command, volumes):
             yield BackendSchedule.Status(
+                schedule=self,
                 timestamp=item["time"],
                 status=item["status"],
             )
@@ -148,6 +149,7 @@ class ContainerDataConfigSchedule(ContainerSchedule, DataConfigSchedule):
 
         async for item in self._runner(command, volumes):
             yield BackendSchedule.Status(
+                schedule=self,
                 timestamp=item["time"],
                 status=item["status"],
             )
@@ -219,11 +221,13 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
             if item["type"] == "log":
                 self._logs_messages.append(item["content"])
                 yield BackendSchedule.Log(
+                    schedule=self,
                     timestamp=item["time"],
                     content=item["content"],
                 )
             elif item["type"] == "status":
                 yield BackendSchedule.Status(
+                    schedule=self,
                     timestamp=item["time"],
                     status=item["status"],
                 )
