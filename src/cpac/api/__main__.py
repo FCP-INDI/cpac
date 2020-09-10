@@ -56,9 +56,19 @@ def parse_args(args):
 
     scheduler_parser = subparsers.add_parser('scheduler')
     scheduler_parser.add_argument('--address', action='store', type=address, default='localhost:3333')
-    scheduler_parser.add_argument('--backend', choices=['docker', 'singularity'], default='singularity')
+    scheduler_parser.add_argument('--proxy', action='store_true')
+    scheduler_parser.add_argument('--backend', choices=['docker', 'singularity', 'slurm'], default='singularity')
+
     scheduler_parser.add_argument('--singularity-image', nargs='?')
+    
     scheduler_parser.add_argument('--docker-image', nargs='?')
+
+    scheduler_parser.add_argument('--slurm-host', nargs='?')
+    scheduler_parser.add_argument('--slurm-username', nargs='?')
+    scheduler_parser.add_argument('--slurm-key', nargs='?')
+    scheduler_parser.add_argument('--slurm-control', nargs='?')
+    scheduler_parser.add_argument('--slurm-pip-install', nargs='?')
+
     # scheduler_parser.register('action', 'extend', ExtendAction)
     # scheduler_parser.add_argument('--backend', nargs='+', action='extend', choices=['docker', 'singularity'])
 
@@ -96,7 +106,7 @@ async def start(args):
         if arg.startswith(backend)
     })
 
-    async with Scheduler(backend) as scheduler:
+    async with Scheduler(backend, proxy=args.proxy) as scheduler:
         await start(args.address, scheduler)
         await scheduler
 

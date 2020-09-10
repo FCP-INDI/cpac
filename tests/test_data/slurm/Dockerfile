@@ -108,15 +108,16 @@ RUN wget https://dl.google.com/go/go1.13.linux-amd64.tar.gz && \
     tar -C /usr/local -xzvf go1.13.linux-amd64.tar.gz && \
     rm go1.13.linux-amd64.tar.gz
 ENV PATH=/usr/local/go/bin:$PATH
-
 RUN wget https://github.com/sylabs/singularity/releases/download/v3.6.1/singularity-3.6.1.tar.gz && \
     tar -xzf singularity-3.6.1.tar.gz && \
     cd singularity && \
     ./mconfig && \
     make -C builddir && \
-    make -C builddir install
-
-COPY cpacpy-singularity_test.sif /opt
+    make -C builddir install && \
+    rm -Rf singularity-3.6.1.tar.gz singularity
+RUN yum -y install squashfs-tools iptables-services net-tools
+RUN echo 'root:100000:65536' > /etc/subuid
+RUN echo 'root:100000:65536' > /etc/subgid
 
 # Install conda
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /opt/miniconda.sh && \

@@ -22,20 +22,19 @@ class SingularitySchedule(ContainerSchedule):
 
     async def _runner(self, command, volumes, port=None):
 
-        if not port:
-            port = find_free_port()
-
-        # TODO review random port, cannot connect to websocket
-        port = 8008
-
         proc_command = [
             'singularity',
             'run',
             '--fakeroot',
-            '--network', 'bridge',
-            '--network-args',
-            f'portmap=8008:{port}/tcp',
         ]
+
+        if port:
+            proc_command += [
+                '--network', 'bridge',
+                '--network-args',
+                f'portmap={port}:{port}/tcp',
+            ]
+            self._run_logs_port = int(port)
 
         for host_dir, container_dir in volumes.items():
             proc_command += [
@@ -46,7 +45,6 @@ class SingularitySchedule(ContainerSchedule):
         proc_command += command
 
         self._run_process = subprocess.Popen(proc_command)
-        self._run_logs_port = int(port)
 
         status_code = self._run_process.poll()
         while status_code is None:
@@ -56,7 +54,7 @@ class SingularitySchedule(ContainerSchedule):
             except subprocess.TimeoutExpired:
                 pass
                 
-            self._run_status = RunStatus.RUNNING
+            self._status = RunStatus.RUNNING
             status_code = self._run_process.poll()
 
         self._status = RunStatus.SUCCESS if status_code == 0 else RunStatus.FAILURE
@@ -66,8 +64,6 @@ class SingularitySchedule(ContainerSchedule):
             "time": time.time(),
             "status": self._status
         }
-
-        self._run_status = None
 
 
 class SingularityDataSettingsSchedule(SingularitySchedule,

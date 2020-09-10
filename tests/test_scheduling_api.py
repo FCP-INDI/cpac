@@ -11,10 +11,10 @@ from cpac import __version__
 from cpac.utils import generate_data_url
 from cpac.api.backends.base import RunStatus
 
-from fixtures import event_loop, scheduler, app
+from fixtures import event_loop, scheduler, app, app_client
 
 @pytest.mark.asyncio
-async def test_version(app, http_client, base_url):
+async def test_version(http_client, base_url, app):
     response = await http_client.fetch(base_url, raise_error=False)
     assert response.code == 200
 
@@ -48,45 +48,13 @@ async def test_data_settings(http_client, base_url, app, scheduler):
 
     await scheduler
 
-    # Check when it get results
-    response = await http_client.fetch(f'{base_url}/schedule/{schedule}/result', raise_error=False)
-    body = json_decode(response.body)
-
-    assert 'result' in body
-    result = body['result']
-
-    assert 'data_config' in result
-    data_config = result['data_config']
-
-    assert len(data_config) == 4
-
-
-@pytest.mark.asyncio
-async def test_data_settings(http_client, base_url, app, scheduler):
-
-    with open(os.path.join(Constants.TESTS_DATA_PATH, 'data_settings_template.yml'), 'r') as f:
-        data_settings = f.read()
-
-    # Schedule a data_settings => data_config conversion
-    body = json.dumps({
-        'type': 'data_settings', 
-        'data_settings': generate_data_url(data_settings, 'text/yaml'),
-    })
-    response = await http_client.fetch(f'{base_url}/schedule', method='POST', headers=None, body=body, raise_error=False)
+    response = await http_client.fetch(f'{base_url}/schedule/status', raise_error=False)
     assert response.code == 200
-
     body = json_decode(response.body)
-    assert 'schedule' in body
-    schedule = body['schedule']
-
-    # Check before there are results
-    response = await http_client.fetch(f'{base_url}/schedule/{schedule}/result', raise_error=False)
-    assert response.code == 425
-
-    await scheduler
 
     # Check when it get results
     response = await http_client.fetch(f'{base_url}/schedule/{schedule}/result', raise_error=False)
+    assert response.code == 200
     body = json_decode(response.body)
 
     assert 'result' in body

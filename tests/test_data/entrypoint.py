@@ -52,7 +52,7 @@ parser.add_argument('--skip_bids_validator', action='store_true')
 
 parser.add_argument('--anat_only', action='store_true')
 parser.add_argument('--tracking_opt-out', default=False)
-parser.add_argument('--monitoring', action='store_true')
+parser.add_argument('--monitoring', default=None, type=int)
 
 print(sys.argv)
 
@@ -111,6 +111,16 @@ elif args.analysis_level == "participant":
     with open(args.data_config_file) as f:
         data_config = yaml.safe_load(f)[0]
 
+    # def copytree(src, dst, symlinks=False, ignore=None):
+    #     for item in os.listdir(src):
+    #         s = os.path.join(src, item)
+    #         d = os.path.join(dst, item)
+    #         if os.path.isdir(s):
+    #             shutil.copytree(s, d, symlinks, ignore)
+    #         else:
+    #             shutil.copy2(s, d)
+
+    # copytree('/code/cpac_output', args.output_dir)
 
     nodes = [
         f"resting_preproc_sub-{data_config['subject_id']}.1_anat_pipeline.1_normalize",
@@ -150,11 +160,13 @@ elif args.analysis_level == "participant":
             await asyncio.sleep(1)
 
     async def serve():
+        server = None
         try:
-            server = await websockets.serve(socketee, "0.0.0.0", 8008)
+            server = await websockets.serve(socketee, "0.0.0.0", args.monitoring)
             await server.wait_closed()
         finally:
-            server.close()
+            if server:
+                server.close()
 
     async def wait_some():
         await asyncio.sleep(3)

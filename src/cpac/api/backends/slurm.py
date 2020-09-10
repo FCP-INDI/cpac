@@ -5,255 +5,78 @@ import hashlib
 import json
 import logging
 import os
+import pkgutil
 import shutil
 import tempfile
 import time
+import uuid
 from functools import reduce
 from subprocess import PIPE, STDOUT, Popen
 
 import yaml
 from tornado.websocket import websocket_connect
 
+from cpac.api.client import Client
+
 from ...utils import yaml_parse
 from ..schedules import (DataConfigSchedule, DataSettingsSchedule,
                          ParticipantPipelineSchedule, Schedule)
 from .base import Backend, BackendSchedule, RunStatus
-from .utils import merge_async_iters, find_free_port
+from .utils import find_free_port, merge_async_iters
 
 logger = logging.getLogger(__name__)
 
 class SLURMSchedule(BackendSchedule):
 
-    _run_status = None
+    _status = None
     _prefix = 'cpacpy-slurm_'
 
     @property
     async def status(self):
-        if not self._run_status:
+        if not self._status:
             return RunStatus.UNSTARTED
-        return self._run_status
+        return self._status
+
+    async def run(self):
+        self._job_id = await self.backend.start_job(f'cpacpy_{repr(self)}', '')
+        logger.info(f'[{self}] Job ID {self._job_id}')
+
+        while self._status is not RunStatus.RUNNING:
+            await asyncio.sleep(1)
+            status = await self.backend.queue_info(self._job_id)
+
+            self._status = status[self._job_id]['STATE']
+            logger.info(f'[{self}] Job status {self._status}')
+
+        self._proxy_addr = await self.backend.proxy(self._job_id)
+        logger.info(f'[{self}] Job proxy {self._proxy_addr[0]}:{self._proxy_addr[1]}')
+
+        status = None
+        try:
+            async with Client(self._proxy_addr) as client:
+                logger.info(f'[{self}] Scheduling {self}')
+                schedule = await client.schedule(self)
+                logger.info(f'[{self}] Job scheduled {schedule}')
+                async for message in client.listen(self):
+                    logger.info(f'[{self}] Job message {message}')
+                    yield message
+                    if isinstance(message, Schedule.End):
+                        status = message.status
+                self._results = await client.result(self)
+        finally:
+            await self.backend.unproxy(self._job_id)
+            await self.backend.cancel_job(self._job_id)
+            self._status = status if status else RunStatus.FAILURE
 
 
 class SLURMDataSettingsSchedule(SLURMSchedule, DataSettingsSchedule):
-
-    async def run(self):
-        output_folder = tempfile.mkdtemp(prefix=self._prefix)
-
-        volumes = {
-            output_folder: {'bind': '/output_folder', 'mode': 'rw'},
-            '/tmp': {'bind': '/scratch', 'mode': 'rw'},
-        }
-
-        data_settings_file = os.path.join(output_folder, 'data_settings.yml')
-
-        if isinstance(self.data_settings, str):
-            if '\n' in self.data_settings:
-                self.data_settings = yaml.safe_load(self.data_settings)
-            else:
-                self.data_settings = yaml_parse(self.data_settings)
-
-        with open(data_settings_file, 'w') as f:
-            yaml.dump(self.data_settings, f)
-
-        command = [
-            '/',
-            '/output_folder',
-            'cli',
-            '--',
-            'utils',
-            'data_config',
-            'build',
-            '/output_folder/data_settings.yml',
-        ]
-
-        async for item in self._runner(command, volumes):
-            yield BackendSchedule.Status(
-                timestamp=item["time"],
-                status=item["status"],
-            )
-
-        try:
-            files = glob.glob(os.path.join(output_folder, 'cpac_data_config_*.yml'))
-            if files:
-                with open(files[0]) as f:
-                    self._results['data_config'] = yaml.safe_load(f)
-        finally:
-            shutil.rmtree(output_folder)
-
+    pass
 
 class SLURMDataConfigSchedule(SLURMSchedule, DataConfigSchedule):
+    pass
 
-    async def run(self):
-        run_folder = tempfile.mkdtemp(prefix='cpacpy-docker_')
-        config_folder = os.path.join(run_folder, 'config')
-        output_folder = os.path.join(run_folder, 'output')
-
-        os.makedirs(config_folder)
-        os.makedirs(output_folder)
-
-        volumes = {
-            '/tmp': {'bind': '/scratch', 'mode': 'rw'},
-            config_folder: {'bind': '/config', 'mode': 'ro'},
-            output_folder: {'bind': '/output', 'mode': 'rw'},
-        }
-
-        data_folder = None
-        data_config = None
-        try:
-            data_config_data = self.data_config
-            if isinstance(data_config_data, str):
-                data_config_data = yaml_parse(data_config_data)
-
-            data_config = os.path.join(config_folder, 'data_config.yml')
-            with open(data_config, 'w') as f:
-                yaml.dump(data_config_data, f)
-
-        except ValueError:
-            data_folder = self.data_config
-
-        if data_folder and not data_folder.startswith('s3://'):
-            volumes[data_folder] = {'bind': '/data_folder', 'mode': 'ro'}
-            data_folder = '/data_folder'
-
-        command = [data_folder or '/dev/null', '/output', 'test_config']
-        if data_config:
-            command += ['--data_config_file', '/config/data_config.yml']
-
-        async for item in self._runner(command, volumes):
-            yield BackendSchedule.Status(
-                timestamp=item["time"],
-                status=item["status"],
-            )
-
-        try:
-            files = glob.glob(os.path.join(output_folder, 'cpac_data_config_*.yml'))
-            if files:
-                with open(files[0]) as f:
-                    self._results['data_config'] = yaml.safe_load(f)
-        finally:
-            shutil.rmtree(output_folder)
-
-
-class SLURMParticipantPipelineSchedule(SLURMSchedule,
-                                        ParticipantPipelineSchedule):
-
-    async def run(self):
-        run_folder = tempfile.mkdtemp(prefix='cpacpy-docker_')
-        config_folder = os.path.join(run_folder, 'config')
-        output_folder = os.path.join(run_folder, 'output')
-
-        os.makedirs(config_folder)
-        os.makedirs(output_folder)
-
-        pipeline = None
-        if self.pipeline is not None:
-            pipeline = os.path.join(config_folder, 'pipeline.yml')
-            shutil.copy(self.pipeline, pipeline)
-
-        volumes = {
-            '/tmp': {'bind': '/scratch', 'mode': 'rw'},
-            config_folder: {'bind': '/config', 'mode':'ro'},
-            output_folder: {'bind': '/output', 'mode':'rw'},
-        }
-
-        data_config = os.path.join(config_folder, 'data_config.yml')
-        mapped_data_config = '/config/data_config.yml'
-        if isinstance(self.subject, str):
-            shutil.copy(self.subject, data_config)
-        else:
-            with open(data_config, 'w') as f:
-                yaml.dump([self.subject], f)
-
-        command = [
-            '/', '/output', 'participant',
-            '--monitoring',
-            '--skip_bids_validator',
-            '--save_working_dir',
-            '--data_config_file',
-            mapped_data_config
-        ]
-
-        if pipeline:
-            command += ['--pipeline_file', pipeline]
-
-        self._run_status = None
-        self._run_logs_port = 8008
-        self._run_logs_last = None
-        self._run_logs_messages = asyncio.Queue()
-
-        self._logs_messages = []
-
-        async for item in merge_async_iters(
-            self._logger_listener(),
-            self._runner(command, volumes)
-        ):
-            if item["type"] == "log":
-                self._logs_messages.append(item["content"])
-                yield BackendSchedule.Log(
-                    timestamp=item["time"],
-                    content=item["content"],
-                )
-            elif item["type"] == "status":
-                yield BackendSchedule.Status(
-                    timestamp=item["time"],
-                    status=item["status"],
-                )
-
-        self._run_status = None
-
-    @property
-    async def logs(self):
-        if self._run_status == RunStatus.RUNNING:
-            for log in self._logs_messages:
-                yield log
-            while True:
-                log = await self._run_logs_messages.get()
-                self._logs_messages += [log]
-                yield log
-                self._run_logs_messages.task_done()
-        else:
-            for log in self._logs_messages:
-                yield log
-
-    async def _logger_listener(self):
-
-        while self._run_status is None:
-            await asyncio.sleep(0.1)
-
-        while self._run_status != RunStatus.RUNNING:
-            await asyncio.sleep(0.1)
-
-        port = self._run_logs_port
-        uri = f"ws://localhost:{port}/log"
-
-        while True:
-            ws = None
-            try:
-                ws = await websocket_connect(uri)
-                await ws.write_message(json.dumps({
-                    "time": time.time(),
-                    "message": {
-                        "last_log": self._run_logs_last,
-                    }
-                }))
-                while True:
-                    msg = await ws.read_message()
-                    if msg is None:
-                        break
-                    msg = json.loads(msg)
-                    self._run_logs_last = msg["time"]
-                    yield {
-                        "type": "log",
-                        "time": msg["time"],
-                        "content": msg["message"],
-                    }
-            except:
-                await asyncio.sleep(0.1)
-                yield
-            finally:
-                if ws:
-                    ws.close()
-
+class SLURMParticipantPipelineSchedule(SLURMSchedule, ParticipantPipelineSchedule):
+    pass
 
 class SLURMBackend(Backend):
 
@@ -266,24 +89,25 @@ class SLURMBackend(Backend):
         ParticipantPipelineSchedule: SLURMParticipantPipelineSchedule,
     }
 
-    def __init__(self, host, username, password, node_backend=None, scheduler=None):
+    def __init__(self, host, username, key, control, node_backend=None, pip_install=None, scheduler=None):
         self.scheduler = scheduler
         self.host = host.split(':')
         self.username = username
-        self.password = password
+        self.key = key
         self.node_backend = node_backend
+        self.pip_install = pip_install
 
-        # TODO parametrize
-        self._controlsock = '/tmp/controlpath.sock'
         self._forwards = {}
 
-        try:
-            os.remove(self._controlsock)
-        except:
-            pass
+        self.control = control
 
+        try:
+            os.remove(self.control)
+        except: #TODO treat specific exception
+            pass
+        
         self._control_args = [
-            '-o', f'ControlPath={self._controlsock}',
+            '-o', f'ControlPath={self.control}',
             '-o', 'ControlMaster=auto',
             '-o', 'ControlPersist=15m',
         ]
@@ -292,40 +116,48 @@ class SLURMBackend(Backend):
 
 
     def connect(self):
+        if os.path.exists(self.control):
+            return
+
         cmd = [
             'ssh',
             '-T',
             '-p', self.host[1],
             '-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null', # TODO enable host key check
-            '-i', '/home/anibalsolon/Documents/cpac-python-package/tests/test_data/slurm/compose-cluster/id_rsa',
+            '-i', self.key,
             ] + self._control_args + [
             f'{self.username}@{self.host[0]}'
         ]
-        conn = Popen(cmd, stdin=PIPE)
-        conn.communicate(b"\n")
+        stdout, stderr = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate(b"\n")
+        # TODO handle exit code
+        # print("Connect")
+        # print(stdout)
+        # print(stderr)
 
     def copy(self, src, dst):
         cmd = [
             'scp',
             '-BCr'
-            ] + self._control_args + [
+        ] + self._control_args + [
             src,
             f'dummy:{dst}'
         ]
-        conn = Popen(cmd, stdin=PIPE)
-        conn.communicate(b"\n")
+        stdout, stderr = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate(b"\n")
+        # TODO handle exit code
+        # print("Copy")
+        # print(stdout)
+        # print(stderr)
+
 
     def exec(self, command):
         cmd = [
             'ssh',
             '-T',
             '-p', self.host[1],
-            # '-i', '/home/anibalsolon/Documents/cpac-python-package/tests/test_data/slurm/compose-cluster/id_rsa',
-            ] + self._control_args + [
+        ] + self._control_args + [
             'dummy',
         ] + command
-        conn = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        stdout, stderr = conn.communicate(b"\n")
+        stdout, stderr = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate(b"\n")
         return stdout, stderr
 
     async def queue_info(self, jobs=None):
@@ -379,23 +211,36 @@ class SLURMBackend(Backend):
         status = await self.queue_info()
         out, err = self.exec(['scancel'] + [str(j) for j in status.keys()])
 
-    async def run_on_node(self, job_name, time):
+    async def start_job(self, job_name, time):
+        slurm_template = pkgutil.get_data(__package__, 'data/slurm.sh').decode()
+        slurm_script = slurm_template \
+            .replace('$JOB_NAME', job_name) \
+            .replace('$PIP_INSTALL', self.pip_install) \
+            .replace('$TIME', '0-05:00:00')
 
-        with open('/home/anibalsolon/Documents/cpac-python-package/src/cpac/api/data/slurm.sh') as f:
-            slurm_template = f.read()
-
-        slurm_script = slurm_template.format(
-            job_name=job_name,
-            time='0-05:00:00'
-        )
-
-        with open('/tmp/cpacpy-slurm.sh', 'w') as f:
+        _, slurm_script_name = tempfile.mkstemp(prefix='cpacpy-slurm_', suffix='.sh')
+        with open(slurm_script_name, 'w') as f:
             f.write(slurm_script)
 
-        self.copy('/tmp/cpacpy-slurm.sh', '/tmp/cpacpy-slurm.sh')
-        job, _ = self.exec(['sbatch', '--parsable', '/tmp/cpacpy-slurm.sh'])
+        self.copy(slurm_script_name, '/tmp/cpacpy-slurm.sh')
+        job, error = self.exec(['sbatch', '--parsable', '/tmp/cpacpy-slurm.sh'])
+        
+        try:
+            os.remove(slurm_script_name)
+        except:
+            pass
 
-        return int(job)
+        try:
+            return int(job)
+        except ValueError:
+            raise Exception(error.decode())
+
+    async def cancel_job(self, job):
+        logger.info(f'[SLURMBackend] Canceling job {job}')
+        stdout, stderr = self.exec(['scancel', str(job)])
+        print("Cancel")
+        logger.info(f'[SLURMBackend] {stdout}')
+        logger.info(f'[SLURMBackend] {stderr}')
 
     async def proxy(self, job_id):
         status = (await self.queue_info(job_id))[job_id]
@@ -403,9 +248,6 @@ class SLURMBackend(Backend):
             return
 
         port = find_free_port()
-
-        # ssh -O cancel -S/tmp/controlpath.sock -L 22442:c2:3333 dummy
-
         forward = f'0.0.0.0:{port}:{status["NODELIST"]}:3333'
         self._forwards[job_id] = forward
 
@@ -416,6 +258,16 @@ class SLURMBackend(Backend):
             ] + self._control_args + [
             'dummy',
         ]
-        conn = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        stdout, stderr = conn.communicate(b"\n")
+        Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate(b"\n")
         return ('localhost', port)
+
+    async def unproxy(self, job_id):
+        cmd = [
+            'ssh',
+            '-T',
+            '-O', 'cancel',
+            '-L', self._forwards[job_id]
+            ] + self._control_args + [
+            'dummy',
+        ]
+        Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate(b"\n")
