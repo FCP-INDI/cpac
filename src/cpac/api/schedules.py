@@ -57,6 +57,9 @@ class Schedule:
             return traverse_deep(self._results, keys)
         except KeyError as e:
             raise KeyError(*e.args)
+    @property
+    def base(self):
+        return self.__class__
 
     @property
     def uid(self):
@@ -134,3 +137,10 @@ class ParticipantPipelineSchedule(Schedule):
             "subject": self.subject,
             "pipeline": self.pipeline,
         }
+
+schedules = [
+    Schedule,
+    DataSettingsSchedule,
+    DataConfigSchedule,
+    ParticipantPipelineSchedule,
+]

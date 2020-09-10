@@ -7,8 +7,9 @@ From: python:3-alpine
 %files
     . /code
 
-%environment
-    export PYTHONASYNCIODEBUG=1
+# %environment
+#     export PYTHONASYNCIODEBUG=1
 
 %runscript
-    python -X dev /code/entrypoint.py "$@"
+    python /code/entrypoint.py "$@"
+#    python -X dev /code/entrypoint.py "$@"

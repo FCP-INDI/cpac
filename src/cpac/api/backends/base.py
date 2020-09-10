@@ -78,6 +78,14 @@ class BackendSchedule:
     async def logs(self):
         return {}
 
+    @property
+    def base(self):
+        classes = [DataSettingsSchedule, ParticipantPipelineSchedule, DataConfigSchedule]
+        return [
+            c for c in classes
+            if isinstance(self, c)
+        ][0]
+
     async def run(self):
         raise NotImplementedError
 

@@ -51,9 +51,10 @@ class Scheduler:
         BackendSchedule.Status,
     ]
 
-    def __init__(self, backend, persistent=False):
+    def __init__(self, backend, persistent=False, proxy=False):
         self.backend = backend(self)
         self.persistent = persistent
+        self.proxy = proxy
         self._db_connection = None
         self._schedules = ScheduleTree(name='ROOT')
         self._futures = {}
@@ -89,7 +90,7 @@ class Scheduler:
 
     def load_config(self):
         with open(self.config_file, 'r') as f:
-            self._config = yaml.load(f)
+            self._config = yaml.safe_load(f)
 
     def save_config(self):
         with open(self.config_file, 'w') as f:
@@ -110,27 +111,29 @@ class Scheduler:
             pending = self._futures.values()
 
     async def __aexit__(self, exc_type, exc, tb):
-        if self._db_connection:
-            self._db_connection.close()
-        self.save_config()
+        pass
+        # if self._db_connection:
+        #     self._db_connection.close()
+        # self.save_config()
 
-    def schedule(self, schedule, parent=None, name=None):
+    def schedule(self, schedule, parent=None, name=None, proxied=False):
 
-        backend = self.backend
+        if not proxied:
+            backend = self.backend
+            if isinstance(schedule, BackendSchedule):
+                raise ValueError(f"Schedule must be naive, got {schedule.__class__.__name__}")
 
-        if isinstance(schedule, BackendSchedule):
-            raise ValueError(f"Schedule must be naive, got {schedule.__class__.__name__}")
+            schedule = backend.specialize(schedule)
 
-        schedule = backend.specialize(schedule)
         schedule_id = repr(schedule)
-
         self._schedules.children[schedule_id] = ScheduleTree(name=name, parent=parent, schedule=schedule)
         if parent:
             self._schedules[repr(parent)].children[schedule_id] = self._schedules[schedule_id]
 
-        self._futures[schedule_id] = self._loop.create_task(
-            self.run_scheduled(schedule)
-        )
+        if not proxied:
+            self._futures[schedule_id] = self._loop.create_task(
+                self.run_scheduled(schedule)
+            )
 
         return schedule
 
@@ -157,7 +160,7 @@ class Scheduler:
 
                 watchers = self._watchers[message.__class__].get(sid, [])
 
-                logger.info(f"[Scheduler] Got message {message.__class__.__name__} to schedule {schedule} ({len(watchers)})")
+                logger.info(f"[Scheduler] Got message {message.__class__.__name__} from schedule {schedule} ({len(watchers)})")
 
                 if isinstance(message, Schedule.Spawn):
 
@@ -166,23 +169,26 @@ class Scheduler:
 
                     logger.info(f'[Scheduler] Scheduling {subschedule} from {schedule}')
 
-                    for watcher_class in self._watchers:
-                        for watcher in self._watchers[watcher_class].get(sid, []):
-                            children = watcher["children"]
-                            if not children:
-                                continue
+                    if not self.proxy:
 
-                            self.watch(
-                                schedule=subschedule,
-                                function=watcher["function"],
-                                children=watcher["children"],
-                                watcher_classes=[watcher_class],
+                        for watcher_class in self._watchers:
+                            for watcher in self._watchers[watcher_class].get(sid, []):
+                                children = watcher["children"]
+                                if not children:
+                                    continue
+
+                                self.watch(
+                                    schedule=subschedule,
+                                    function=watcher["function"],
+                                    children=watcher["children"],
+                                    watcher_classes=[watcher_class],
                             )
 
                     self.schedule(
                         subschedule,
                         parent=schedule,
-                        name=name
+                        name=name,
+                        proxied=self.proxy
                     )
 
                 for watcher in watchers:
@@ -195,6 +201,8 @@ class Scheduler:
             for watcher_class in self._watchers:
                 if sid in self._watchers[watcher_class]:
                     del self._watchers[watcher_class][sid]
+
+            logger.info(f"[Scheduler] Schedule {schedule} is done ({await schedule.status})")
 
             return schedule
 

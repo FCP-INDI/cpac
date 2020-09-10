@@ -11,6 +11,7 @@ from .container import (ContainerBackend, ContainerSchedule,
                         ContainerDataSettingsSchedule, ContainerDataConfigSchedule,
                         ContainerParticipantPipelineSchedule)
 
+from .utils import find_free_port
 
 logger = logging.getLogger(__name__)
 
@@ -32,21 +33,28 @@ class DockerSchedule(ContainerSchedule):
     _prefix = 'cpacpy-docker_'
 
     async def _runner(self, command, volumes, port=None):
+
+        docker_port = {}
+        if port:
+            docker_port = {f'{port}/tcp': port}
+
         container = self.backend.client.containers.run(
             self.backend.image,
             name=f'cpacpy-{repr(self)}',
             command=command,
             detach=True,
             stdin_open=False,
-            ports={'8008/tcp': port},
+            ports=docker_port,
             volumes=volumes,
             user=f'{uid}:{gid}',
         )
 
-        while not container.attrs['NetworkSettings']['Ports']:
-            await asyncio.sleep(1)
-            container.reload()
-        self._run_logs_port = int(container.attrs['NetworkSettings']['Ports']['8008/tcp'][0]['HostPort'])
+        if port:
+            while not container.attrs['NetworkSettings']['Ports']:
+                await asyncio.sleep(1)
+                container.reload()
+
+            self._run_logs_port = int(container.attrs['NetworkSettings']['Ports'][f'{port}/tcp'][0]['HostPort'])
 
         while True:
             try:
@@ -54,10 +62,10 @@ class DockerSchedule(ContainerSchedule):
 
                 container.reload()
                 status = container.status
-                if self._run_status == docker_statuses[status]:
+                if self._status == docker_statuses[status]:
                     continue
 
-                self._run_status = docker_statuses[status]
+                self._status = docker_statuses[status]
                 if status not in ['running', 'created']:
                     break
 
@@ -82,10 +90,10 @@ class DockerSchedule(ContainerSchedule):
             "status": self._status
         }
 
-        # try:
-        #     container.remove(v=True, force=True)
-        # except:
-        #     pass
+        try:
+            container.remove(v=True, force=True)
+        except:
+            pass
 
 class DockerDataSettingsSchedule(ContainerDataSettingsSchedule,
                                  DockerSchedule,

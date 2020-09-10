@@ -8,6 +8,7 @@ import os
 import shutil
 import tempfile
 import time
+
 import yaml
 from tornado.websocket import websocket_connect
 
@@ -15,20 +16,20 @@ from ...utils import yaml_parse
 from ..schedules import (DataConfigSchedule, DataSettingsSchedule,
                          ParticipantPipelineSchedule, Schedule)
 from .base import Backend, BackendSchedule, RunStatus
-from .utils import merge_async_iters
+from .utils import find_free_port, merge_async_iters
 
 logger = logging.getLogger(__name__)
 
 class ContainerSchedule(BackendSchedule):
 
-    _run_status = None
+    _status = None
     _prefix = 'cpacpy-container_'
 
     @property
     async def status(self):
-        if not self._run_status:
+        if not self._status:
             return RunStatus.UNSTARTED
-        return self._run_status
+        return self._status
 
     @staticmethod
     def _remap_files(subject):
@@ -112,7 +113,7 @@ class ContainerDataSettingsSchedule(ContainerSchedule, DataSettingsSchedule):
 class ContainerDataConfigSchedule(ContainerSchedule, DataConfigSchedule):
 
     async def run(self):
-        run_folder = tempfile.mkdtemp(prefix='cpacpy-docker_')
+        run_folder = tempfile.mkdtemp(prefix=self._prefix)
         config_folder = os.path.join(run_folder, 'config')
         output_folder = os.path.join(run_folder, 'output')
 
@@ -193,9 +194,11 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
             with open(data_config, 'w') as f:
                 yaml.dump([self.subject], f)
 
+        self._run_logs_port = find_free_port()
+
         command = [
             '/', '/output', 'participant',
-            '--monitoring',
+            '--monitoring', str(self._run_logs_port),
             '--skip_bids_validator',
             '--save_working_dir',
             '--data_config_file',
@@ -205,16 +208,17 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
         if pipeline:
             command += ['--pipeline_file', pipeline]
 
-        self._run_status = None
-        self._run_logs_port = 8008
+        self._status = None
         self._run_logs_last = None
         self._run_logs_messages = asyncio.Queue()
 
         self._logs_messages = []
 
+        started_at = time.time()
+
         merged, _, cancel_tasks = merge_async_iters(
             self._logger_listener(),
-            self._runner(command, volumes)
+            self._runner(command, volumes, port=self._run_logs_port)
         )
 
         async for item in merged:
@@ -234,11 +238,13 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
 
         await cancel_tasks()
 
-        self._run_status = None
+        self._results = {
+            "time": time.time() - started_at,
+        }
 
     @property
     async def logs(self):
-        if self._run_status == RunStatus.RUNNING:
+        if self._status == RunStatus.RUNNING:
             for log in self._logs_messages:
                 yield log
             while True:
@@ -252,10 +258,10 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
 
     async def _logger_listener(self):
 
-        while self._run_status is None:
+        while self._status is None:
             await asyncio.sleep(0.1)
 
-        while self._run_status != RunStatus.RUNNING:
+        while self._status != RunStatus.RUNNING:
             await asyncio.sleep(0.1)
 
         port = self._run_logs_port
@@ -303,4 +309,3 @@ class ContainerBackend(Backend):
         DataConfigSchedule: ContainerDataConfigSchedule,
         ParticipantPipelineSchedule: ContainerParticipantPipelineSchedule,
     }
-

@@ -16,6 +16,8 @@ from cpac.utils import generate_data_url
 
 from fixtures import event_loop, scheduler, app
 
+logger = logging.getLogger(__name__)
+
 @pytest.mark.asyncio
 async def test_data_config_logs(app, http_client, base_url, scheduler):
 
@@ -56,7 +58,7 @@ async def test_data_config_logs(app, http_client, base_url, scheduler):
     schedules_alive = set([schedule])
     messages = []
     try:
-        while len(schedules_alive):
+        while len(schedules_alive) > 0:
             message = json.loads(await ws_client.read_message())
             messages += [message]
 
@@ -69,9 +71,10 @@ async def test_data_config_logs(app, http_client, base_url, scheduler):
             if message_type == 'Start':
                 schedules_alive |= set([schedule_id])
             if message_type == 'Spawn':
-                schedules_alive |= set([message['schedule']])
+                schedules_alive |= set([message['child']])
             if message_type == 'End':
                 schedules_alive ^= set([schedule_id])
+                logger.info(f'Schedules alive: {list(schedules_alive)}')
 
     except Exception as e:
         import traceback

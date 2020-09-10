@@ -6,19 +6,21 @@ from tornado.simple_httpclient import HTTPStreamClosedError, HTTPTimeoutError
 from tornado.websocket import websocket_connect
 
 from .schedules import (DataConfigSchedule, DataSettingsSchedule,
-                         ParticipantPipelineSchedule, Schedule)
+                         ParticipantPipelineSchedule, Schedule,
+                         schedules)
 
 logger = logging.getLogger(__name__)
 
 class Client:
 
     _http_client = None
+    _schedule_mapping = {}
 
     def __init__(self, server):
         self.server = f'{server[0]}:{server[1]}'
 
     async def __aenter__(self):
-        self._http_client = httpclient.AsyncHTTPClient()
+        self._http_client = httpclient.AsyncHTTPClient(force_instance=True)
         while True:
             try:
                 response = await self._http_client.fetch(f'http://{self.server}/')
@@ -41,15 +43,13 @@ class Client:
         self._http_client = None
 
     async def schedule(self, schedule):
-        if not isinstance(schedule, (DataConfigSchedule, DataSettingsSchedule)):
-            raise ValueError("Must be DataSettingsSchedule or DataConfigSchedule schedule")
-
         try:
-            schedule_type = None
             if isinstance(schedule, DataSettingsSchedule):
                 schedule_type =  "data_settings"
             elif isinstance(schedule, DataConfigSchedule):
                 schedule_type =  "pipeline"
+            elif isinstance(schedule, ParticipantPipelineSchedule):
+                schedule_type =  "participant"
 
             response = await self._http_client.fetch(
                 f'http://{self.server}/schedule',
@@ -58,15 +58,67 @@ class Client:
                     "type": schedule_type,
                     **schedule.__json__(),
                 })
-            ) 
+            )
         except Exception as e:
             raise e
         else:
             data = json.loads(response.body)['schedule']
+            self.map(schedule, data)
             logger.info(f'[Client] Scheduled {data}')
             return data
 
-    async def listen(self, schedule, children=True):
+    async def result(self, schedule, mapped=True):
+        try:
+            if mapped:
+                schedule = self[schedule]
+
+            response = await self._http_client.fetch(
+                f'http://{self.server}/schedule/{schedule}/result',
+                method='GET'
+            )
+        except Exception as e:
+            raise e
+        else:
+            if response.code == 425:
+                return None
+
+            data = json.loads(response.body)
+            return data['result']
+
+    async def metadata(self, schedule, mapped=True):
+        try:
+            if mapped:
+                schedule = self[schedule]
+
+            response = await self._http_client.fetch(
+                f'http://{self.server}/schedule/{schedule}/metadata',
+                method='GET'
+            )
+        except Exception as e:
+            raise e
+        else:
+            data = json.loads(response.body)
+            metadata = data['metadata']
+            logger.info(f'[Client] Metadata {metadata}')
+            return metadata
+
+    def __getitem__(self, key):
+        if isinstance(key, Schedule):
+            key = repr(key)
+
+        if key not in self._schedule_mapping:
+            raise ValueError(f'Schedule {key} does not exist. Actual keys: {list(self._schedule_mapping)}')
+
+        return self._schedule_mapping[key]
+
+    def map(self, schedule, remote_schedule):
+        if isinstance(schedule, Schedule):
+            schedule = repr(schedule)
+        self._schedule_mapping[schedule] = remote_schedule
+
+    async def listen(self, schedule, children=True, mapped=True):
+        if mapped:
+            schedule = self[schedule]
 
         from .backends.base import BackendSchedule
         event_types = {
@@ -81,7 +133,6 @@ class Client:
         logger.info(f'[Client] Listen {uri}')
 
         ws = await websocket_connect(uri)
-
         msg = await ws.read_message()
         if msg is None:
             return
@@ -104,16 +155,42 @@ class Client:
             msg = json.loads(msg)
             if msg['type'] != 'watch':
                 continue
-                
+
             data = msg['data']
             message_type = data['type']
             message = data['message']
-        
+
             if message_type == 'Spawn':
-                schedules_alive |= set([message['child']])
+                logger.info(f'[Client] Spawn received for {message["child"]}, alive: {list(schedules_alive)}')
+
             if message_type == 'End':
                 schedules_alive ^= set([message['schedule']])
+                logger.info(f'[Client] End received for {message["schedule"]}, alive: {list(schedules_alive)}')
 
-            yield event_types[data['type']](**message)
+            logger.info(f'[Client] Message {msg}')
 
+            message['schedule'] = await (ScheduleProxy(message['schedule'])(self))
+            if message_type == 'Spawn':
+                message['child'] = await (ScheduleProxy(message['child'])(self))
+
+            yield event_types[message_type](**message)
+
+        logger.info(f'[Client] Finished listening for {schedule}')
         ws.close()
+
+
+class ScheduleProxy:
+
+    _types = {
+        schedule.__name__: schedule
+        for schedule in schedules
+    }
+
+    def __init__(self, schedule):
+        self._schedule = schedule
+
+    async def __call__(self, client):
+        meta = await client.metadata(self._schedule, mapped=False)
+        inst = self._types[meta['type']](**meta['parameters'])
+        client.map(inst, meta['id'])
+        return inst

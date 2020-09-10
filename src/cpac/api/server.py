@@ -8,7 +8,7 @@ from tornado.options import define, options
 from tornado.concurrent import run_on_executor
 
 from cpac import __version__
-from .schedules import Schedule, DataSettingsSchedule, DataConfigSchedule
+from .schedules import Schedule, DataSettingsSchedule, DataConfigSchedule, ParticipantPipelineSchedule
 
 import os
 import time
@@ -137,11 +137,58 @@ class ScheduleHandler(BaseHandler):
 
             return self.finish({"schedule": repr(schedule)})
 
+        elif self.json["type"] == "participant":
+
+            subject = self.json.get("subject")
+            if not subject:
+                return self.bad_request()
+
+            pipeline = self.json.get("pipeline")
+            if pipeline:
+                if not pipeline.startswith('data:') and not pipeline.startswith('s3:'):
+                    return self.bad_request()
+
+            _logger.info(f"Scheduling for participant {subject}")
+
+            schedule = scheduler.schedule(
+                ParticipantPipelineSchedule(
+                    subject=subject,
+                    pipeline=pipeline,
+                )
+            )
+
+            return self.finish({"schedule": repr(schedule)})
+
         return self.bad_request()
 
 
+class StatusHandler(BaseHandler):
+    async def get(self, result=None):
+        scheduler = self.application.settings.get('scheduler')
+        schedule_status = await scheduler.statuses
+
+        return self.finish({
+            "status": schedule_status,
+        })
+
+
+class MetadataScheduleHandler(BaseHandler):
+    async def get(self, schedule):
+        scheduler = self.application.settings.get('scheduler')
+        schedule_tree = scheduler[schedule]
+        schedule = schedule_tree.schedule
+
+        return self.finish({
+            "metadata": {
+                "parameters": schedule.__json__(),
+                "type": schedule.base.__name__,
+                "id": repr(schedule),
+            },
+        })
+
+
 class StatusScheduleHandler(BaseHandler):
-    async def get(self, schedule, result=None):
+    async def get(self, schedule):
         scheduler = self.application.settings.get('scheduler')
         schedule_tree = scheduler[schedule]
         schedule = schedule_tree.schedule
@@ -260,6 +307,8 @@ class WatchScheduleHandler(tornado.websocket.WebSocketHandler):
 app = tornado.web.Application(
     [
         (r"/", MainHandler),
+        (r"/schedule/status", StatusHandler),
+        (r"/schedule/(?P<schedule>[^/]+)/metadata", MetadataScheduleHandler),  # TODO uuid regex
         (r"/schedule/(?P<schedule>[^/]+)/status", StatusScheduleHandler),  # TODO uuid regex
         (r"/schedule/(?P<schedule>[^/]+)/result", ResultScheduleHandler),  # TODO uuid regex
         (r"/schedule/(?P<schedule>[^/]+)/result/(?P<result>.+)", ResultScheduleHandler),  # TODO uuid regex
