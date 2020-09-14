@@ -37,6 +37,12 @@ class SLURMSchedule(BackendSchedule):
             return RunStatus.UNSTARTED
         return self._status
 
+    async def pre(self):
+        pass
+
+    async def post(self):
+        pass
+
     async def run(self):
         self._job_id = await self.backend.start_job(f'cpacpy_{repr(self)}', '')
         logger.info(f'[{self}] Job ID {self._job_id}')
@@ -157,8 +163,10 @@ class SLURMBackend(Backend):
         ] + self._control_args + [
             'dummy',
         ] + command
-        stdout, stderr = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate(b"\n")
-        return stdout, stderr
+        proc = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        stdout, stderr = proc.communicate(b"\n")
+        returncode = proc.returncode
+        return returncode, stdout, stderr
 
     async def queue_info(self, jobs=None):
         query = []
@@ -167,7 +175,7 @@ class SLURMBackend(Backend):
             jobs = [int(j) for j in jobs]
             query = ['--jobs', ','.join(str(j) for j in jobs)]
 
-        queue, _ = self.exec(
+        _, queue, _ = self.exec(
             ['squeue'] + query +
             ['--Format=JobId,Name,Account,BatchHost,Partition,Priority,StartTime,State,TimeUsed,WorkDir,NodeList']
         )
@@ -209,7 +217,7 @@ class SLURMBackend(Backend):
 
     async def cancel_all(self):
         status = await self.queue_info()
-        out, err = self.exec(['scancel'] + [str(j) for j in status.keys()])
+        ret, out, err = self.exec(['scancel'] + [str(j) for j in status.keys()])
 
     async def start_job(self, job_name, time):
         slurm_template = pkgutil.get_data(__package__, 'data/slurm.sh').decode()
@@ -223,7 +231,7 @@ class SLURMBackend(Backend):
             f.write(slurm_script)
 
         self.copy(slurm_script_name, '/tmp/cpacpy-slurm.sh')
-        job, error = self.exec(['sbatch', '--parsable', '/tmp/cpacpy-slurm.sh'])
+        ret, job, error = self.exec(['sbatch', '--parsable', '/tmp/cpacpy-slurm.sh'])
         
         try:
             os.remove(slurm_script_name)
@@ -236,11 +244,8 @@ class SLURMBackend(Backend):
             raise Exception(error.decode())
 
     async def cancel_job(self, job):
-        logger.info(f'[SLURMBackend] Canceling job {job}')
-        stdout, stderr = self.exec(['scancel', str(job)])
-        print("Cancel")
-        logger.info(f'[SLURMBackend] {stdout}')
-        logger.info(f'[SLURMBackend] {stderr}')
+        logger.info(f'[SLURMBackend] Cancelling job {job}')
+        ret, stdout, stderr = self.exec(['scancel', str(job)])
 
     async def proxy(self, job_id):
         status = (await self.queue_info(job_id))[job_id]
