@@ -14,9 +14,10 @@ class DataSplitterSchedule(Schedule):
         for piece in self['text/pieces']:
             yield Schedule.Spawn(
                 name=piece,
-                schedule=DataUppererSchedule(data=piece)
+                schedule=self,
+                child=DataUppererSchedule(data=piece)
             )
-            
+
 
 class DataUppererSchedule(Schedule):
     def __init__(self, data, parent=None):
@@ -35,7 +36,7 @@ class DummyDataSplitterSchedule(DummySchedule, DataSplitterSchedule):
             'pieces': self.pieces
         }
         self._status = RunStatus.SUCCESS
-    
+
     @property
     async def status(self):
         return RunStatus.SUCCESS
