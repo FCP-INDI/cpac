@@ -4,11 +4,14 @@ import tornado.web
 import tornado.websocket
 import tornado.ioloop
 import tornado.autoreload
+import tornado.httputil
+import tornado.iostream
 from tornado.options import define, options
 from tornado.concurrent import run_on_executor
 
 from cpac import __version__
 from .schedules import Schedule, DataSettingsSchedule, DataConfigSchedule, ParticipantPipelineSchedule
+from .backends.base import FileResult
 
 import os
 import time
@@ -199,8 +202,18 @@ class StatusScheduleHandler(BaseHandler):
         })
 
 
+class ResultEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, FileResult):
+            return {
+                "_type": "FileResult",
+                "mime": o.mime,
+            }
+        return super().default(o)
+
+
 class ResultScheduleHandler(BaseHandler):
-    def get(self, schedule, result=None):
+    async def get(self, schedule, result=None):
         scheduler = self.application.settings.get('scheduler')
         schedule_tree = scheduler[schedule]
         schedule = schedule_tree.schedule
@@ -211,25 +224,78 @@ class ResultScheduleHandler(BaseHandler):
 
         schedule_results = schedule.results
         if result:
-            schedule_result = schedule_results[result]
+            schedule_result = schedule[result]
 
-            # if schedule_result.mime:
-            #     self.set_header("Content-Type", schedule_result.mime)
-            # for chunk in schedule_results[result]():
-            #     self.write(chunk)
+            if isinstance(schedule_result, FileResult):
+                self.set_header("Content-Type", schedule_result.mime)
 
-            return self.finish({
-                "result": schedule_results,
-            })
+                request_range = None
+                range_header = self.request.headers.get("Range")
+                if range_header:
+                    request_range = tornado.httputil._parse_request_range(range_header)
 
-        return self.finish({
+                size = schedule_result.size
+                if request_range:
+                    start, end = request_range
+                    if start is not None and start < 0:
+                        start += size
+                        if start < 0:
+                            start = 0
+                    if (
+                        start is not None
+                        and (start >= size or (end is not None and start >= end))
+                    ) or end == 0:
+                        self.set_status(416)  # Range Not Satisfiable
+                        self.set_header("Content-Type", "text/plain")
+                        self.set_header("Content-Range", "bytes */%s" % (size,))
+                        return
+                    if end is not None and end > size:
+                        end = size
+                    if size != (end or size) - (start or 0):
+                        self.set_status(206)  # Partial Content
+                        self.set_header(
+                            "Content-Range", tornado.httputil._get_content_range(start, end, size)
+                        )
+                else:
+                    start = end = None
+
+                if start is not None and end is not None:
+                    content_length = end - start
+                elif end is not None:
+                    content_length = end
+                elif start is not None:
+                    content_length = size - start
+                else:
+                    content_length = size
+                self.set_header("Content-Length", content_length)
+
+                content = schedule_result.get_content(start, end)
+                async for chunk in content:
+                    try:
+                        self.write(chunk)
+                        await self.flush()
+                    except tornado.iostream.StreamClosedError:
+                        return
+
+            self.set_header("Content-Type", "application/json; charset=UTF-8")
+            return self.finish(json.dumps({
+                "result": schedule_results
+            }, cls=ResultEncoder))
+
+        self.set_header("Content-Type", "application/json; charset=UTF-8")
+        return self.finish(json.dumps({
             "result": schedule_results,
             "children": list(schedule_tree.children.keys()),
-        })
+        }, cls=ResultEncoder))
 
 
 class ScheduleEncoder(json.JSONEncoder):
     def default(self, o):
+        if isinstance(o, FileResult):
+            return {
+                "_type": "FileResult",
+                "mime": o.mime,
+            }
         if isinstance(o, Schedule):
             return repr(o)
         return super().default(o)

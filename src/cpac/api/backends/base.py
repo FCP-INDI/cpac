@@ -1,13 +1,96 @@
 import asyncio
 import inspect
+import io
+import os
+import json
 import logging
 from collections.abc import Iterable
 from dataclasses import dataclass
+from typing import Any
 
+from ...utils import read_crash
 from ..schedules import (DataConfigSchedule, DataSettingsSchedule,
                          ParticipantPipelineSchedule, Schedule)
 
 logger = logging.getLogger(__name__)
+
+
+class FileResult:
+    def __init__(self, path, mime=None):
+        self._path = path
+        self._mime = mime or 'text/plain'
+
+    async def __aenter__(self):
+        self._fp = open(self._path)
+        return self._fp
+
+    async def __aexit__(self, exc_type, exc, tb):
+        self._fp.close()
+
+    @property
+    def size(self):
+        return os.path.getsize(self._path)
+
+    @property
+    def mime(self):
+        return self._mime
+
+    async def get_content(
+        self, start: int = None, end: int = None
+    ):
+        async with self as f:
+            if start is not None:
+                f.seek(start)
+            if end is not None:
+                remaining = end - (start or 0)
+            else:
+                remaining = None
+            while True:
+                chunk_size = 64 * 1024
+                if remaining is not None and remaining < chunk_size:
+                    chunk_size = remaining
+                chunk = f.read(chunk_size)
+                if chunk:
+                    if remaining is not None:
+                        remaining -= len(chunk)
+                    yield chunk
+                else:
+                    if remaining is not None:
+                        assert remaining == 0
+                    return
+
+
+
+class LogFileResult(FileResult):
+    def __init__(self, path):
+        self._path = path
+        self._mime = 'application/vdn.cpacpy-log+json'
+
+
+class CrashInputEncoder(json.JSONEncoder):
+    def default(self, o):
+        if o.__class__.__name__ == '_Undefined':
+            return None
+        try:
+            return super().default(o)
+        except TypeError:
+            return f'{o}'
+
+
+class CrashFileResult(FileResult):
+    def __init__(self, path):
+        self._path = path
+        self._mime = 'application/vdn.cpacpy-crash+json'
+
+    async def __aenter__(self):
+        data = read_crash(self._path)
+        str_stream = io.StringIO()
+        json.dump(data, str_stream, cls=CrashInputEncoder)
+        str_stream.seek(0)
+        return str_stream
+
+    async def __aexit__(self, exc_type, exc, tb):
+        pass
 
 
 class RunStatus:
@@ -69,6 +152,13 @@ class BackendSchedule:
         schedule: Schedule
         timestamp: float
         status: str
+
+    @dataclass
+    class Result:
+        schedule: Schedule
+        result: Any
+        timestamp: float
+        key: str
 
     @property
     async def status(self):

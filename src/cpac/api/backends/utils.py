@@ -2,10 +2,15 @@ import asyncio
 import logging
 import socket
 import time
+import uuid
 from contextlib import closing
 from subprocess import PIPE, STDOUT, Popen
 
 logger = logging.getLogger(__name__)
+
+
+def struuid(s, namespace):
+    return str(uuid.uuid5(uuid.UUID(namespace) if namespace else uuid.UUID(int=0), s))
 
 
 def find_free_port():

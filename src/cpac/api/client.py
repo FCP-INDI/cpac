@@ -127,6 +127,7 @@ class Client:
             'End': Schedule.End,
             'Log': BackendSchedule.Log,
             'Status': BackendSchedule.Status,
+            'Result': BackendSchedule.Result,
         }
 
         uri = f'ws://{self.server}/schedule/connect'
@@ -144,8 +145,8 @@ class Client:
         await ws.write_message(json.dumps({
             'type': 'watch',
             'schedule': schedule,
-            'watchers': ['Spawn', 'Start', 'End', 'Log', 'Status'],
-            'children': True,
+            'watchers': ['Spawn', 'Start', 'End', 'Log', 'Status', 'Result'],
+            'children': children,
         }))
 
         while len(schedules_alive) > 0:

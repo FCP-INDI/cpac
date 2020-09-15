@@ -6,6 +6,7 @@ from base64 import b64encode, b64decode
 from cpac import dist_name
 from itertools import permutations
 from warnings import warn
+from unittest.mock import patch
 
 
 class Locals_to_bind():
@@ -270,3 +271,25 @@ def yaml_parse(path_or_data_url):
     with open(config_filename, 'r') as f:
         config_data = yaml.safe_load(f)
         return config_data
+
+
+def read_crash(crash_file):
+
+    def accept_all(object, name, value):
+        return value
+
+    with patch('nipype.interfaces.base.traits_extension.File.validate', side_effect=accept_all):
+        from nipype.utils.filemanip import loadcrash
+        crash_data = loadcrash(crash_file)
+
+        data = {
+            "traceback": "".join(crash_data["traceback"])
+        }
+        if "node" in crash_data:
+            node = crash_data["node"]
+            data["node"] = {
+                "name": str(node),
+                "directory": node.output_dir(),
+                "inputs": node.inputs.trait_get(),
+            }
+        return data
