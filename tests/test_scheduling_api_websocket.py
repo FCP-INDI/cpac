@@ -57,28 +57,23 @@ async def test_data_config_logs(app, http_client, base_url, scheduler):
 
     schedules_alive = set([schedule])
     messages = []
-    try:
-        while len(schedules_alive) > 0:
-            message = json.loads(await ws_client.read_message())
-            messages += [message]
+    while len(schedules_alive) > 0:
+        message = json.loads(await ws_client.read_message())
+        messages += [message]
 
-            if message['type'] != 'watch':
-                continue
+        if message['type'] != 'watch':
+            continue
 
-            data = message['data']
+        data = message['data']
 
-            schedule_id, message_type, message = data['id'], data['type'], data['message']
-            if message_type == 'Start':
-                schedules_alive |= set([schedule_id])
-            if message_type == 'Spawn':
-                schedules_alive |= set([message['child']])
-            if message_type == 'End':
-                schedules_alive ^= set([schedule_id])
-                logger.info(f'Schedules alive: {list(schedules_alive)}')
-
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
+        schedule_id, message_type, message = data['id'], data['type'], data['message']
+        if message_type == 'Start':
+            schedules_alive |= set([schedule_id])
+        if message_type == 'Spawn':
+            schedules_alive |= set([message['child']])
+        if message_type == 'End':
+            schedules_alive ^= set([schedule_id])
+            logger.info(f'Schedules alive: {list(schedules_alive)}')
 
     await scheduler
 

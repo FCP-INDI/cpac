@@ -178,7 +178,11 @@ class StatusHandler(BaseHandler):
 class MetadataScheduleHandler(BaseHandler):
     async def get(self, schedule):
         scheduler = self.application.settings.get('scheduler')
-        schedule_tree = scheduler[schedule]
+        try:
+            schedule_tree = scheduler[schedule]
+        except KeyError:
+            return self.send_error(404)
+
         schedule = schedule_tree.schedule
 
         return self.finish({
@@ -193,7 +197,11 @@ class MetadataScheduleHandler(BaseHandler):
 class StatusScheduleHandler(BaseHandler):
     async def get(self, schedule):
         scheduler = self.application.settings.get('scheduler')
-        schedule_tree = scheduler[schedule]
+        try:
+            schedule_tree = scheduler[schedule]
+        except KeyError:
+            return self.send_error(404)
+
         schedule = schedule_tree.schedule
         schedule_status = await schedule.status
 
@@ -215,7 +223,12 @@ class ResultEncoder(json.JSONEncoder):
 class ResultScheduleHandler(BaseHandler):
     async def get(self, schedule, result=None):
         scheduler = self.application.settings.get('scheduler')
-        schedule_tree = scheduler[schedule]
+
+        try:
+            schedule_tree = scheduler[schedule]
+        except KeyError:
+            return self.send_error(404)
+
         schedule = schedule_tree.schedule
 
         if not schedule.available_results:
@@ -229,53 +242,60 @@ class ResultScheduleHandler(BaseHandler):
             if isinstance(schedule_result, FileResult):
                 self.set_header("Content-Type", schedule_result.mime)
 
-                request_range = None
-                range_header = self.request.headers.get("Range")
-                if range_header:
-                    request_range = tornado.httputil._parse_request_range(range_header)
+                async with schedule_result as stream:
 
-                size = schedule_result.size
-                if request_range:
-                    start, end = request_range
-                    if start is not None and start < 0:
-                        start += size
-                        if start < 0:
-                            start = 0
-                    if (
-                        start is not None
-                        and (start >= size or (end is not None and start >= end))
-                    ) or end == 0:
-                        self.set_status(416)  # Range Not Satisfiable
-                        self.set_header("Content-Type", "text/plain")
-                        self.set_header("Content-Range", "bytes */%s" % (size,))
-                        return
-                    if end is not None and end > size:
-                        end = size
-                    if size != (end or size) - (start or 0):
-                        self.set_status(206)  # Partial Content
-                        self.set_header(
-                            "Content-Range", tornado.httputil._get_content_range(start, end, size)
-                        )
-                else:
-                    start = end = None
+                    request_range = None
+                    range_header = self.request.headers.get("Range")
+                    if range_header:
+                        request_range = tornado.httputil._parse_request_range(range_header)
 
-                if start is not None and end is not None:
-                    content_length = end - start
-                elif end is not None:
-                    content_length = end
-                elif start is not None:
-                    content_length = size - start
-                else:
-                    content_length = size
-                self.set_header("Content-Length", content_length)
+                    size = schedule_result.size
+                    if request_range:
+                        start, end = request_range
+                        if start is not None and start < 0:
+                            start += size
+                            if start < 0:
+                                start = 0
+                        if (
+                            start is not None
+                            and (start >= size or (end is not None and start >= end))
+                        ) or end == 0:
+                            self.set_status(416)  # Range Not Satisfiable
+                            self.set_header("Content-Range", f"bytes */{size}")
+                            return
 
-                content = schedule_result.get_content(start, end)
-                async for chunk in content:
-                    try:
-                        self.write(chunk)
-                        await self.flush()
-                    except tornado.iostream.StreamClosedError:
-                        return
+                        if end is not None and end > size:
+                            end = size
+
+                        if size != (end or size) - (start or 0):
+                            self.set_status(206)  # Partial Content
+                            self.set_header(
+                                "Content-Range",
+                                f"bytes {start or 0}-{(end or size) - 1}/{size}"
+                            )
+                    else:
+                        start = end = None
+
+                    if start is not None and end is not None:
+                        content_length = end - start
+                    elif end is not None:
+                        content_length = end
+                    elif start is not None:
+                        content_length = size - start
+                    else:
+                        content_length = size
+
+                    self.set_header("Content-Length", content_length)
+
+                    content = schedule_result.slice(start, end)
+                    async for chunk in content:
+                        try:
+                            self.write(chunk)
+                            await self.flush()
+                        except tornado.iostream.StreamClosedError:
+                            break
+
+                    return
 
             self.set_header("Content-Type", "application/json; charset=UTF-8")
             return self.finish(json.dumps({
@@ -303,7 +323,7 @@ class ScheduleEncoder(json.JSONEncoder):
 
 def schedule_watch_wrapper(scheduler, socket, message_id):
 
-    def schedule_watch(schedule, message):
+    def schedule_watch(self, schedule, message):
         content = {
             "type": "watch",
             "data": {
@@ -316,7 +336,10 @@ def schedule_watch_wrapper(scheduler, socket, message_id):
         if message_id:
             content['__cpacpy_message_id'] = message_id
 
-        socket.write_message(json.dumps(content, cls=ScheduleEncoder))
+        try:
+            socket.write_message(json.dumps(content, cls=ScheduleEncoder))
+        except tornado.websocket.WebSocketClosedError:
+            pass
 
     return schedule_watch
 
@@ -355,7 +378,7 @@ class WatchScheduleHandler(tornado.websocket.WebSocketHandler):
                     for kls in scheduler.events
                     if kls.__name__ in message["watchers"]
                 ]
-                
+
             schedule = scheduler[message["schedule"]].schedule
             scheduler.watch(
                 schedule,

@@ -16,14 +16,18 @@ from fixtures import app, app_client, event_loop, scheduler
 async def test_result_crash(http_client, base_url, app, scheduler):
 
     crash_file = os.path.join(Constants.TESTS_DATA_PATH, 'cpac_output/crash/crash-file.pklz')
-    res = CrashFileResult(crash_file)
+    result = CrashFileResult(crash_file)
 
     schedule = ParticipantPipelineSchedule(
         subject=os.path.join(Constants.TESTS_DATA_PATH, 'data_config_template_single.yml')
     )
 
-    response = await http_client.fetch(f'{base_url}/schedule/{repr(schedule)}/result', raise_error=False)
+    schedule['crashes/001'] = result
+    scheduler.schedule(schedule, proxied=True)
 
+    response = await http_client.fetch(f'{base_url}/schedule/{repr(schedule)}/result', raise_error=False)
+    assert response.code == 200
+    
     body = json_decode(response.body)
 
     crash = list(body['result']['crashes'].keys())[0]

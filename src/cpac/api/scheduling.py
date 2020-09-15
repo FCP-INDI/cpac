@@ -150,6 +150,17 @@ class Scheduler:
                 "children": children,
             }]
 
+    def unwatch(self, schedule, function):
+        sid = repr(schedule)
+        logger.info(f"[Scheduler] Unscheduling watcher on schedule {schedule}")
+        for watcher_class in self.events:
+            if sid not in self._watchers[watcher_class]:
+                continue
+            try:
+                self._watchers[watcher_class][sid].remove(function)
+            except ValueError:
+                pass
+
     async def run_scheduled(self, schedule):
 
         async with self._semaphore:
@@ -183,7 +194,7 @@ class Scheduler:
                                     function=watcher["function"],
                                     children=watcher["children"],
                                     watcher_classes=[watcher_class],
-                            )
+                                )
 
                     self.schedule(
                         subschedule,
@@ -195,7 +206,7 @@ class Scheduler:
                 for watcher in watchers:
                     function = watcher["function"]
                     try:
-                        function(schedule, message)
+                        function(function, schedule, message)
                     except Exception as e:
                         logger.exception(e)
 

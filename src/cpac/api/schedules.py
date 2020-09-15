@@ -48,13 +48,16 @@ class Schedule:
     def __getitem__(self, key):
         return self.result(key)
 
+    def __setitem__(self, key, value):
+        return self.result(key, value)
+
     def __getstate__(self):
         return self.__dict__
 
-    def result(self, key):
+    def result(self, key, value=None):
         keys = key.split('/')
         try:
-            return traverse_deep(self._results, keys)
+            return traverse_deep(self._results, keys, value)
         except KeyError as e:
             raise KeyError(*e.args)
     @property
