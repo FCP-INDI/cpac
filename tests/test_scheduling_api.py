@@ -122,6 +122,22 @@ async def test_data_config(http_client, base_url, app, scheduler):
     child = children[0]
     response = await http_client.fetch(f'{base_url}/schedule/{child}/result', raise_error=False)
 
-    # TODO add a result for participant run
-    # body = json_decode(response.body)
-    # print(body)
+    body = json_decode(response.body)
+
+    log = list(body['result']['logs'].keys())[0]
+    response = await http_client.fetch(f'{base_url}/schedule/{child}/result/logs/{log}', raise_error=False)
+    logs = response.body
+    assert b'nipype.workflow INFO' in logs.split(b'\n')[0]
+
+    crash = list(body['result']['crashes'].keys())[0]
+    response = await http_client.fetch(f'{base_url}/schedule/{child}/result/crashes/{crash}', raise_error=False)
+    crash_data = json_decode(response.body)
+    assert crash_data['traceback'].startswith('Traceback')
+
+    node = crash_data['node']
+    assert node['name'] == 'resting_preproc_sub-0051074_ses-1.anat_mni_ants_register_0.calc_ants_warp'
+    assert node['directory'] == '/tmp/resting_preproc_sub-0051074_ses-1/anat_mni_ants_register_0/calc_ants_warp'
+    assert 'inputs' in node and type(node['inputs']) == dict
+
+    inputs = node['inputs']
+    assert inputs['anatomical_brain'] == '/tmp/resting_preproc_sub-0051074_ses-1/anat_preproc_afni_0/anat_skullstrip_orig_vol/sub-0051074_T1w_resample_calc.nii.gz'

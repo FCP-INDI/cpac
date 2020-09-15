@@ -21,43 +21,47 @@ class FileResult:
         self._mime = mime or 'text/plain'
 
     async def __aenter__(self):
-        self._fp = open(self._path)
-        return self._fp
+        self._stream = open(self._path)
+        return self._stream
 
     async def __aexit__(self, exc_type, exc, tb):
-        self._fp.close()
+        self._stream.close()
 
     @property
     def size(self):
-        return os.path.getsize(self._path)
+        pos = self._stream.tell()
+        self._stream.seek(0, os.SEEK_END)
+        size = self._stream.tell()
+        self._stream.seek(pos)
+        return size
 
     @property
     def mime(self):
         return self._mime
 
-    async def get_content(
+    async def slice(
         self, start: int = None, end: int = None
     ):
-        async with self as f:
-            if start is not None:
-                f.seek(start)
-            if end is not None:
-                remaining = end - (start or 0)
+        f = self._stream
+        if start is not None:
+            f.seek(start)
+        if end is not None:
+            remaining = end - (start or 0)
+        else:
+            remaining = None
+        while True:
+            chunk_size = 64 * 1024
+            if remaining is not None and remaining < chunk_size:
+                chunk_size = remaining
+            chunk = f.read(chunk_size)
+            if chunk:
+                if remaining is not None:
+                    remaining -= len(chunk)
+                yield chunk
             else:
-                remaining = None
-            while True:
-                chunk_size = 64 * 1024
-                if remaining is not None and remaining < chunk_size:
-                    chunk_size = remaining
-                chunk = f.read(chunk_size)
-                if chunk:
-                    if remaining is not None:
-                        remaining -= len(chunk)
-                    yield chunk
-                else:
-                    if remaining is not None:
-                        assert remaining == 0
-                    return
+                if remaining is not None:
+                    assert remaining == 0
+                return
 
 
 
@@ -82,15 +86,14 @@ class CrashFileResult(FileResult):
         self._path = path
         self._mime = 'application/vdn.cpacpy-crash+json'
 
-    async def __aenter__(self):
-        data = read_crash(self._path)
-        str_stream = io.StringIO()
-        json.dump(data, str_stream, cls=CrashInputEncoder)
-        str_stream.seek(0)
-        return str_stream
 
-    async def __aexit__(self, exc_type, exc, tb):
-        pass
+    async def __aenter__(self):
+        self._stream = io.StringIO()
+        data = read_crash(self._path)
+        self._stream = io.StringIO()
+        json.dump(data, self._stream, cls=CrashInputEncoder)
+        self._stream.seek(0)
+        return self._stream
 
 
 class RunStatus:

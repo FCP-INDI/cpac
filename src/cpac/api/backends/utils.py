@@ -53,13 +53,13 @@ def merge_async_iters(*aiters):
                 if next_item is None:
                     continue
                 if raised:
-                    cancel_tasks()
+                    await cancel_tasks()
                     if isinstance(next_item, StopAsyncIteration):
                         break
                     raise next_item
                 yield next_item
         finally:
-            cancel_tasks()
+            await cancel_tasks()
 
     async def cancel_tasks():
         nonlocal cancelling
