@@ -108,6 +108,13 @@ class ContainerDataSettingsSchedule(ContainerSchedule, DataSettingsSchedule):
             if files:
                 with open(files[0]) as f:
                     self._results['data_config'] = yaml.safe_load(f)
+ 
+                yield BackendSchedule.Result(
+                    schedule=self,
+                    result=self._results['data_config'],
+                    timestamp=time.time(),
+                    key='data_config',
+                )
         finally:
             shutil.rmtree(output_folder)
 
@@ -162,6 +169,13 @@ class ContainerDataConfigSchedule(ContainerSchedule, DataConfigSchedule):
             if files:
                 with open(files[0]) as f:
                     self._results['data_config'] = yaml.safe_load(f)
+
+                yield BackendSchedule.Result(
+                    schedule=self,
+                    result=self._results['data_config'],
+                    timestamp=time.time(),
+                    key='data_config',
+                )
         finally:
             shutil.rmtree(output_folder)
 
