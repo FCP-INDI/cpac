@@ -1,0 +1,1775 @@
+200807-20:15:39,948 nipype.workflow INFO:
+	 
+
+    C-PAC version: 1.6.0
+
+    Setting maximum number of cores per participant to 1
+    Setting number of participants at once to 1
+    Setting OMP_NUM_THREADS to 1
+    Setting MKL_NUM_THREADS to 1
+    Setting ANTS/ITK thread usage to 1
+    Maximum potential number of cores that might be used during this run: 1
+
+
+200807-20:15:46,168 nipype.workflow INFO:
+	 
+
+Pipeline building completed.
+
+
+200807-20:15:52,308 nipype.workflow INFO:
+	 
+
+Strategy forks:
+- analysis_nuisance
+
+
+200807-20:16:00,28 nipype.workflow INFO:
+	 Workflow resting_preproc_sub-1_ses-1 settings: ['check', 'execution', 'logging', 'monitoring']
+200807-20:16:11,306 nipype.workflow INFO:
+	 Running serially.
+200807-20:16:11,318 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_1/_mask_CC400_mask_file_..cpac_templates..CC400.nii.gz/check_for_s3".
+200807-20:16:11,323 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,323 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" found cached.
+200807-20:16:11,328 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_CC400_mask_file_..cpac_templates..CC400.nii.gz/check_for_s3".
+200807-20:16:11,332 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,332 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:11,338 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_aal_mask_pad_mask_file_..cpac_templates..aal_mask_pad.nii.gz/check_for_s3".
+200807-20:16:11,343 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,343 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:11,348 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.check_for_s3_PRIORS_WHITE" in "/tmp/resting_preproc_sub-1_ses-1/check_for_s3_PRIORS_WHITE".
+200807-20:16:11,354 nipype.workflow INFO:
+	 [Node] Running "check_for_s3_PRIORS_WHITE" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:11,585 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.check_for_s3_PRIORS_WHITE".
+200807-20:16:11,589 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_HarvardOxfordsub-maxprob-thr25_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..HarvardOxfordsub-maxprob-thr25_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,594 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,594 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:11,600 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_yeo-17_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..yeo-17_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,604 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,604 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:11,609 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_gather_0.selectrest" in "/tmp/resting_preproc_sub-1_ses-1/func_gather_0/_scan_rest_run-1/selectrest".
+200807-20:16:11,618 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_gather_0.selectrest" - collecting precomputed outputs
+200807-20:16:11,619 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_gather_0.selectrest" found cached.
+200807-20:16:11,625 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_Schaefer2018-1000-node_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..Schaefer2018-1000-node_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,628 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,629 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:11,634 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_CorticalAreaParcellationfromRestingStateCorrelationsGordon2014_mask_file_..ndmg_atlases..label..Human..CorticalAreaParcellationfromRestingStateCorrelationsGordon2014.nii.gz/check_for_s3".
+200807-20:16:11,638 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,639 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:11,644 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.resampled_template_skull_for_func_preproc" in "/tmp/resting_preproc_sub-1_ses-1/resampled_template_skull_for_func_preproc".
+200807-20:16:11,649 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.resampled_template_skull_for_func_preproc" - collecting precomputed outputs
+200807-20:16:11,649 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.resampled_template_skull_for_func_preproc" found cached.
+200807-20:16:11,654 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_gather_0.select_fmap_phase" in "/tmp/resting_preproc_sub-1_ses-1/func_gather_0/_scan_rest_run-1/select_fmap_phase".
+200807-20:16:11,660 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_gather_0.select_fmap_phase" - collecting precomputed outputs
+200807-20:16:11,661 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_gather_0.select_fmap_phase" found cached.
+200807-20:16:11,667 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_gather_0.s3_fmap_phase" in "/tmp/resting_preproc_sub-1_ses-1/func_gather_0/_scan_rest_run-1/s3_fmap_phase".
+200807-20:16:11,673 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_gather_0.s3_fmap_phase" - collecting precomputed outputs
+200807-20:16:11,673 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_gather_0.s3_fmap_phase" found cached.
+200807-20:16:11,678 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_Schaefer2018-400-node_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..Schaefer2018-400-node_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,681 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,681 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:11,686 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_MICCAI2012MultiAtlasLabelingWorkshopandChallengeNeuromorphometrics_mask_file_..ndmg_atlases..label..Human..MICCAI2012MultiAtlasLabelingWorkshopandChallengeNeuromorphometrics.nii.gz/check_for_s3".
+200807-20:16:11,689 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,690 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:11,695 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_mfi_1.resample_o" in "/tmp/resting_preproc_sub-1_ses-1/montage_mfi_1/resample_o".
+200807-20:16:11,699 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_mfi_1.resample_o" - collecting precomputed outputs
+200807-20:16:11,699 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_mfi_1.resample_o" found cached.
+200807-20:16:11,705 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_CC200_mask_file_..cpac_templates..CC200.nii.gz/check_for_s3".
+200807-20:16:11,709 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,710 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:11,715 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_0/_mask_aal_mask_pad_mask_file_..cpac_templates..aal_mask_pad.nii.gz/check_for_s3".
+200807-20:16:11,720 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,721 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" found cached.
+200807-20:16:11,726 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_MICCAI2012MultiAtlasLabelingWorkshopandChallengeNeuromorphometrics_mask_file_..ndmg_atlases..label..Human..MICCAI2012MultiAtlasLabelingWorkshopandChallengeNeuromorphometrics.nii.gz/check_for_s3".
+200807-20:16:11,731 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,732 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:11,737 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_mni_anat_1.resample_o" in "/tmp/resting_preproc_sub-1_ses-1/montage_mni_anat_1/resample_o".
+200807-20:16:11,741 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_mni_anat_1.resample_o" - collecting precomputed outputs
+200807-20:16:11,741 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_mni_anat_1.resample_o" found cached.
+200807-20:16:11,746 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_0/_mask_CC200_mask_file_..cpac_templates..CC200.nii.gz/check_for_s3".
+200807-20:16:11,749 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,749 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" found cached.
+200807-20:16:11,754 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_brodmann_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..brodmann_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,758 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,758 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:11,764 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_Juelichgmthr252mmEickhoff2005_mask_file_..ndmg_atlases..label..Human..Juelichgmthr252mmEickhoff2005.nii.gz/check_for_s3".
+200807-20:16:11,767 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,768 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:11,773 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.resampled_template_symmetric_brain" in "/tmp/resting_preproc_sub-1_ses-1/resampled_template_symmetric_brain".
+200807-20:16:11,776 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.resampled_template_symmetric_brain" - collecting precomputed outputs
+200807-20:16:11,776 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.resampled_template_symmetric_brain" found cached.
+200807-20:16:11,781 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_0/_mask_rois_3mm_mask_file_..cpac_templates..rois_3mm.nii.gz/check_for_s3".
+200807-20:16:11,785 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,786 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" found cached.
+200807-20:16:11,791 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_Talairach_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..Talairach_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,794 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,795 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:11,799 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_DKT_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..DKT_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,803 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,803 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:11,808 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_yeo-17_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..yeo-17_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,811 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,812 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:11,817 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_1/_mask_rois_3mm_mask_file_..cpac_templates..rois_3mm.nii.gz/check_for_s3".
+200807-20:16:11,822 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,822 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" found cached.
+200807-20:16:11,827 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_Schaefer2018-400-node_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..Schaefer2018-400-node_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,830 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,830 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:11,835 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_0/_mask_ho_mask_pad_mask_file_..cpac_templates..ho_mask_pad.nii.gz/check_for_s3".
+200807-20:16:11,838 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,839 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" found cached.
+200807-20:16:11,843 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_Schaefer2018-200-node_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..Schaefer2018-200-node_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,846 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,847 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:11,852 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_CC200_mask_file_..cpac_templates..CC200.nii.gz/check_for_s3".
+200807-20:16:11,855 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,856 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:11,861 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.spatial_map_dataflow_for_DR_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/spatial_map_dataflow_for_DR_1/_spatial_map_PNAS_Smith09_rsn10_spatial_map_file_..cpac_templates..PNAS_Smith09_rsn10.nii.gz/check_for_s3".
+200807-20:16:11,865 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.spatial_map_dataflow_for_DR_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,865 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.spatial_map_dataflow_for_DR_1.check_for_s3" found cached.
+200807-20:16:11,870 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_0/_mask_aal_mask_pad_mask_file_..cpac_templates..aal_mask_pad.nii.gz/check_for_s3".
+200807-20:16:11,875 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,875 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" found cached.
+200807-20:16:11,880 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_1/_mask_tt_mask_pad_mask_file_..cpac_templates..tt_mask_pad.nii.gz/check_for_s3".
+200807-20:16:11,885 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,885 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" found cached.
+200807-20:16:11,892 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.check_for_s3_PRIORS_GRAY" in "/tmp/resting_preproc_sub-1_ses-1/check_for_s3_PRIORS_GRAY".
+200807-20:16:11,896 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.check_for_s3_PRIORS_GRAY" - collecting precomputed outputs
+200807-20:16:11,896 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.check_for_s3_PRIORS_GRAY" found cached.
+200807-20:16:11,901 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_1/_mask_ho_mask_pad_mask_file_..cpac_templates..ho_mask_pad.nii.gz/check_for_s3".
+200807-20:16:11,904 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,904 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" found cached.
+200807-20:16:11,909 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_glasser_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..glasser_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,912 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,913 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:11,917 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_0/_mask_CC400_mask_file_..cpac_templates..CC400.nii.gz/check_for_s3".
+200807-20:16:11,922 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,923 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" found cached.
+200807-20:16:11,929 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_slab907_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..slab907_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,934 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,935 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:11,939 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_0/_mask_CC400_mask_file_..cpac_templates..CC400.nii.gz/check_for_s3".
+200807-20:16:11,942 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,943 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" found cached.
+200807-20:16:11,948 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_ho_mask_pad_mask_file_..cpac_templates..ho_mask_pad.nii.gz/check_for_s3".
+200807-20:16:11,951 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,952 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:11,956 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_gather_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/anat_gather_0/check_for_s3".
+200807-20:16:11,960 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.anat_gather_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,960 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.anat_gather_0.check_for_s3" found cached.
+200807-20:16:11,964 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_slab907_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..slab907_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,968 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,968 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:11,973 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_yeo-7_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..yeo-7_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:11,977 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,977 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:11,982 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.resampled_template_brain_for_anat" in "/tmp/resting_preproc_sub-1_ses-1/resampled_template_brain_for_anat".
+200807-20:16:11,986 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.resampled_template_brain_for_anat" - collecting precomputed outputs
+200807-20:16:11,987 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.resampled_template_brain_for_anat" found cached.
+200807-20:16:11,990 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_tt_mask_pad_mask_file_..cpac_templates..tt_mask_pad.nii.gz/check_for_s3".
+200807-20:16:11,993 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:11,993 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:11,998 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_Schaefer2018-200-node_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..Schaefer2018-200-node_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,3 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,3 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,8 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_gather_0.select_scan_params" in "/tmp/resting_preproc_sub-1_ses-1/func_gather_0/_scan_rest_run-1/select_scan_params".
+200807-20:16:12,14 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_gather_0.select_scan_params" - collecting precomputed outputs
+200807-20:16:12,15 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_gather_0.select_scan_params" found cached.
+200807-20:16:12,25 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_yeo-17-liberal_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..yeo-17-liberal_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,29 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,29 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,34 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_aal_mask_pad_mask_file_..cpac_templates..aal_mask_pad.nii.gz/check_for_s3".
+200807-20:16:12,38 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,38 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,44 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_rois_3mm_mask_file_..cpac_templates..rois_3mm.nii.gz/check_for_s3".
+200807-20:16:12,48 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,49 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,54 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_HarvardOxfordcort-maxprob-thr25_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..HarvardOxfordcort-maxprob-thr25_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,57 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,58 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:12,63 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.resampled_template_skull_for_func_derivative" in "/tmp/resting_preproc_sub-1_ses-1/resampled_template_skull_for_func_derivative".
+200807-20:16:12,66 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.resampled_template_skull_for_func_derivative" - collecting precomputed outputs
+200807-20:16:12,66 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.resampled_template_skull_for_func_derivative" found cached.
+200807-20:16:12,71 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_yeo-7-liberal_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..yeo-7-liberal_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,74 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,74 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:12,79 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_Schaefer2018-1000-node_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..Schaefer2018-1000-node_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,83 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,83 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,88 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_CorticalAreaParcellationfromRestingStateCorrelationsGordon2014_mask_file_..ndmg_atlases..label..Human..CorticalAreaParcellationfromRestingStateCorrelationsGordon2014.nii.gz/check_for_s3".
+200807-20:16:12,92 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,92 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,97 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.spatial_map_dataflow_for_DR_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/spatial_map_dataflow_for_DR_0/_spatial_map_PNAS_Smith09_rsn10_spatial_map_file_..cpac_templates..PNAS_Smith09_rsn10.nii.gz/check_for_s3".
+200807-20:16:12,101 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.spatial_map_dataflow_for_DR_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,101 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.spatial_map_dataflow_for_DR_0.check_for_s3" found cached.
+200807-20:16:12,105 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_yeo-7-liberal_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..yeo-7-liberal_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,110 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,111 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,115 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_DesikanKlein2012_mask_file_..ndmg_atlases..label..Human..DesikanKlein2012.nii.gz/check_for_s3".
+200807-20:16:12,119 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,119 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:12,124 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.resampled_template_skull_for_anat" in "/tmp/resting_preproc_sub-1_ses-1/resampled_template_skull_for_anat".
+200807-20:16:12,127 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.resampled_template_skull_for_anat" - collecting precomputed outputs
+200807-20:16:12,127 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.resampled_template_skull_for_anat" found cached.
+200807-20:16:12,133 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_desikan_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..desikan_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,137 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,137 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,142 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_0/_mask_rois_3mm_mask_file_..cpac_templates..rois_3mm.nii.gz/check_for_s3".
+200807-20:16:12,145 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,146 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" found cached.
+200807-20:16:12,151 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_1/_mask_CC200_mask_file_..cpac_templates..CC200.nii.gz/check_for_s3".
+200807-20:16:12,155 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,156 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" found cached.
+200807-20:16:12,160 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_aal_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..aal_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,165 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,166 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,173 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_HarvardOxfordcort-maxprob-thr25_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..HarvardOxfordcort-maxprob-thr25_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,178 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,178 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,184 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_Talairach_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..Talairach_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,189 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,189 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:12,194 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_rois_3mm_mask_file_..cpac_templates..rois_3mm.nii.gz/check_for_s3".
+200807-20:16:12,199 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,199 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:12,204 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_brodmann_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..brodmann_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,209 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,209 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:12,214 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_0/_mask_ho_mask_pad_mask_file_..cpac_templates..ho_mask_pad.nii.gz/check_for_s3".
+200807-20:16:12,218 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,219 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" found cached.
+200807-20:16:12,224 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_1/_mask_ez_mask_pad_mask_file_..cpac_templates..ez_mask_pad.nii.gz/check_for_s3".
+200807-20:16:12,227 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,227 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" found cached.
+200807-20:16:12,232 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_glasser_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..glasser_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,235 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,236 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,240 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_mfi_0.resample_o" in "/tmp/resting_preproc_sub-1_ses-1/montage_mfi_0/resample_o".
+200807-20:16:12,244 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_mfi_0.resample_o" - collecting precomputed outputs
+200807-20:16:12,244 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_mfi_0.resample_o" found cached.
+200807-20:16:12,248 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_0/_mask_CC200_mask_file_..cpac_templates..CC200.nii.gz/check_for_s3".
+200807-20:16:12,253 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,253 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" found cached.
+200807-20:16:12,259 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_1/_mask_aal_mask_pad_mask_file_..cpac_templates..aal_mask_pad.nii.gz/check_for_s3".
+200807-20:16:12,264 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,265 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" found cached.
+200807-20:16:12,270 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_DesikanKlein2012_mask_file_..ndmg_atlases..label..Human..DesikanKlein2012.nii.gz/check_for_s3".
+200807-20:16:12,273 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,274 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,279 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_1/_mask_rois_3mm_mask_file_..cpac_templates..rois_3mm.nii.gz/check_for_s3".
+200807-20:16:12,286 nipype.workflow INFO:
+	 [Node] Running "check_for_s3" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:12,498 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3".
+200807-20:16:12,502 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_mni_anat_0.resample_o" in "/tmp/resting_preproc_sub-1_ses-1/montage_mni_anat_0/resample_o".
+200807-20:16:12,506 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_mni_anat_0.resample_o" - collecting precomputed outputs
+200807-20:16:12,507 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_mni_anat_0.resample_o" found cached.
+200807-20:16:12,512 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_AAL2zourioMazoyer2002_mask_file_..ndmg_atlases..label..Human..AAL2zourioMazoyer2002.nii.gz/check_for_s3".
+200807-20:16:12,517 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,518 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:12,524 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.resampled_template_symmetric_skull" in "/tmp/resting_preproc_sub-1_ses-1/resampled_template_symmetric_skull".
+200807-20:16:12,528 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.resampled_template_symmetric_skull" - collecting precomputed outputs
+200807-20:16:12,529 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.resampled_template_symmetric_skull" found cached.
+200807-20:16:12,536 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.spatial_map_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/spatial_map_dataflow_1/_spatial_map_PNAS_Smith09_rsn10_spatial_map_file_..cpac_templates..PNAS_Smith09_rsn10.nii.gz/check_for_s3".
+200807-20:16:12,540 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.spatial_map_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,541 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.spatial_map_dataflow_1.check_for_s3" found cached.
+200807-20:16:12,551 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_Schaefer2018-300-node_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..Schaefer2018-300-node_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,556 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,556 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:12,563 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_0/_mask_tt_mask_pad_mask_file_..cpac_templates..tt_mask_pad.nii.gz/check_for_s3".
+200807-20:16:12,567 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,568 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" found cached.
+200807-20:16:12,572 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_1/_mask_tt_mask_pad_mask_file_..cpac_templates..tt_mask_pad.nii.gz/check_for_s3".
+200807-20:16:12,575 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,576 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" found cached.
+200807-20:16:12,580 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_1/_mask_aal_mask_pad_mask_file_..cpac_templates..aal_mask_pad.nii.gz/check_for_s3".
+200807-20:16:12,584 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,584 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" found cached.
+200807-20:16:12,589 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_Juelichgmthr252mmEickhoff2005_mask_file_..ndmg_atlases..label..Human..Juelichgmthr252mmEickhoff2005.nii.gz/check_for_s3".
+200807-20:16:12,592 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,593 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,598 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_CC400_mask_file_..cpac_templates..CC400.nii.gz/check_for_s3".
+200807-20:16:12,601 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,601 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:12,606 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_gather_0.check_func_scan" in "/tmp/resting_preproc_sub-1_ses-1/func_gather_0/_scan_rest_run-1/check_func_scan".
+200807-20:16:12,611 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_gather_0.check_func_scan" - collecting precomputed outputs
+200807-20:16:12,612 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_gather_0.check_func_scan" found cached.
+200807-20:16:12,619 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_gather_0.select_fmap_mag" in "/tmp/resting_preproc_sub-1_ses-1/func_gather_0/_scan_rest_run-1/select_fmap_mag".
+200807-20:16:12,627 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_gather_0.select_fmap_mag" - collecting precomputed outputs
+200807-20:16:12,628 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_gather_0.select_fmap_mag" found cached.
+200807-20:16:12,634 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_gather_0.s3_fmap_mag" in "/tmp/resting_preproc_sub-1_ses-1/func_gather_0/_scan_rest_run-1/s3_fmap_mag".
+200807-20:16:12,639 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_gather_0.s3_fmap_mag" - collecting precomputed outputs
+200807-20:16:12,640 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_gather_0.s3_fmap_mag" found cached.
+200807-20:16:12,644 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_aal_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..aal_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,647 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,648 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:12,652 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_gather_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/func_gather_0/_scan_rest_run-1/check_for_s3".
+200807-20:16:12,657 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_gather_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,658 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_gather_0.check_for_s3" found cached.
+200807-20:16:12,662 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_tt_mask_pad_mask_file_..cpac_templates..tt_mask_pad.nii.gz/check_for_s3".
+200807-20:16:12,666 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,666 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:12,672 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_yeo-17-liberal_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..yeo-17-liberal_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:12,678 nipype.workflow INFO:
+	 [Node] Running "check_for_s3" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:12,898 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3".
+200807-20:16:12,902 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_0/_mask_tt_mask_pad_mask_file_..cpac_templates..tt_mask_pad.nii.gz/check_for_s3".
+200807-20:16:12,905 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:12,905 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" found cached.
+200807-20:16:12,910 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_gather_0.s3_scan_params" in "/tmp/resting_preproc_sub-1_ses-1/func_gather_0/_scan_rest_run-1/s3_scan_params".
+200807-20:16:12,923 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_gather_0.s3_scan_params" - collecting precomputed outputs
+200807-20:16:12,924 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_gather_0.s3_scan_params" found cached.
+200807-20:16:12,932 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.scan_params_0" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/scan_params_0".
+200807-20:16:12,946 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.scan_params_0" - collecting precomputed outputs
+200807-20:16:12,946 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.scan_params_0" found cached.
+200807-20:16:12,956 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.edit_func_0.func_get_idx" in "/tmp/resting_preproc_sub-1_ses-1/edit_func_0/_scan_rest_run-1/func_get_idx".
+200807-20:16:12,972 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.edit_func_0.func_get_idx" - collecting precomputed outputs
+200807-20:16:12,973 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.edit_func_0.func_get_idx" found cached.
+200807-20:16:12,979 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.edit_func_0.func_drop_trs" in "/tmp/resting_preproc_sub-1_ses-1/edit_func_0/_scan_rest_run-1/func_drop_trs".
+200807-20:16:12,993 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.edit_func_0.func_drop_trs" - collecting precomputed outputs
+200807-20:16:12,993 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.edit_func_0.func_drop_trs" found cached.
+200807-20:16:13,1 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_HarvardOxfordsub-maxprob-thr25_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..HarvardOxfordsub-maxprob-thr25_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:13,4 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:13,4 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:13,9 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.check_for_s3_lateral_ventricles_mask" in "/tmp/resting_preproc_sub-1_ses-1/check_for_s3_lateral_ventricles_mask".
+200807-20:16:13,12 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.check_for_s3_lateral_ventricles_mask" - collecting precomputed outputs
+200807-20:16:13,12 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.check_for_s3_lateral_ventricles_mask" found cached.
+200807-20:16:13,17 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_DKT_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..DKT_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:13,21 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:13,21 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:13,26 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.resampled_template_brain_for_func_derivative" in "/tmp/resting_preproc_sub-1_ses-1/resampled_template_brain_for_func_derivative".
+200807-20:16:13,29 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.resampled_template_brain_for_func_derivative" - collecting precomputed outputs
+200807-20:16:13,29 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.resampled_template_brain_for_func_derivative" found cached.
+200807-20:16:13,34 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_files_smooth_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_tempreg_maps_files_smooth_1/resample_u".
+200807-20:16:13,40 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_files_smooth_1.resample_u" - collecting precomputed outputs
+200807-20:16:13,40 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_files_smooth_1.resample_u" found cached.
+200807-20:16:13,44 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_centrality_smooth_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_centrality_smooth_0/resample_u".
+200807-20:16:13,50 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_centrality_smooth_0.resample_u" - collecting precomputed outputs
+200807-20:16:13,50 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_centrality_smooth_0.resample_u" found cached.
+200807-20:16:13,56 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_centrality_smooth_zstd_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_centrality_smooth_zstd_1/resample_u".
+200807-20:16:13,64 nipype.workflow INFO:
+	 [Node] Running "resample_u" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:13,556 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.montage_centrality_smooth_zstd_1.resample_u".
+200807-20:16:13,561 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_alff_to_standard_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_alff_to_standard_0/resample_u".
+200807-20:16:13,570 nipype.workflow INFO:
+	 [Node] Running "resample_u" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:14,114 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.montage_alff_to_standard_0.resample_u".
+200807-20:16:14,119 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_alff_to_standard_zstd_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_alff_to_standard_zstd_0/resample_u".
+200807-20:16:14,131 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_alff_to_standard_zstd_0.resample_u" - collecting precomputed outputs
+200807-20:16:14,131 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_alff_to_standard_zstd_0.resample_u" found cached.
+200807-20:16:14,138 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_reho_to_standard_smooth_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_reho_to_standard_smooth_0/resample_u".
+200807-20:16:14,145 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_reho_to_standard_smooth_0.resample_u" - collecting precomputed outputs
+200807-20:16:14,146 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_reho_to_standard_smooth_0.resample_u" found cached.
+200807-20:16:14,152 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_centrality_zstd_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_centrality_zstd_1/resample_u".
+200807-20:16:14,156 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_centrality_zstd_1.resample_u" - collecting precomputed outputs
+200807-20:16:14,157 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_centrality_zstd_1.resample_u" found cached.
+200807-20:16:14,162 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_falff_to_standard_zstd_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_falff_to_standard_zstd_0/resample_u".
+200807-20:16:14,167 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_falff_to_standard_zstd_0.resample_u" - collecting precomputed outputs
+200807-20:16:14,168 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_falff_to_standard_zstd_0.resample_u" found cached.
+200807-20:16:14,173 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_zstat_files_to_standard_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_dr_tempreg_maps_zstat_files_to_standard_0/resample_u".
+200807-20:16:14,178 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_zstat_files_to_standard_0.resample_u" - collecting precomputed outputs
+200807-20:16:14,178 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_zstat_files_to_standard_0.resample_u" found cached.
+200807-20:16:14,191 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_centrality_smooth_zstd_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_centrality_smooth_zstd_0/resample_u".
+200807-20:16:14,197 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_centrality_smooth_zstd_0.resample_u" - collecting precomputed outputs
+200807-20:16:14,197 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_centrality_smooth_zstd_0.resample_u" found cached.
+200807-20:16:14,204 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_alff_to_standard_smooth_zstd_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_alff_to_standard_smooth_zstd_1/resample_u".
+200807-20:16:14,210 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_alff_to_standard_smooth_zstd_1.resample_u" - collecting precomputed outputs
+200807-20:16:14,211 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_alff_to_standard_smooth_zstd_1.resample_u" found cached.
+200807-20:16:14,215 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_zstat_files_to_standard_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_dr_tempreg_maps_zstat_files_to_standard_1/resample_u".
+200807-20:16:14,220 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_zstat_files_to_standard_1.resample_u" - collecting precomputed outputs
+200807-20:16:14,221 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_zstat_files_to_standard_1.resample_u" found cached.
+200807-20:16:14,226 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_alff_to_standard_smooth_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_alff_to_standard_smooth_1/resample_u".
+200807-20:16:14,231 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_alff_to_standard_smooth_1.resample_u" - collecting precomputed outputs
+200807-20:16:14,231 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_alff_to_standard_smooth_1.resample_u" found cached.
+200807-20:16:14,236 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_falff_to_standard_zstd_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_falff_to_standard_zstd_1/resample_u".
+200807-20:16:14,243 nipype.workflow INFO:
+	 [Node] Running "resample_u" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:14,692 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.montage_falff_to_standard_zstd_1.resample_u".
+200807-20:16:14,697 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_falff_to_standard_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_falff_to_standard_1/resample_u".
+200807-20:16:14,702 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_falff_to_standard_1.resample_u" - collecting precomputed outputs
+200807-20:16:14,703 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_falff_to_standard_1.resample_u" found cached.
+200807-20:16:14,707 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_files_to_standard_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_dr_tempreg_maps_files_to_standard_0/resample_u".
+200807-20:16:14,712 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_files_to_standard_0.resample_u" - collecting precomputed outputs
+200807-20:16:14,713 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_files_to_standard_0.resample_u" found cached.
+200807-20:16:14,718 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_zstat_files_to_standard_smooth_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_dr_tempreg_maps_zstat_files_to_standard_smooth_1/resample_u".
+200807-20:16:14,724 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_zstat_files_to_standard_smooth_1.resample_u" - collecting precomputed outputs
+200807-20:16:14,724 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_zstat_files_to_standard_smooth_1.resample_u" found cached.
+200807-20:16:14,731 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_reho_to_standard_smooth_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_reho_to_standard_smooth_1/resample_u".
+200807-20:16:14,736 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_reho_to_standard_smooth_1.resample_u" - collecting precomputed outputs
+200807-20:16:14,737 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_reho_to_standard_smooth_1.resample_u" found cached.
+200807-20:16:14,742 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_alff_to_standard_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_alff_to_standard_1/resample_u".
+200807-20:16:14,746 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_alff_to_standard_1.resample_u" - collecting precomputed outputs
+200807-20:16:14,747 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_alff_to_standard_1.resample_u" found cached.
+200807-20:16:14,751 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_zstat_files_smooth_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_tempreg_maps_zstat_files_smooth_1/resample_u".
+200807-20:16:14,756 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_zstat_files_smooth_1.resample_u" - collecting precomputed outputs
+200807-20:16:14,757 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_zstat_files_smooth_1.resample_u" found cached.
+200807-20:16:14,761 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_files_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_tempreg_maps_files_1/resample_u".
+200807-20:16:14,766 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_files_1.resample_u" - collecting precomputed outputs
+200807-20:16:14,767 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_files_1.resample_u" found cached.
+200807-20:16:14,772 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_falff_to_standard_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_falff_to_standard_0/resample_u".
+200807-20:16:14,777 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_falff_to_standard_0.resample_u" - collecting precomputed outputs
+200807-20:16:14,777 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_falff_to_standard_0.resample_u" found cached.
+200807-20:16:14,786 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_alff_to_standard_smooth_zstd_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_alff_to_standard_smooth_zstd_0/resample_u".
+200807-20:16:14,791 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_alff_to_standard_smooth_zstd_0.resample_u" - collecting precomputed outputs
+200807-20:16:14,791 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_alff_to_standard_smooth_zstd_0.resample_u" found cached.
+200807-20:16:14,797 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_alff_to_standard_zstd_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_alff_to_standard_zstd_1/resample_u".
+200807-20:16:14,802 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_alff_to_standard_zstd_1.resample_u" - collecting precomputed outputs
+200807-20:16:14,802 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_alff_to_standard_zstd_1.resample_u" found cached.
+200807-20:16:14,807 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_vmhc_raw_score_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_vmhc_raw_score_1/resample_u".
+200807-20:16:14,812 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_vmhc_raw_score_1.resample_u" - collecting precomputed outputs
+200807-20:16:14,812 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_vmhc_raw_score_1.resample_u" found cached.
+200807-20:16:14,819 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_zstat_files_smooth_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_tempreg_maps_zstat_files_smooth_0/resample_u".
+200807-20:16:14,827 nipype.workflow INFO:
+	 [Node] Running "resample_u" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:15,323 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_zstat_files_smooth_0.resample_u".
+200807-20:16:15,329 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_falff_to_standard_smooth_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_falff_to_standard_smooth_1/resample_u".
+200807-20:16:15,334 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_falff_to_standard_smooth_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,334 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_falff_to_standard_smooth_1.resample_u" found cached.
+200807-20:16:15,340 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_reho_to_standard_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_reho_to_standard_1/resample_u".
+200807-20:16:15,344 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_reho_to_standard_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,345 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_reho_to_standard_1.resample_u" found cached.
+200807-20:16:15,349 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_centrality_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_centrality_0/resample_u".
+200807-20:16:15,356 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_centrality_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,356 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_centrality_0.resample_u" found cached.
+200807-20:16:15,361 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_roi_files_to_standard_1/resample_u".
+200807-20:16:15,366 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,366 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_1.resample_u" found cached.
+200807-20:16:15,370 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_falff_to_standard_smooth_zstd_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_falff_to_standard_smooth_zstd_0/resample_u".
+200807-20:16:15,376 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_falff_to_standard_smooth_zstd_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,376 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_falff_to_standard_smooth_zstd_0.resample_u" found cached.
+200807-20:16:15,382 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_reho_to_standard_zstd_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_reho_to_standard_zstd_1/resample_u".
+200807-20:16:15,387 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_reho_to_standard_zstd_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,387 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_reho_to_standard_zstd_1.resample_u" found cached.
+200807-20:16:15,392 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_zstat_files_to_standard_smooth_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_dr_tempreg_maps_zstat_files_to_standard_smooth_0/resample_u".
+200807-20:16:15,397 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_zstat_files_to_standard_smooth_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,397 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_zstat_files_to_standard_smooth_0.resample_u" found cached.
+200807-20:16:15,402 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_zstat_files_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_tempreg_maps_zstat_files_0/resample_u".
+200807-20:16:15,406 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_zstat_files_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,407 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_zstat_files_0.resample_u" found cached.
+200807-20:16:15,411 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_centrality_smooth_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_centrality_smooth_1/resample_u".
+200807-20:16:15,416 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_centrality_smooth_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,416 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_centrality_smooth_1.resample_u" found cached.
+200807-20:16:15,421 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_zstat_files_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_tempreg_maps_zstat_files_1/resample_u".
+200807-20:16:15,425 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_zstat_files_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,426 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_zstat_files_1.resample_u" found cached.
+200807-20:16:15,431 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_alff_to_standard_smooth_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_alff_to_standard_smooth_0/resample_u".
+200807-20:16:15,436 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_alff_to_standard_smooth_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,436 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_alff_to_standard_smooth_0.resample_u" found cached.
+200807-20:16:15,441 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_files_smooth_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_tempreg_maps_files_smooth_0/resample_u".
+200807-20:16:15,446 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_files_smooth_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,447 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_files_smooth_0.resample_u" found cached.
+200807-20:16:15,452 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_smooth_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_roi_files_to_standard_smooth_0/resample_u".
+200807-20:16:15,457 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_smooth_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,458 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_smooth_0.resample_u" found cached.
+200807-20:16:15,462 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_vmhc_raw_score_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_vmhc_raw_score_0/resample_u".
+200807-20:16:15,469 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_vmhc_raw_score_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,470 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_vmhc_raw_score_0.resample_u" found cached.
+200807-20:16:15,475 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_reho_to_standard_smooth_zstd_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_reho_to_standard_smooth_zstd_1/resample_u".
+200807-20:16:15,480 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_reho_to_standard_smooth_zstd_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,481 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_reho_to_standard_smooth_zstd_1.resample_u" found cached.
+200807-20:16:15,485 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_reho_to_standard_zstd_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_reho_to_standard_zstd_0/resample_u".
+200807-20:16:15,493 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_reho_to_standard_zstd_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,493 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_reho_to_standard_zstd_0.resample_u" found cached.
+200807-20:16:15,499 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_fisher_zstd_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_roi_files_to_standard_fisher_zstd_0/resample_u".
+200807-20:16:15,505 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_fisher_zstd_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,506 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_fisher_zstd_0.resample_u" found cached.
+200807-20:16:15,512 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_files_to_standard_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_dr_tempreg_maps_files_to_standard_1/resample_u".
+200807-20:16:15,517 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_files_to_standard_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,517 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_files_to_standard_1.resample_u" found cached.
+200807-20:16:15,521 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_files_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_tempreg_maps_files_0/resample_u".
+200807-20:16:15,526 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_files_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,526 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_tempreg_maps_files_0.resample_u" found cached.
+200807-20:16:15,531 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_roi_files_to_standard_0/resample_u".
+200807-20:16:15,536 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,536 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_0.resample_u" found cached.
+200807-20:16:15,541 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_reho_to_standard_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_reho_to_standard_0/resample_u".
+200807-20:16:15,545 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_reho_to_standard_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,546 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_reho_to_standard_0.resample_u" found cached.
+200807-20:16:15,550 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_smooth_fisher_zstd_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_roi_files_to_standard_smooth_fisher_zstd_0/resample_u".
+200807-20:16:15,555 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_smooth_fisher_zstd_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,556 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_smooth_fisher_zstd_0.resample_u" found cached.
+200807-20:16:15,561 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_smooth_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_roi_files_to_standard_smooth_1/resample_u".
+200807-20:16:15,567 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_smooth_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,567 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_smooth_1.resample_u" found cached.
+200807-20:16:15,572 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_falff_to_standard_smooth_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_falff_to_standard_smooth_0/resample_u".
+200807-20:16:15,577 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_falff_to_standard_smooth_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,577 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_falff_to_standard_smooth_0.resample_u" found cached.
+200807-20:16:15,582 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_centrality_zstd_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_centrality_zstd_0/resample_u".
+200807-20:16:15,588 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_centrality_zstd_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,588 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_centrality_zstd_0.resample_u" found cached.
+200807-20:16:15,594 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_files_to_standard_smooth_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_dr_tempreg_maps_files_to_standard_smooth_1/resample_u".
+200807-20:16:15,599 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_files_to_standard_smooth_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,600 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_files_to_standard_smooth_1.resample_u" found cached.
+200807-20:16:15,605 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_smooth_fisher_zstd_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_roi_files_to_standard_smooth_fisher_zstd_1/resample_u".
+200807-20:16:15,609 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_smooth_fisher_zstd_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,610 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_smooth_fisher_zstd_1.resample_u" found cached.
+200807-20:16:15,613 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_falff_to_standard_smooth_zstd_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_falff_to_standard_smooth_zstd_1/resample_u".
+200807-20:16:15,617 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_falff_to_standard_smooth_zstd_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,618 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_falff_to_standard_smooth_zstd_1.resample_u" found cached.
+200807-20:16:15,622 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_Schaefer2018-300-node_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..Schaefer2018-300-node_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:15,625 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:15,625 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:15,630 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_files_to_standard_smooth_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_dr_tempreg_maps_files_to_standard_smooth_0/resample_u".
+200807-20:16:15,635 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_files_to_standard_smooth_0.resample_u" - collecting precomputed outputs
+200807-20:16:15,635 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_dr_tempreg_maps_files_to_standard_smooth_0.resample_u" found cached.
+200807-20:16:15,641 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_desikan_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..desikan_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:15,644 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:15,644 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:15,649 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.spatial_map_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/spatial_map_dataflow_0/_spatial_map_PNAS_Smith09_rsn10_spatial_map_file_..cpac_templates..PNAS_Smith09_rsn10.nii.gz/check_for_s3".
+200807-20:16:15,652 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.spatial_map_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:15,652 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.spatial_map_dataflow_0.check_for_s3" found cached.
+200807-20:16:15,657 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.check_for_s3_templateSpecificationFile" in "/tmp/resting_preproc_sub-1_ses-1/check_for_s3_templateSpecificationFile".
+200807-20:16:15,660 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.check_for_s3_templateSpecificationFile" - collecting precomputed outputs
+200807-20:16:15,661 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.check_for_s3_templateSpecificationFile" found cached.
+200807-20:16:15,665 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_1/_mask_ez_mask_pad_mask_file_..cpac_templates..ez_mask_pad.nii.gz/check_for_s3".
+200807-20:16:15,669 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:15,669 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" found cached.
+200807-20:16:15,674 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.check_for_s3_PRIORS_CSF" in "/tmp/resting_preproc_sub-1_ses-1/check_for_s3_PRIORS_CSF".
+200807-20:16:15,677 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.check_for_s3_PRIORS_CSF" - collecting precomputed outputs
+200807-20:16:15,677 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.check_for_s3_PRIORS_CSF" found cached.
+200807-20:16:15,682 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_AAL2zourioMazoyer2002_mask_file_..ndmg_atlases..label..Human..AAL2zourioMazoyer2002.nii.gz/check_for_s3".
+200807-20:16:15,686 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:15,686 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:15,691 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_1/_mask_ho_mask_pad_mask_file_..cpac_templates..ho_mask_pad.nii.gz/check_for_s3".
+200807-20:16:15,694 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:15,694 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" found cached.
+200807-20:16:15,699 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_1/_mask_CC200_mask_file_..cpac_templates..CC200.nii.gz/check_for_s3".
+200807-20:16:15,702 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:15,703 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_1.check_for_s3" found cached.
+200807-20:16:15,707 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_centrality_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_centrality_1/resample_u".
+200807-20:16:15,712 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_centrality_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,712 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_centrality_1.resample_u" found cached.
+200807-20:16:15,716 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_0/_mask_yeo-7_space-MNI152NLin6_res-1x1x1_mask_file_..ndmg_atlases..label..Human..yeo-7_space-MNI152NLin6_res-1x1x1.nii.gz/check_for_s3".
+200807-20:16:15,720 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:15,720 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_0.check_for_s3" found cached.
+200807-20:16:15,725 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_fisher_zstd_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_sca_roi_files_to_standard_fisher_zstd_1/resample_u".
+200807-20:16:15,733 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_fisher_zstd_1.resample_u" - collecting precomputed outputs
+200807-20:16:15,734 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_sca_roi_files_to_standard_fisher_zstd_1.resample_u" found cached.
+200807-20:16:15,739 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_slice_timing_correction_0.slice_timing" in "/tmp/resting_preproc_sub-1_ses-1/func_slice_timing_correction_0/_scan_rest_run-1/slice_timing".
+200807-20:16:15,754 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_slice_timing_correction_0.slice_timing" - collecting precomputed outputs
+200807-20:16:15,755 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_slice_timing_correction_0.slice_timing" found cached.
+200807-20:16:15,760 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_deoblique" in "/tmp/resting_preproc_sub-1_ses-1/func_preproc_afni_0/_scan_rest_run-1/func_deoblique".
+200807-20:16:15,766 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_deoblique" - collecting precomputed outputs
+200807-20:16:15,766 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_deoblique" found cached.
+200807-20:16:15,772 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_reorient" in "/tmp/resting_preproc_sub-1_ses-1/func_preproc_afni_0/_scan_rest_run-1/func_reorient".
+200807-20:16:15,780 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_reorient" - collecting precomputed outputs
+200807-20:16:15,780 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_reorient" found cached.
+200807-20:16:15,786 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_get_mean_RPI" in "/tmp/resting_preproc_sub-1_ses-1/func_preproc_afni_0/_scan_rest_run-1/func_get_mean_RPI".
+200807-20:16:15,792 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_get_mean_RPI" - collecting precomputed outputs
+200807-20:16:15,792 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_get_mean_RPI" found cached.
+200807-20:16:15,798 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_motion_correct_3dvolreg" in "/tmp/resting_preproc_sub-1_ses-1/func_preproc_afni_0/_scan_rest_run-1/func_motion_correct_3dvolreg".
+200807-20:16:15,814 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_motion_correct_3dvolreg" - collecting precomputed outputs
+200807-20:16:15,814 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_motion_correct_3dvolreg" found cached.
+200807-20:16:15,827 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_get_mean_motion" in "/tmp/resting_preproc_sub-1_ses-1/func_preproc_afni_0/_scan_rest_run-1/func_get_mean_motion".
+200807-20:16:15,841 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_get_mean_motion" - collecting precomputed outputs
+200807-20:16:15,841 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_get_mean_motion" found cached.
+200807-20:16:15,845 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_motion_correct_A" in "/tmp/resting_preproc_sub-1_ses-1/func_preproc_afni_0/_scan_rest_run-1/func_motion_correct_A".
+200807-20:16:15,868 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_motion_correct_A" - collecting precomputed outputs
+200807-20:16:15,868 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_motion_correct_A" found cached.
+200807-20:16:15,886 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.gen_motion_stats_0.calculate_FD" in "/tmp/resting_preproc_sub-1_ses-1/gen_motion_stats_0/_scan_rest_run-1/calculate_FD".
+200807-20:16:15,898 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.gen_motion_stats_0.calculate_FD" - collecting precomputed outputs
+200807-20:16:15,898 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.gen_motion_stats_0.calculate_FD" found cached.
+200807-20:16:15,902 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_46" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_0_46".
+200807-20:16:15,919 nipype.workflow INFO:
+	 [Node] Running "sinker_0_46" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:16,136 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_46".
+200807-20:16:16,142 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_46" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_1_46".
+200807-20:16:16,155 nipype.workflow INFO:
+	 [Node] Running "sinker_1_46" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:16,369 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_46".
+200807-20:16:16,374 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_motion_0.motion_plot" in "/tmp/resting_preproc_sub-1_ses-1/qc_motion_0/_scan_rest_run-1/motion_plot".
+200807-20:16:16,392 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.qc_motion_0.motion_plot" - collecting precomputed outputs
+200807-20:16:16,393 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.qc_motion_0.motion_plot" found cached.
+200807-20:16:16,397 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_160" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_0_160".
+200807-20:16:16,413 nipype.workflow INFO:
+	 [Node] Running "sinker_0_160" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:16,617 nipype.interface INFO:
+	 sub: /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc___movement_trans_plot/_scan_rest_run-1/motion_rot_plot.png -> /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc/movement_trans_plot/_scan_rest_run-1/motion_rot_plot.png
+200807-20:16:16,629 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_160".
+200807-20:16:16,634 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_159" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_0_159".
+200807-20:16:16,649 nipype.workflow INFO:
+	 [Node] Running "sinker_0_159" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:16,852 nipype.interface INFO:
+	 sub: /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc___movement_rot_plot/_scan_rest_run-1/motion_trans_plot.png -> /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc/movement_rot_plot/_scan_rest_run-1/motion_trans_plot.png
+200807-20:16:16,865 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_159".
+200807-20:16:16,871 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_70" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_0_70".
+200807-20:16:16,889 nipype.workflow INFO:
+	 [Node] Running "sinker_0_70" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:17,828 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_70".
+200807-20:16:17,833 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.gen_motion_stats_0.calculate_FDJ" in "/tmp/resting_preproc_sub-1_ses-1/gen_motion_stats_0/_scan_rest_run-1/calculate_FDJ".
+200807-20:16:17,847 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.gen_motion_stats_0.calculate_FDJ" - collecting precomputed outputs
+200807-20:16:17,847 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.gen_motion_stats_0.calculate_FDJ" found cached.
+200807-20:16:17,852 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_45" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_0_45".
+200807-20:16:17,864 nipype.workflow INFO:
+	 [Node] Running "sinker_0_45" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:18,81 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_45".
+200807-20:16:18,87 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_45" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_1_45".
+200807-20:16:18,99 nipype.workflow INFO:
+	 [Node] Running "sinker_1_45" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:18,315 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_45".
+200807-20:16:18,321 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_fd_1.fd_plot" in "/tmp/resting_preproc_sub-1_ses-1/qc_fd_1/_scan_rest_run-1/fd_plot".
+200807-20:16:18,328 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.qc_fd_1.fd_plot" - collecting precomputed outputs
+200807-20:16:18,329 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.qc_fd_1.fd_plot" found cached.
+200807-20:16:18,334 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_152" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_1_152".
+200807-20:16:18,351 nipype.workflow INFO:
+	 [Node] Running "sinker_1_152" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:18,555 nipype.interface INFO:
+	 sub: /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc___fd_plot/_scan_rest_run-1/FD_plot.png -> /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc/fd_plot/_scan_rest_run-1/FD_plot.png
+200807-20:16:18,571 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_152".
+200807-20:16:18,577 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_fd_0.fd_plot" in "/tmp/resting_preproc_sub-1_ses-1/qc_fd_0/_scan_rest_run-1/fd_plot".
+200807-20:16:18,582 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.qc_fd_0.fd_plot" - collecting precomputed outputs
+200807-20:16:18,583 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.qc_fd_0.fd_plot" found cached.
+200807-20:16:18,589 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_152" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_0_152".
+200807-20:16:18,600 nipype.workflow INFO:
+	 [Node] Running "sinker_0_152" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:18,804 nipype.interface INFO:
+	 sub: /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc___fd_plot/_scan_rest_run-1/FD_plot.png -> /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc/fd_plot/_scan_rest_run-1/FD_plot.png
+200807-20:16:18,818 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_152".
+200807-20:16:18,824 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_preproc_afni_0_skullstrip.func_get_brain_mask_AFNI" in "/tmp/resting_preproc_sub-1_ses-1/func_preproc_afni_0/func_preproc_afni_0_skullstrip/_scan_rest_run-1/func_get_brain_mask_AFNI".
+200807-20:16:18,839 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_preproc_afni_0_skullstrip.func_get_brain_mask_AFNI" - collecting precomputed outputs
+200807-20:16:18,840 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_preproc_afni_0_skullstrip.func_get_brain_mask_AFNI" found cached.
+200807-20:16:18,846 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.nuisance_0_0.GlobalSignal_merge_masks" in "/tmp/resting_preproc_sub-1_ses-1/nuisance_0_0/_scan_rest_run-1/_selector_CSF-2mmE-M_aC-CSF+WM-2mm-DPC5_G-M_M-SDB_P-2_BP-B0.01-T0.1/GlobalSignal_merge_masks".
+200807-20:16:18,854 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.nuisance_0_0.GlobalSignal_merge_masks" - collecting precomputed outputs
+200807-20:16:18,855 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.nuisance_0_0.GlobalSignal_merge_masks" found cached.
+200807-20:16:18,864 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.nuisance_0_0.GlobalSignal_union_masks" in "/tmp/resting_preproc_sub-1_ses-1/nuisance_0_0/_scan_rest_run-1/_selector_CSF-2mmE-M_aC-CSF+WM-2mm-DPC5_G-M_M-SDB_P-2_BP-B0.01-T0.1/GlobalSignal_union_masks".
+200807-20:16:18,873 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.nuisance_0_0.GlobalSignal_union_masks" - collecting precomputed outputs
+200807-20:16:18,875 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.nuisance_0_0.GlobalSignal_union_masks" found cached.
+200807-20:16:18,881 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.alff_falff_1.get_option_string" in "/tmp/resting_preproc_sub-1_ses-1/alff_falff_1/_scan_rest_run-1/get_option_string".
+200807-20:16:18,888 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.alff_falff_1.get_option_string" - collecting precomputed outputs
+200807-20:16:18,890 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.alff_falff_1.get_option_string" found cached.
+200807-20:16:18,894 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_49" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_1_49".
+200807-20:16:18,908 nipype.workflow INFO:
+	 [Node] Running "sinker_1_49" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:19,125 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_49".
+200807-20:16:19,131 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_49" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_0_49".
+200807-20:16:19,146 nipype.workflow INFO:
+	 [Node] Running "sinker_0_49" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:19,363 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_49".
+200807-20:16:19,371 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.functional_brain_mask_derivative_0" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/functional_brain_mask_derivative_0".
+200807-20:16:19,378 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.functional_brain_mask_derivative_0" - collecting precomputed outputs
+200807-20:16:19,378 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.functional_brain_mask_derivative_0" found cached.
+200807-20:16:19,383 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.alff_falff_0.get_option_string" in "/tmp/resting_preproc_sub-1_ses-1/alff_falff_0/_scan_rest_run-1/get_option_string".
+200807-20:16:19,389 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.alff_falff_0.get_option_string" - collecting precomputed outputs
+200807-20:16:19,390 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.alff_falff_0.get_option_string" found cached.
+200807-20:16:19,394 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.gen_motion_stats_0.cal_DVARS" in "/tmp/resting_preproc_sub-1_ses-1/gen_motion_stats_0/_scan_rest_run-1/cal_DVARS".
+200807-20:16:19,417 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.gen_motion_stats_0.cal_DVARS" - collecting precomputed outputs
+200807-20:16:19,417 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.gen_motion_stats_0.cal_DVARS" found cached.
+200807-20:16:19,423 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.gen_motion_stats_0.calc_power_parameters" in "/tmp/resting_preproc_sub-1_ses-1/gen_motion_stats_0/_scan_rest_run-1/calc_power_parameters".
+200807-20:16:19,431 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.gen_motion_stats_0.calc_power_parameters" - collecting precomputed outputs
+200807-20:16:19,432 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.gen_motion_stats_0.calc_power_parameters" found cached.
+200807-20:16:19,436 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_70" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_1_70".
+200807-20:16:19,461 nipype.workflow INFO:
+	 [Node] Running "sinker_1_70" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:20,685 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_70".
+200807-20:16:20,699 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.gen_motion_stats_0.calc_motion_parameters" in "/tmp/resting_preproc_sub-1_ses-1/gen_motion_stats_0/_scan_rest_run-1/calc_motion_parameters".
+200807-20:16:20,727 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.gen_motion_stats_0.calc_motion_parameters" - collecting precomputed outputs
+200807-20:16:20,727 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.gen_motion_stats_0.calc_motion_parameters" found cached.
+200807-20:16:20,732 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_73" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_0_73".
+200807-20:16:20,750 nipype.workflow INFO:
+	 [Node] Running "sinker_0_73" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:20,963 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_73".
+200807-20:16:20,968 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_73" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_1_73".
+200807-20:16:20,982 nipype.workflow INFO:
+	 [Node] Running "sinker_1_73" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:21,195 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_73".
+200807-20:16:21,200 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_motion_1.motion_plot" in "/tmp/resting_preproc_sub-1_ses-1/qc_motion_1/_scan_rest_run-1/motion_plot".
+200807-20:16:21,213 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.qc_motion_1.motion_plot" - collecting precomputed outputs
+200807-20:16:21,213 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.qc_motion_1.motion_plot" found cached.
+200807-20:16:21,217 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_160" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_1_160".
+200807-20:16:21,229 nipype.workflow INFO:
+	 [Node] Running "sinker_1_160" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:21,431 nipype.interface INFO:
+	 sub: /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc___movement_trans_plot/_scan_rest_run-1/motion_rot_plot.png -> /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc/movement_trans_plot/_scan_rest_run-1/motion_rot_plot.png
+200807-20:16:21,444 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_160".
+200807-20:16:21,450 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_159" in "/tmp/resting_preproc_sub-1_ses-1/_scan_rest_run-1/sinker_1_159".
+200807-20:16:21,468 nipype.workflow INFO:
+	 [Node] Running "sinker_1_159" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:21,672 nipype.interface INFO:
+	 sub: /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc___movement_rot_plot/_scan_rest_run-1/motion_trans_plot.png -> /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc/movement_rot_plot/_scan_rest_run-1/motion_trans_plot.png
+200807-20:16:21,685 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_159".
+200807-20:16:21,691 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_preproc_afni_0_skullstrip.func_extract_brain" in "/tmp/resting_preproc_sub-1_ses-1/func_preproc_afni_0/func_preproc_afni_0_skullstrip/_scan_rest_run-1/func_extract_brain".
+200807-20:16:21,706 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_preproc_afni_0_skullstrip.func_extract_brain" - collecting precomputed outputs
+200807-20:16:21,707 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_preproc_afni_0_skullstrip.func_extract_brain" found cached.
+200807-20:16:21,713 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_mean" in "/tmp/resting_preproc_sub-1_ses-1/func_preproc_afni_0/_scan_rest_run-1/func_mean".
+200807-20:16:21,720 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_mean" - collecting precomputed outputs
+200807-20:16:21,720 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_mean" found cached.
+200807-20:16:21,727 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_normalize" in "/tmp/resting_preproc_sub-1_ses-1/func_preproc_afni_0/_scan_rest_run-1/func_normalize".
+200807-20:16:21,734 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_normalize" - collecting precomputed outputs
+200807-20:16:21,734 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_normalize" found cached.
+200807-20:16:21,741 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.nuisance_0_0.GlobalSignal_mean" in "/tmp/resting_preproc_sub-1_ses-1/nuisance_0_0/_scan_rest_run-1/_selector_CSF-2mmE-M_aC-CSF+WM-2mm-DPC5_G-M_M-SDB_P-2_BP-B0.01-T0.1/GlobalSignal_mean".
+200807-20:16:21,751 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.nuisance_0_0.GlobalSignal_mean" - collecting precomputed outputs
+200807-20:16:21,751 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.nuisance_0_0.GlobalSignal_mean" found cached.
+200807-20:16:21,757 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_snr_1.std_dev" in "/tmp/resting_preproc_sub-1_ses-1/qc_snr_1/_scan_rest_run-1/std_dev".
+200807-20:16:21,765 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.qc_snr_1.std_dev" - collecting precomputed outputs
+200807-20:16:21,766 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.qc_snr_1.std_dev" found cached.
+200807-20:16:21,771 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_snr_0.std_dev" in "/tmp/resting_preproc_sub-1_ses-1/qc_snr_0/_scan_rest_run-1/std_dev".
+200807-20:16:21,778 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.qc_snr_0.std_dev" - collecting precomputed outputs
+200807-20:16:21,778 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.qc_snr_0.std_dev" found cached.
+200807-20:16:21,783 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_mask_normalize" in "/tmp/resting_preproc_sub-1_ses-1/func_preproc_afni_0/_scan_rest_run-1/func_mask_normalize".
+200807-20:16:21,791 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_mask_normalize" - collecting precomputed outputs
+200807-20:16:21,792 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.func_preproc_afni_0.func_mask_normalize" found cached.
+200807-20:16:21,797 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_sca_0/_mask_ez_mask_pad_mask_file_..cpac_templates..ez_mask_pad.nii.gz/check_for_s3".
+200807-20:16:21,802 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:21,802 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_sca_0.check_for_s3" found cached.
+200807-20:16:21,808 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_1/_mask_ho_mask_pad_mask_file_..cpac_templates..ho_mask_pad.nii.gz/check_for_s3".
+200807-20:16:21,812 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:21,813 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_1.check_for_s3" found cached.
+200807-20:16:21,818 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_0/_mask_ez_mask_pad_mask_file_..cpac_templates..ez_mask_pad.nii.gz/check_for_s3".
+200807-20:16:21,821 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" - collecting precomputed outputs
+200807-20:16:21,822 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_0.check_for_s3" found cached.
+200807-20:16:21,827 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" in "/tmp/resting_preproc_sub-1_ses-1/roi_dataflow_for_mult_reg_1/_mask_CC400_mask_file_..cpac_templates..CC400.nii.gz/check_for_s3".
+200807-20:16:21,831 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" - collecting precomputed outputs
+200807-20:16:21,831 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.roi_dataflow_for_mult_reg_1.check_for_s3" found cached.
+200807-20:16:21,836 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_reho_to_standard_smooth_zstd_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_reho_to_standard_smooth_zstd_0/resample_u".
+200807-20:16:21,841 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_reho_to_standard_smooth_zstd_0.resample_u" - collecting precomputed outputs
+200807-20:16:21,841 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_reho_to_standard_smooth_zstd_0.resample_u" found cached.
+200807-20:16:21,846 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.resampled_template_brain_for_func_preproc" in "/tmp/resting_preproc_sub-1_ses-1/resampled_template_brain_for_func_preproc".
+200807-20:16:21,849 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.resampled_template_brain_for_func_preproc" - collecting precomputed outputs
+200807-20:16:21,850 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.resampled_template_brain_for_func_preproc" found cached.
+200807-20:16:21,853 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_deoblique" in "/tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_deoblique".
+200807-20:16:21,861 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_deoblique" - collecting precomputed outputs
+200807-20:16:21,861 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_deoblique" found cached.
+200807-20:16:21,865 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_reorient" in "/tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_reorient".
+200807-20:16:21,871 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_reorient" - collecting precomputed outputs
+200807-20:16:21,871 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_reorient" found cached.
+200807-20:16:21,875 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_13" in "/tmp/resting_preproc_sub-1_ses-1/sinker_1_13".
+200807-20:16:21,892 nipype.workflow INFO:
+	 [Node] Running "sinker_1_13" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:22,141 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_13".
+200807-20:16:22,146 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_13" in "/tmp/resting_preproc_sub-1_ses-1/sinker_0_13".
+200807-20:16:22,164 nipype.workflow INFO:
+	 [Node] Running "sinker_0_13" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:22,469 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_13".
+200807-20:16:22,479 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_skullstrip_0.skull_edge" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_0/skull_edge".
+200807-20:16:22,489 nipype.workflow INFO:
+	 [Node] Running "skull_edge" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:25,234 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.qc_skullstrip_0.skull_edge".
+200807-20:16:25,242 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_skullstrip_0.montage_skull.resample_o" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_0/montage_skull/resample_o".
+200807-20:16:25,249 nipype.workflow INFO:
+	 [Node] Running "resample_o" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:26,200 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.qc_skullstrip_0.montage_skull.resample_o".
+200807-20:16:26,205 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_skullstrip_1.skull_edge" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_1/skull_edge".
+200807-20:16:26,218 nipype.workflow INFO:
+	 [Node] Running "skull_edge" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:29,72 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.qc_skullstrip_1.skull_edge".
+200807-20:16:29,80 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_skullstrip_1.montage_skull.resample_o" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_1/montage_skull/resample_o".
+200807-20:16:29,88 nipype.workflow INFO:
+	 [Node] Running "resample_o" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:30,45 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.qc_skullstrip_1.montage_skull.resample_o".
+200807-20:16:30,51 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_skullstrip_args" in "/tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_skullstrip_args".
+200807-20:16:30,57 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_skullstrip_args" - collecting precomputed outputs
+200807-20:16:30,58 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_skullstrip_args" found cached.
+200807-20:16:30,81 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_skullstrip" in "/tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_skullstrip".
+200807-20:16:30,95 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_skullstrip" - collecting precomputed outputs
+200807-20:16:30,95 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_skullstrip" found cached.
+200807-20:16:30,105 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_brain_mask" in "/tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_brain_mask".
+200807-20:16:30,114 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_brain_mask" - collecting precomputed outputs
+200807-20:16:30,114 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_brain_mask" found cached.
+200807-20:16:30,120 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_skullstrip_orig_vol" in "/tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_skullstrip_orig_vol".
+200807-20:16:30,133 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_skullstrip_orig_vol" - collecting precomputed outputs
+200807-20:16:30,134 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.anat_preproc_afni_0.anat_skullstrip_orig_vol" found cached.
+200807-20:16:30,141 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_skullstrip_1.montage_skull.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_1/montage_skull/resample_u".
+200807-20:16:30,150 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.qc_skullstrip_1.montage_skull.resample_u" - collecting precomputed outputs
+200807-20:16:30,150 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.qc_skullstrip_1.montage_skull.resample_u" found cached.
+200807-20:16:30,155 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_skullstrip_1.montage_skull.montage_s" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_1/montage_skull/montage_s".
+200807-20:16:30,173 nipype.workflow INFO:
+	 [Node] Setting-up "_montage_s0" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_1/montage_skull/montage_s/mapflow/_montage_s0".
+200807-20:16:30,181 nipype.workflow INFO:
+	 [Node] Running "_montage_s0" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:34,890 nipype.workflow INFO:
+	 [Node] Finished "_montage_s0".
+200807-20:16:34,896 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.qc_skullstrip_1.montage_skull.montage_s".
+200807-20:16:34,898 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_198" in "/tmp/resting_preproc_sub-1_ses-1/sinker_1_198".
+200807-20:16:34,916 nipype.workflow INFO:
+	 [Node] Running "sinker_1_198" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:35,120 nipype.interface INFO:
+	 sub: /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc___skullstrip_vis_s/_montage_s0/skull_vis_s.png -> /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc/skullstrip_vis_s/_montage_s0/skull_vis_s.png
+200807-20:16:35,144 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_198".
+200807-20:16:35,150 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_skullstrip_1.montage_skull.montage_a" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_1/montage_skull/montage_a".
+200807-20:16:35,165 nipype.workflow INFO:
+	 [Node] Setting-up "_montage_a0" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_1/montage_skull/montage_a/mapflow/_montage_a0".
+200807-20:16:35,175 nipype.workflow INFO:
+	 [Node] Running "_montage_a0" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:42,534 nipype.workflow INFO:
+	 [Node] Finished "_montage_a0".
+200807-20:16:42,542 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.qc_skullstrip_1.montage_skull.montage_a".
+200807-20:16:42,548 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_197" in "/tmp/resting_preproc_sub-1_ses-1/sinker_1_197".
+200807-20:16:42,562 nipype.workflow INFO:
+	 [Node] Running "sinker_1_197" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:42,767 nipype.interface INFO:
+	 sub: /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc___skullstrip_vis_a/_montage_a0/skull_vis_a.png -> /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc/skullstrip_vis_a/_montage_a0/skull_vis_a.png
+200807-20:16:42,793 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_197".
+200807-20:16:42,799 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_edge_0" in "/tmp/resting_preproc_sub-1_ses-1/anat_edge_0".
+200807-20:16:42,807 nipype.workflow INFO:
+	 [Node] Running "anat_edge_0" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:45,330 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.anat_edge_0".
+200807-20:16:45,335 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_anat_0.resample_o" in "/tmp/resting_preproc_sub-1_ses-1/montage_anat_0/resample_o".
+200807-20:16:45,342 nipype.workflow INFO:
+	 [Node] Running "resample_o" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:46,46 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.montage_anat_0.resample_o".
+200807-20:16:46,53 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_9" in "/tmp/resting_preproc_sub-1_ses-1/sinker_1_9".
+200807-20:16:46,66 nipype.workflow INFO:
+	 [Node] Running "sinker_1_9" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:46,301 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_9".
+200807-20:16:46,307 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.func_to_anat_FLIRT_0.linear_func_to_anat" in "/tmp/resting_preproc_sub-1_ses-1/func_to_anat_FLIRT_0/_scan_rest_run-1/linear_func_to_anat".
+200807-20:16:46,327 nipype.workflow INFO:
+	 [Node] Running "linear_func_to_anat" ("nipype.interfaces.fsl.preprocess.FLIRT"), a CommandLine Interface with command:
+flirt -in /tmp/resting_preproc_sub-1_ses-1/func_preproc_afni_0/_scan_rest_run-1/func_mean/sub-1_task-rest_run-1_bold_calc_tshift_resample_volreg_calc_tstat.nii.gz -ref /tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_skullstrip_orig_vol/sub-1_T1w_resample_calc.nii.gz -out sub-1_task-rest_run-1_bold_calc_tshift_resample_volreg_calc_tstat_flirt.nii.gz -omat sub-1_task-rest_run-1_bold_calc_tshift_resample_volreg_calc_tstat_flirt.mat -cost corratio -dof 6 -interp trilinear
+200807-20:16:52,734 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.func_to_anat_FLIRT_0.linear_func_to_anat".
+200807-20:16:52,742 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_snr_1.montage_snr.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/qc_snr_1/montage_snr/resample_u".
+200807-20:16:52,752 nipype.workflow INFO:
+	 [Node] Running "resample_u" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:53,554 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.qc_snr_1.montage_snr.resample_u".
+200807-20:16:53,559 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_edge_1" in "/tmp/resting_preproc_sub-1_ses-1/anat_edge_1".
+200807-20:16:53,565 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.anat_edge_1" - collecting precomputed outputs
+200807-20:16:53,565 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.anat_edge_1" found cached.
+200807-20:16:53,570 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_anat_1.resample_o" in "/tmp/resting_preproc_sub-1_ses-1/montage_anat_1/resample_o".
+200807-20:16:53,578 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.montage_anat_1.resample_o" - collecting precomputed outputs
+200807-20:16:53,578 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.montage_anat_1.resample_o" found cached.
+200807-20:16:53,583 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_9" in "/tmp/resting_preproc_sub-1_ses-1/sinker_0_9".
+200807-20:16:53,600 nipype.workflow INFO:
+	 [Node] Running "sinker_0_9" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-20:16:53,831 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_9".
+200807-20:16:53,837 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_csf_gm_wm_1.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_csf_gm_wm_1/resample_u".
+200807-20:16:53,847 nipype.workflow INFO:
+	 [Node] Running "resample_u" ("CPAC.utils.interfaces.function.Function")
+200807-20:16:54,698 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.montage_csf_gm_wm_1.resample_u".
+200807-20:16:54,702 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_mni_ants_register_0.calc_ants_warp" in "/tmp/resting_preproc_sub-1_ses-1/anat_mni_ants_register_0/calc_ants_warp".
+200807-20:16:54,725 nipype.workflow INFO:
+	 [Node] Running "calc_ants_warp" ("nipype.interfaces.utility.wrappers.Function")
+200807-20:49:53,796 nipype.workflow WARNING:
+	 [Node] Error on "resting_preproc_sub-1_ses-1.anat_mni_ants_register_0.calc_ants_warp" (/tmp/resting_preproc_sub-1_ses-1/anat_mni_ants_register_0/calc_ants_warp)
+200807-20:49:53,806 nipype.workflow ERROR:
+	 Node calc_ants_warp failed to run on host 175aa434d56d.
+200807-20:49:53,809 nipype.workflow ERROR:
+	 Saving crash info to /home/anibalsolon/Documents/cpac-python-package/output/crash/crash-20200807-204953-UID1000-calc_ants_warp-41abbc1a-2fda-46a7-aaf2-1ec253228ec3.pklz
+Traceback (most recent call last):
+  File "/usr/local/miniconda/lib/python2.7/site-packages/nipype/pipeline/plugins/linear.py", line 44, in run
+    node.run(updatehash=updatehash)
+  File "/usr/local/miniconda/lib/python2.7/site-packages/nipype/pipeline/engine/nodes.py", line 471, in run
+    result = self._run_interface(execute=True)
+  File "/usr/local/miniconda/lib/python2.7/site-packages/nipype/pipeline/engine/nodes.py", line 555, in _run_interface
+    return self._run_command(execute)
+  File "/usr/local/miniconda/lib/python2.7/site-packages/nipype/pipeline/engine/nodes.py", line 635, in _run_command
+    result = self._interface.run(cwd=outdir)
+  File "/usr/local/miniconda/lib/python2.7/site-packages/nipype/interfaces/base/core.py", line 521, in run
+    runtime = self._run_interface(runtime)
+  File "/usr/local/miniconda/lib/python2.7/site-packages/nipype/interfaces/utility/wrappers.py", line 144, in _run_interface
+    out = function_handle(**args)
+  File "<string>", line 47, in hardcoded_reg
+Exception: [!] ANTS registration did not complete successfully.
+
+Error details:
+Command '['antsRegistration', '--collapse-output-transforms', '0', '--dimensionality', '3', '--initial-moving-transform', '[/usr/share/fsl/5.0/data/standard/MNI152_T1_2mm_brain.nii.gz,/tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_skullstrip_orig_vol/sub-1_T1w_resample_calc.nii.gz,0]', '--output', '[transform,transform_Warped.nii.gz]', '--transform', 'Rigid[0.1]', '--metric', 'MI[/usr/share/fsl/5.0/data/standard/MNI152_T1_2mm_brain.nii.gz,/tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_skullstrip_orig_vol/sub-1_T1w_resample_calc.nii.gz,1,32,Regular,0.25]', '--convergence', '[1000x500x250x100,1e-08,10]', '--smoothing-sigmas', '3.0x2.0x1.0x0.0', '--shrink-factors', '8x4x2x1', '--use-histogram-matching', '1', '--transform', 'Affine[0.1]', '--metric', 'MI[/usr/share/fsl/5.0/data/standard/MNI152_T1_2mm_brain.nii.gz,/tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_skullstrip_orig_vol/sub-1_T1w_resample_calc.nii.gz,1,32,Regular,0.25]', '--convergence', '[1000x500x250x100,1e-08,10]', '--smoothing-sigmas', '3.0x2.0x1.0x0.0', '--shrink-factors', '8x4x2x1', '--use-histogram-matching', '1', '--transform', 'SyN[0.1,3.0,0.0]', '--metric', 'CC[/usr/share/fsl/5.0/data/standard/MNI152_T1_2mm_brain.nii.gz,/tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_skullstrip_orig_vol/sub-1_T1w_resample_calc.nii.gz,1,4]', '--convergence', '[100x100x70x20,1e-09,15]', '--smoothing-sigmas', '3.0x2.0x1.0x0.0', '--shrink-factors', '6x4x2x1', '--use-histogram-matching', '1', '--winsorize-image-intensities', '[0.01,0.99]', '--interpolation', 'LanczosWindowedSinc']' returned non-zero exit status -9
+
+
+
+200807-20:49:53,841 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.montage_csf_gm_wm_0.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/montage_csf_gm_wm_0/resample_u".
+200807-20:49:53,849 nipype.workflow INFO:
+	 [Node] Running "resample_u" ("CPAC.utils.interfaces.function.Function")
+200807-20:49:54,650 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.montage_csf_gm_wm_0.resample_u".
+200807-20:49:54,657 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.nuisance_1_0.Anatomical_2mm_flirt" in "/tmp/resting_preproc_sub-1_ses-1/nuisance_1_0/_scan_rest_run-1/_selector_CSF-2mmE-M_aC-CSF+WM-2mm-DPC5_M-SDB_P-2_BP-B0.01-T0.1/Anatomical_2mm_flirt".
+200807-20:49:54,698 nipype.workflow INFO:
+	 [Node] Running "Anatomical_2mm_flirt" ("nipype.interfaces.fsl.preprocess.FLIRT"), a CommandLine Interface with command:
+flirt -in /tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_skullstrip_orig_vol/sub-1_T1w_resample_calc.nii.gz -ref /tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_skullstrip_orig_vol/sub-1_T1w_resample_calc.nii.gz -out sub-1_T1w_resample_calc_flirt.nii.gz -omat sub-1_T1w_resample_calc_flirt.mat -applyisoxfm 2.000000
+200807-20:49:58,538 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.nuisance_1_0.Anatomical_2mm_flirt".
+200807-20:49:58,550 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.nuisance_0_0.Anatomical_2mm_flirt" in "/tmp/resting_preproc_sub-1_ses-1/nuisance_0_0/_scan_rest_run-1/_selector_CSF-2mmE-M_aC-CSF+WM-2mm-DPC5_G-M_M-SDB_P-2_BP-B0.01-T0.1/Anatomical_2mm_flirt".
+200807-20:49:58,566 nipype.workflow INFO:
+	 [Node] Running "Anatomical_2mm_flirt" ("nipype.interfaces.fsl.preprocess.FLIRT"), a CommandLine Interface with command:
+flirt -in /tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_skullstrip_orig_vol/sub-1_T1w_resample_calc.nii.gz -ref /tmp/resting_preproc_sub-1_ses-1/anat_preproc_afni_0/anat_skullstrip_orig_vol/sub-1_T1w_resample_calc.nii.gz -out sub-1_T1w_resample_calc_flirt.nii.gz -omat sub-1_T1w_resample_calc_flirt.mat -applyisoxfm 2.000000
+200807-20:50:02,440 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.nuisance_0_0.Anatomical_2mm_flirt".
+200807-20:50:02,446 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.seg_preproc_0.segment" in "/tmp/resting_preproc_sub-1_ses-1/seg_preproc_0/segment".
+200807-20:50:02,471 nipype.workflow INFO:
+	 [Node] Running "segment" ("nipype.interfaces.fsl.preprocess.FAST"), a CommandLine Interface with command:
+fast -t 1 -o segment -p -g -S 1 /tmp/resting_preproc_sub-1_ses-1/seg_preproc_0/segment/sub-1_T1w_resample_calc.nii.gz
+200807-20:54:06,869 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.seg_preproc_0.segment".
+200807-20:54:07,31 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_snr_0.montage_snr.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/qc_snr_0/montage_snr/resample_u".
+200807-20:54:07,36 nipype.workflow INFO:
+	 [Node] Cached "resting_preproc_sub-1_ses-1.qc_snr_0.montage_snr.resample_u" - collecting precomputed outputs
+200807-20:54:07,36 nipype.workflow INFO:
+	 [Node] "resting_preproc_sub-1_ses-1.qc_snr_0.montage_snr.resample_u" found cached.
+200807-20:54:07,45 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_symmetric_mni_ants_register_0.calc_ants_warp" in "/tmp/resting_preproc_sub-1_ses-1/anat_symmetric_mni_ants_register_0/calc_ants_warp".
+200807-20:54:07,74 nipype.workflow INFO:
+	 [Node] Running "calc_ants_warp" ("nipype.interfaces.utility.wrappers.Function")
+200807-21:27:34,422 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.anat_symmetric_mni_ants_register_0.calc_ants_warp".
+200807-21:27:34,505 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_symmetric_mni_ants_register_0.select_forward_rigid" in "/tmp/resting_preproc_sub-1_ses-1/anat_symmetric_mni_ants_register_0/select_forward_rigid".
+200807-21:27:34,572 nipype.workflow INFO:
+	 [Node] Running "select_forward_rigid" ("nipype.interfaces.utility.wrappers.Function")
+200807-21:27:34,785 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.anat_symmetric_mni_ants_register_0.select_forward_rigid".
+200807-21:27:34,791 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_23" in "/tmp/resting_preproc_sub-1_ses-1/sinker_1_23".
+200807-21:27:34,804 nipype.workflow INFO:
+	 [Node] Running "sinker_1_23" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:35,40 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_23".
+200807-21:27:35,47 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_23" in "/tmp/resting_preproc_sub-1_ses-1/sinker_0_23".
+200807-21:27:35,65 nipype.workflow INFO:
+	 [Node] Running "sinker_0_23" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:35,287 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_23".
+200807-21:27:35,293 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_symmetric_mni_ants_register_0.select_forward_affine" in "/tmp/resting_preproc_sub-1_ses-1/anat_symmetric_mni_ants_register_0/select_forward_affine".
+200807-21:27:35,356 nipype.workflow INFO:
+	 [Node] Running "select_forward_affine" ("nipype.interfaces.utility.wrappers.Function")
+200807-21:27:35,573 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.anat_symmetric_mni_ants_register_0.select_forward_affine".
+200807-21:27:35,579 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_21" in "/tmp/resting_preproc_sub-1_ses-1/sinker_1_21".
+200807-21:27:35,591 nipype.workflow INFO:
+	 [Node] Running "sinker_1_21" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:35,816 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_21".
+200807-21:27:35,823 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_21" in "/tmp/resting_preproc_sub-1_ses-1/sinker_0_21".
+200807-21:27:35,836 nipype.workflow INFO:
+	 [Node] Running "sinker_0_21" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:36,50 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_21".
+200807-21:27:36,56 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_symmetric_mni_ants_register_0.select_forward_initial" in "/tmp/resting_preproc_sub-1_ses-1/anat_symmetric_mni_ants_register_0/select_forward_initial".
+200807-21:27:36,132 nipype.workflow INFO:
+	 [Node] Running "select_forward_initial" ("nipype.interfaces.utility.wrappers.Function")
+200807-21:27:36,346 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.anat_symmetric_mni_ants_register_0.select_forward_initial".
+200807-21:27:36,353 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_22" in "/tmp/resting_preproc_sub-1_ses-1/sinker_0_22".
+200807-21:27:36,370 nipype.workflow INFO:
+	 [Node] Running "sinker_0_22" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:36,582 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_22".
+200807-21:27:36,588 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_22" in "/tmp/resting_preproc_sub-1_ses-1/sinker_1_22".
+200807-21:27:36,599 nipype.workflow INFO:
+	 [Node] Running "sinker_1_22" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:36,812 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_22".
+200807-21:27:36,820 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_symmetric_mni_ants_register_0.select_forward_warp" in "/tmp/resting_preproc_sub-1_ses-1/anat_symmetric_mni_ants_register_0/select_forward_warp".
+200807-21:27:36,884 nipype.workflow INFO:
+	 [Node] Running "select_forward_warp" ("nipype.interfaces.utility.wrappers.Function")
+200807-21:27:37,105 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.anat_symmetric_mni_ants_register_0.select_forward_warp".
+200807-21:27:37,110 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_16" in "/tmp/resting_preproc_sub-1_ses-1/sinker_1_16".
+200807-21:27:37,124 nipype.workflow INFO:
+	 [Node] Running "sinker_1_16" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:37,459 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_16".
+200807-21:27:37,464 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_16" in "/tmp/resting_preproc_sub-1_ses-1/sinker_0_16".
+200807-21:27:37,475 nipype.workflow INFO:
+	 [Node] Running "sinker_0_16" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:37,864 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_16".
+200807-21:27:37,869 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_236" in "/tmp/resting_preproc_sub-1_ses-1/sinker_0_236".
+200807-21:27:37,933 nipype.workflow INFO:
+	 [Node] Running "sinker_0_236" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:38,171 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_236".
+200807-21:27:38,178 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.anat_symmetric_mni_ants_register_0.select_inverse_warp" in "/tmp/resting_preproc_sub-1_ses-1/anat_symmetric_mni_ants_register_0/select_inverse_warp".
+200807-21:27:38,242 nipype.workflow INFO:
+	 [Node] Running "select_inverse_warp" ("nipype.interfaces.utility.wrappers.Function")
+200807-21:27:38,456 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.anat_symmetric_mni_ants_register_0.select_inverse_warp".
+200807-21:27:38,461 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_237" in "/tmp/resting_preproc_sub-1_ses-1/sinker_0_237".
+200807-21:27:38,485 nipype.workflow INFO:
+	 [Node] Running "sinker_0_237" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:38,814 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_237".
+200807-21:27:38,820 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_237" in "/tmp/resting_preproc_sub-1_ses-1/sinker_1_237".
+200807-21:27:38,832 nipype.workflow INFO:
+	 [Node] Running "sinker_1_237" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:39,237 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_237".
+200807-21:27:39,243 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_1_236" in "/tmp/resting_preproc_sub-1_ses-1/sinker_1_236".
+200807-21:27:39,316 nipype.workflow INFO:
+	 [Node] Running "sinker_1_236" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:39,568 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_1_236".
+200807-21:27:39,574 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_skullstrip_0.montage_skull.resample_u" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_0/montage_skull/resample_u".
+200807-21:27:39,583 nipype.workflow INFO:
+	 [Node] Running "resample_u" ("CPAC.utils.interfaces.function.Function")
+200807-21:27:40,378 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.qc_skullstrip_0.montage_skull.resample_u".
+200807-21:27:40,385 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_skullstrip_0.montage_skull.montage_s" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_0/montage_skull/montage_s".
+200807-21:27:40,399 nipype.workflow INFO:
+	 [Node] Setting-up "_montage_s0" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_0/montage_skull/montage_s/mapflow/_montage_s0".
+200807-21:27:40,405 nipype.workflow INFO:
+	 [Node] Running "_montage_s0" ("CPAC.utils.interfaces.function.Function")
+200807-21:27:45,652 nipype.workflow INFO:
+	 [Node] Finished "_montage_s0".
+200807-21:27:45,667 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.qc_skullstrip_0.montage_skull.montage_s".
+200807-21:27:45,670 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_198" in "/tmp/resting_preproc_sub-1_ses-1/sinker_0_198".
+200807-21:27:45,694 nipype.workflow INFO:
+	 [Node] Running "sinker_0_198" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:45,899 nipype.interface INFO:
+	 sub: /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc___skullstrip_vis_s/_montage_s0/skull_vis_s.png -> /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc/skullstrip_vis_s/_montage_s0/skull_vis_s.png
+200807-21:27:45,959 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_198".
+200807-21:27:45,978 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.qc_skullstrip_0.montage_skull.montage_a" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_0/montage_skull/montage_a".
+200807-21:27:46,6 nipype.workflow INFO:
+	 [Node] Setting-up "_montage_a0" in "/tmp/resting_preproc_sub-1_ses-1/qc_skullstrip_0/montage_skull/montage_a/mapflow/_montage_a0".
+200807-21:27:46,21 nipype.workflow INFO:
+	 [Node] Running "_montage_a0" ("CPAC.utils.interfaces.function.Function")
+200807-21:27:54,576 nipype.workflow INFO:
+	 [Node] Finished "_montage_a0".
+200807-21:27:54,587 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.qc_skullstrip_0.montage_skull.montage_a".
+200807-21:27:54,590 nipype.workflow INFO:
+	 [Node] Setting-up "resting_preproc_sub-1_ses-1.sinker_0_197" in "/tmp/resting_preproc_sub-1_ses-1/sinker_0_197".
+200807-21:27:54,606 nipype.workflow INFO:
+	 [Node] Running "sinker_0_197" ("CPAC.utils.interfaces.datasink.DataSink")
+200807-21:27:54,812 nipype.interface INFO:
+	 sub: /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc___skullstrip_vis_a/_montage_a0/skull_vis_a.png -> /home/anibalsolon/Documents/cpac-python-package/output/output/pipeline_analysis_nuisance/sub-1_ses-1/qc/skullstrip_vis_a/_montage_a0/skull_vis_a.png
+200807-21:27:54,835 nipype.workflow INFO:
+	 [Node] Finished "resting_preproc_sub-1_ses-1.sinker_0_197".
+200807-21:27:54,846 nipype.workflow INFO:
+	 ***********************************
+200807-21:27:54,846 nipype.workflow ERROR:
+	 could not run node: resting_preproc_sub-1_ses-1.anat_mni_ants_register_0.calc_ants_warp
+200807-21:27:54,847 nipype.workflow INFO:
+	 crashfile: /home/anibalsolon/Documents/cpac-python-package/output/crash/crash-20200807-204953-UID1000-calc_ants_warp-41abbc1a-2fda-46a7-aaf2-1ec253228ec3.pklz
+200807-21:27:54,851 nipype.workflow INFO:
+	 ***********************************
+200807-21:27:54,893 nipype.workflow INFO:
+	 
+
+    Error of subject workflow resting_preproc_sub-1_ses-1
+
+    CPAC run error:
+
+        Pipeline configuration: analysis
+        Subject workflow: resting_preproc_sub-1_ses-1
+        Elapsed run time (minutes): 72.2490801493
+        Timing information saved in /home/anibalsolon/Documents/cpac-python-package/output/log/cpac_individual_timing_analysis.csv
+        System time of start:      2020-08-07 20:15:52
+
+
+200807-21:27:54,895 nipype.workflow INFO:
+	 Removing working dir: /tmp/resting_preproc_sub-1_ses-1

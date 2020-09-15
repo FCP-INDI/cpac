@@ -111,24 +111,15 @@ elif args.analysis_level == "participant":
     with open(args.data_config_file) as f:
         data_config = yaml.safe_load(f)[0]
 
-    # def copytree(src, dst, symlinks=False, ignore=None):
-    #     for item in os.listdir(src):
-    #         s = os.path.join(src, item)
-    #         d = os.path.join(dst, item)
-    #         if os.path.isdir(s):
-    #             shutil.copytree(s, d, symlinks, ignore)
-    #         else:
-    #             shutil.copy2(s, d)
-
-    # copytree('/code/cpac_output', args.output_dir)
+    subject_id = data_config['subject_id']
 
     nodes = [
-        f"resting_preproc_sub-{data_config['subject_id']}.1_anat_pipeline.1_normalize",
-        f"resting_preproc_sub-{data_config['subject_id']}.1_anat_pipeline.2_skullstrip",
-        f"resting_preproc_sub-{data_config['subject_id']}.1_anat_pipeline.3_segmentation",
-        f"resting_preproc_sub-{data_config['subject_id']}.2_func_pipeline.4_skullstrip",
-        f"resting_preproc_sub-{data_config['subject_id']}.2_func_pipeline.5_registration",
-        f"resting_preproc_sub-{data_config['subject_id']}.2_func_pipeline.6_nuisance_regression",
+        f"resting_preproc_sub-{subject_id}.1_anat_pipeline.1_normalize",
+        f"resting_preproc_sub-{subject_id}.1_anat_pipeline.2_skullstrip",
+        f"resting_preproc_sub-{subject_id}.1_anat_pipeline.3_segmentation",
+        f"resting_preproc_sub-{subject_id}.2_func_pipeline.4_skullstrip",
+        f"resting_preproc_sub-{subject_id}.2_func_pipeline.5_registration",
+        f"resting_preproc_sub-{subject_id}.2_func_pipeline.6_nuisance_regression",
     ]
 
     sleep_between_nodes = 1.0
@@ -136,8 +127,6 @@ elif args.analysis_level == "participant":
     async def socketee(websocket, path):
         if path != '/log':
             return
-
-        start = time.time()
 
         for i, node in enumerate(nodes):
             start = time.time()
@@ -155,7 +144,6 @@ elif args.analysis_level == "participant":
 
             logger.info(f"{node}")
 
-        # Keep socket open
         while True:
             await asyncio.sleep(1)
 
@@ -168,15 +156,38 @@ elif args.analysis_level == "participant":
             if server:
                 server.close()
 
+    async def copy():
+
+        def copy_to_out(src, dst=None):
+            dst = os.path.join(args.output_dir, src if dst is None else dst)
+            dstdir = os.path.dirname(dst)
+            if not os.path.exists(dstdir):
+                os.makedirs(dstdir)
+
+            shutil.copy(os.path.join('/code/cpac_output', src), dst)
+
+        await asyncio.sleep(3)
+        copy_to_out('log/pipeline_analysis/sub-1_ses-1/pypeline.log', f'log/pipeline_analysis/sub-{subject_id}_ses-1/pypeline.log')
+        await asyncio.sleep(sleep_between_nodes)
+        copy_to_out('crash/crash-file.pklz', 'crash/crash-file_001.pklz')
+        await asyncio.sleep(sleep_between_nodes)
+        copy_to_out('crash/crash-file.pklz', 'crash/crash-file_002.pklz')
+        await asyncio.sleep(sleep_between_nodes)
+        copy_to_out('log/pipeline_analysis/sub-1_ses-1/pypeline.log', f'log/pipeline_analysis_nuisance/sub-{subject_id}_ses-1/pypeline.log')
+
+        while True:
+            await asyncio.sleep(1)
+
     async def wait_some():
         await asyncio.sleep(3)
         await asyncio.sleep(len(nodes) * sleep_between_nodes)
         await asyncio.sleep(1)
 
     async def main():
-        task = asyncio.create_task(serve())
+        ws_server = asyncio.create_task(serve())
+        copy_files = asyncio.create_task(copy())
         wait = asyncio.create_task(wait_some())
-        await asyncio.wait([task, wait], return_when=asyncio.FIRST_COMPLETED)
+        await asyncio.wait([ws_server, copy_files, wait], return_when=asyncio.FIRST_COMPLETED)
 
     asyncio.run(main(), debug=True)
 

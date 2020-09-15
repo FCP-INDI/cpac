@@ -49,6 +49,7 @@ class Scheduler:
         Schedule.End,
         BackendSchedule.Log,
         BackendSchedule.Status,
+        BackendSchedule.Result,
     ]
 
     def __init__(self, backend, persistent=False, proxy=False):

@@ -8,6 +8,7 @@ import os
 import shutil
 import tempfile
 import time
+import uuid
 
 import yaml
 from tornado.websocket import websocket_connect
@@ -15,8 +16,9 @@ from tornado.websocket import websocket_connect
 from ...utils import yaml_parse
 from ..schedules import (DataConfigSchedule, DataSettingsSchedule,
                          ParticipantPipelineSchedule, Schedule)
-from .base import Backend, BackendSchedule, RunStatus
-from .utils import find_free_port, merge_async_iters
+from .base import (Backend, BackendSchedule, RunStatus,
+                   FileResult, LogFileResult, CrashFileResult)
+from .utils import find_free_port, merge_async_iters, struuid
 
 logger = logging.getLogger(__name__)
 
@@ -218,17 +220,41 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
 
         merged, _, cancel_tasks = merge_async_iters(
             self._logger_listener(),
+            self._file_listener(output_folder),
             self._runner(command, volumes, port=self._run_logs_port)
         )
 
         async for item in merged:
             if item["type"] == "log":
-                self._logs_messages.append(item["content"])
-                yield BackendSchedule.Log(
-                    schedule=self,
-                    timestamp=item["time"],
-                    content=item["content"],
-                )
+                if item["content"]["type"] == "node":
+                    self._logs_messages.append(item["content"])
+                    yield BackendSchedule.Log(
+                        schedule=self,
+                        timestamp=item["time"],
+                        content=item["content"],
+                    )
+                elif item["content"]["type"] == "file":
+                    content = item["content"]
+
+                    result_type = {
+                        "log": LogFileResult,
+                        "crash": CrashFileResult,
+                    }[content["filetype"]]
+
+                    key_type = { "log": "logs", "crash": "crashes" }[content['filetype']]
+                    key = struuid(content["path"], namespace=self.uid)
+
+                    if key_type not in self._results:
+                        self._results[key_type] = {}
+                    self._results[key_type][key] = result_type(content["path"])
+
+                    yield BackendSchedule.Result(
+                        schedule=self,
+                        result=self._results[key_type][key],
+                        timestamp=item["time"],
+                        key=f"{key_type}/{key}",
+                    )
+
             elif item["type"] == "status":
                 yield BackendSchedule.Status(
                     schedule=self,
@@ -238,9 +264,7 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
 
         await cancel_tasks()
 
-        self._results = {
-            "time": time.time() - started_at,
-        }
+        self._results["time"] = time.time() - started_at
 
     @property
     async def logs(self):
@@ -255,6 +279,38 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
         else:
             for log in self._logs_messages:
                 yield log
+
+    async def _file_listener(self, output_folder):
+        sent_files = set([])
+        while True:
+            logs = set(glob.glob(os.path.join(output_folder, 'log', 'pipeline_*', '*', 'pypeline.log'))) - sent_files
+            crashes = set(glob.glob(os.path.join(output_folder, 'crash', 'crash-*.pklz'))) - sent_files
+            for f in logs:
+                yield {
+                    "type": "log",
+                    "time": time.time(),
+                    "content": {
+                        "type": "file",
+                        "filetype": "log",
+                        "path": f,
+                    }
+                }
+                sent_files |= set([f])
+
+            for f in crashes:
+                yield {
+                    "type": "log",
+                    "time": time.time(),
+                    "content": {
+                        "type": "file",
+                        "filetype": "crash",
+                        "path": f,
+                    }
+                }
+                sent_files |= set([f])
+
+            await asyncio.sleep(0.5)
+            yield
 
     async def _logger_listener(self):
 
@@ -287,7 +343,7 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
                         yield {
                             "type": "log",
                             "time": msg["time"],
-                            "content": msg["message"],
+                            "content": { "type": "node", **msg["message"] },
                         }
                     except asyncio.TimeoutError:
                         await asyncio.sleep(0.1)
