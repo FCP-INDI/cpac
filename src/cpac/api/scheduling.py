@@ -163,6 +163,8 @@ class Scheduler:
 
     async def run_scheduled(self, schedule):
 
+        alloc = lambda: MAX_PARALLEL - self._semaphore._value
+
         async with self._semaphore:
 
             it = schedule()
@@ -172,14 +174,14 @@ class Scheduler:
 
                 watchers = self._watchers[message.__class__].get(sid, [])
 
-                logger.info(f"[Scheduler] Got message {message.__class__.__name__} from schedule {schedule} ({len(watchers)})")
+                logger.info(f"[Scheduler:{alloc()}] Got message {message.__class__.__name__} from schedule {schedule} ({len(watchers)})")
 
                 if isinstance(message, Schedule.Spawn):
 
                     name = message.name
                     subschedule = message.child
 
-                    logger.info(f'[Scheduler] Scheduling {subschedule} from {schedule}')
+                    logger.info(f'[Scheduler:{alloc()}] Scheduling {subschedule} from {schedule}')
 
                     if not self.proxy:
 
@@ -214,9 +216,9 @@ class Scheduler:
                 if sid in self._watchers[watcher_class]:
                     del self._watchers[watcher_class][sid]
 
-            logger.info(f"[Scheduler] Schedule {schedule} is done ({await schedule.status})")
+        logger.info(f"[Scheduler:{alloc()}] Schedule {schedule} is done ({await schedule.status})")
 
-            return schedule
+        return schedule
 
 
     @property
