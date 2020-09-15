@@ -29,14 +29,14 @@ class ScheduleTree:
     @property
     async def status(self):
         return self.schedule.status
-    
+
     @property
     async def logs(self):
         return self.schedule.logs
 
     def __getitem__(self, key):
         return self.children[key]
-    
+
     def __setitem__(self, key, child):
         self.children[key] = child
 
@@ -220,7 +220,6 @@ class Scheduler:
 
         return schedule
 
-
     @property
     async def statuses(self):
         root = self._schedules
@@ -240,7 +239,6 @@ class Scheduler:
             nodes[schedule_id] = node
 
         return nodes
-
 
     @property
     async def logs(self):
