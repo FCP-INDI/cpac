@@ -194,14 +194,24 @@ def render_crashfile(crash_path):
     """
 
 
-def traverse_deep(r, keys):
-    for i, k in enumerate(keys):
+def traverse_deep(r, keys, setval=None):
+    if setval is not None and "*" in keys:
+        raise ValueError('"*" is not accepted when setting keys.')
+
+    r0 = r
+
+    slice_end = (None if setval is None else -1)
+    for i, k in enumerate(keys[:slice_end]):
         if type(r) == dict:
             if k == '*':
                 return {
                     kk: traverse_deep(r[kk], keys[i+1:])
                     for kk in r.keys()
                 }
+
+            if setval and k not in r:
+                r[k] = {}
+                return traverse_deep(r[k], keys[i+1:], setval)
 
             r = r[k]
 
@@ -213,6 +223,15 @@ def traverse_deep(r, keys):
                 ]
 
             r = r[int(k)]
+
+    if setval is not None:
+        if type(r) == dict:
+            r[keys[-1]] = setval
+        elif type(r) == list:
+            r[int(keys[-1])] = setval
+        else:
+            raise ValueError(f'Cannot set value for type "{type(r)}"')
+        return r0
 
     return r
 
