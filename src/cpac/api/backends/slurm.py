@@ -131,7 +131,7 @@ class SLURMBackend(Backend):
             '-p', self.host[1],
             '-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null', # TODO enable host key check
             '-i', self.key,
-            ] + self._control_args + [
+        ] + self._control_args + [
             f'{self.username}@{self.host[0]}'
         ]
         stdout, stderr = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate(b"\n")
