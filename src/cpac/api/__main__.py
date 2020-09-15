@@ -69,16 +69,6 @@ def parse_args(args):
     scheduler_parser.add_argument('--slurm-control', nargs='?')
     scheduler_parser.add_argument('--slurm-pip-install', nargs='?')
 
-    # scheduler_parser.register('action', 'extend', ExtendAction)
-    # scheduler_parser.add_argument('--backend', nargs='+', action='extend', choices=['docker', 'singularity'])
-
-    # run_parser = subparsers.add_parser('run')
-    # run_parser.register('action', 'extend', ExtendAction)
-    # run_parser.add_argument('--address', action='store', type=address)
-    # run_parser.add_argument('--backend', choices=['docker', 'singularity'])
-    # run_parser.add_argument('data_config')
-    # run_parser.add_argument('pipeline', nargs='?')
-
     parsed = parser.parse_args(args)
 
     return parsed
