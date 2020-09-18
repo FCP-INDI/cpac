@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import os
+import re
 
 import pytest
 from tornado.escape import json_decode
@@ -126,11 +127,19 @@ async def test_data_config(http_client, base_url, app, scheduler):
 
     log = list(body['result']['logs'].keys())[0]
     response = await http_client.fetch(f'{base_url}/schedule/{child}/result/logs/{log}', raise_error=False)
+    filename = re.findall('filename="([^"]+)"', response.headers.get('content-disposition'))[0]
+
+    assert filename == '/log/pipeline_analysis/sub-0050952_ses-1/pypeline.log'
+
     logs = response.body
     assert b'nipype.workflow INFO' in logs.split(b'\n')[0]
 
     crash = list(body['result']['crashes'].keys())[0]
     response = await http_client.fetch(f'{base_url}/schedule/{child}/result/crashes/{crash}', raise_error=False)
+    filename = re.findall('filename="([^"]+)"', response.headers.get('content-disposition'))[0]
+
+    assert filename == '/crash/crash-sub-0050952.pklz'
+
     crash_data = json_decode(response.body)
     assert crash_data['traceback'].startswith('Traceback')
 

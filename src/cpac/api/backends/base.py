@@ -14,11 +14,18 @@ from ..schedules import (DataConfigSchedule, DataSettingsSchedule,
 
 logger = logging.getLogger(__name__)
 
+class Result:
+    _mime = 'application/json'
 
-class FileResult:
-    def __init__(self, path, mime=None):
+    @property
+    def mime(self):
+        return self._mime
+
+class FileResult(Result):
+    def __init__(self, path, mime=None, name=None):
         self._path = path
         self._mime = mime or 'text/plain'
+        self._name = name or path
 
     async def __aenter__(self):
         self._stream = open(self._path)
@@ -28,16 +35,16 @@ class FileResult:
         self._stream.close()
 
     @property
+    def name(self):
+        return self._name
+
+    @property
     def size(self):
         pos = self._stream.tell()
         self._stream.seek(0, os.SEEK_END)
         size = self._stream.tell()
         self._stream.seek(pos)
         return size
-
-    @property
-    def mime(self):
-        return self._mime
 
     async def slice(
         self, start: int = None, end: int = None
@@ -64,11 +71,13 @@ class FileResult:
                 return
 
 
-
 class LogFileResult(FileResult):
-    def __init__(self, path):
-        self._path = path
-        self._mime = 'application/vdn.cpacpy-log+json'
+    def __init__(self, path, name=None):
+        super().__init__(
+            path,
+            mime='application/vdn.cpacpy-log+json',
+            name=name
+        )
 
 
 class CrashInputEncoder(json.JSONEncoder):
@@ -82,10 +91,12 @@ class CrashInputEncoder(json.JSONEncoder):
 
 
 class CrashFileResult(FileResult):
-    def __init__(self, path):
-        self._path = path
-        self._mime = 'application/vdn.cpacpy-crash+json'
-
+    def __init__(self, path, name=None):
+        super().__init__(
+            path,
+            mime='application/vdn.cpacpy-crash+json',
+            name=name
+        )
 
     async def __aenter__(self):
         self._stream = io.StringIO()

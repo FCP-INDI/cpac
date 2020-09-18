@@ -11,7 +11,7 @@ from tornado.concurrent import run_on_executor
 
 from cpac import __version__
 from .schedules import Schedule, DataSettingsSchedule, DataConfigSchedule, ParticipantPipelineSchedule
-from .backends.base import FileResult
+from .backends.base import Result, FileResult, CrashFileResult, LogFileResult
 
 import os
 import time
@@ -22,8 +22,27 @@ import logging
 import collections
 import dataclasses
 
-
 _logger = logging.getLogger(__name__)
+
+
+class CustomEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Result):
+            types = {
+                Result: "result",
+                FileResult: "file",
+                CrashFileResult: "crash",
+                LogFileResult: "log",
+            }
+            return {
+                "type": types[o.__class__],
+                "mime": o.mime,
+                "name": o.name if hasattr(o, 'name') else None,
+            }
+        if isinstance(o, Schedule):
+            return repr(o)
+        return super().default(o)
+
 
 class BaseHandler(tornado.web.RequestHandler):
 
@@ -210,16 +229,6 @@ class StatusScheduleHandler(BaseHandler):
         })
 
 
-class ResultEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, FileResult):
-            return {
-                "_type": "FileResult",
-                "mime": o.mime,
-            }
-        return super().default(o)
-
-
 class ResultScheduleHandler(BaseHandler):
     async def get(self, schedule, result=None):
         scheduler = self.application.settings.get('scheduler')
@@ -241,6 +250,8 @@ class ResultScheduleHandler(BaseHandler):
 
             if isinstance(schedule_result, FileResult):
                 self.set_header("Content-Type", schedule_result.mime)
+                self.set_header("Content-Disposition", f'attachment; filename="{schedule_result.name}"')
+                self.set_header("Access-Control-Expose-Headers", "Content-Disposition")
 
                 async with schedule_result as stream:
 
@@ -300,25 +311,13 @@ class ResultScheduleHandler(BaseHandler):
             self.set_header("Content-Type", "application/json; charset=UTF-8")
             return self.finish(json.dumps({
                 "result": schedule_results
-            }, cls=ResultEncoder))
+            }, cls=CustomEncoder))
 
         self.set_header("Content-Type", "application/json; charset=UTF-8")
         return self.finish(json.dumps({
             "result": schedule_results,
             "children": list(schedule_tree.children.keys()),
-        }, cls=ResultEncoder))
-
-
-class ScheduleEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, FileResult):
-            return {
-                "_type": "FileResult",
-                "mime": o.mime,
-            }
-        if isinstance(o, Schedule):
-            return repr(o)
-        return super().default(o)
+        }, cls=CustomEncoder))
 
 
 def schedule_watch_wrapper(scheduler, socket, message_id):
@@ -337,7 +336,7 @@ def schedule_watch_wrapper(scheduler, socket, message_id):
             content['__cpacpy_message_id'] = message_id
 
         try:
-            socket.write_message(json.dumps(content, cls=ScheduleEncoder))
+            socket.write_message(json.dumps(content, cls=CustomEncoder))
         except tornado.websocket.WebSocketClosedError:
             pass
 

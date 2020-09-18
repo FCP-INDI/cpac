@@ -113,6 +113,8 @@ elif args.analysis_level == "participant":
 
     subject_id = data_config['subject_id']
 
+    err_subjects = ('0050959', '0051558', '0050952', '0051575')
+
     nodes = [
         f"resting_preproc_sub-{subject_id}.1_anat_pipeline.1_normalize",
         f"resting_preproc_sub-{subject_id}.1_anat_pipeline.2_skullstrip",
@@ -168,12 +170,11 @@ elif args.analysis_level == "participant":
 
         await asyncio.sleep(3)
         copy_to_out('log/pipeline_analysis/sub-1_ses-1/pypeline.log', f'log/pipeline_analysis/sub-{subject_id}_ses-1/pypeline.log')
-        await asyncio.sleep(sleep_between_nodes)
-        copy_to_out('crash/crash-file.pklz', 'crash/crash-file_001.pklz')
-        await asyncio.sleep(sleep_between_nodes)
-        copy_to_out('crash/crash-file.pklz', 'crash/crash-file_002.pklz')
-        await asyncio.sleep(sleep_between_nodes)
+        await asyncio.sleep(sleep_between_nodes * 3)
         copy_to_out('log/pipeline_analysis/sub-1_ses-1/pypeline.log', f'log/pipeline_analysis_nuisance/sub-{subject_id}_ses-1/pypeline.log')
+        await asyncio.sleep(sleep_between_nodes * 1)
+        if data_config['subject_id'] in err_subjects:
+            copy_to_out('crash/crash-file.pklz', f'crash/crash-sub-{subject_id}.pklz')
 
         while True:
             await asyncio.sleep(1)
@@ -191,7 +192,7 @@ elif args.analysis_level == "participant":
 
     asyncio.run(main(), debug=True)
 
-    if data_config['subject_id'] in ('0050959', '0051558'):
+    if data_config['subject_id'] in err_subjects:
         sys.exit(1)
 
     sys.exit(0)
