@@ -17,7 +17,7 @@ from ...utils import yaml_parse
 from ..schedules import (DataConfigSchedule, DataSettingsSchedule,
                          ParticipantPipelineSchedule, Schedule)
 from .base import (Backend, BackendSchedule, RunStatus,
-                   FileResult, LogFileResult, CrashFileResult)
+                   Result, FileResult, LogFileResult, CrashFileResult)
 from .utils import find_free_port, merge_async_iters, struuid
 
 logger = logging.getLogger(__name__)
@@ -111,7 +111,7 @@ class ContainerDataSettingsSchedule(ContainerSchedule, DataSettingsSchedule):
  
                 yield BackendSchedule.Result(
                     schedule=self,
-                    result=self._results['data_config'],
+                    result=Result(),
                     timestamp=time.time(),
                     key='data_config',
                 )
@@ -172,7 +172,7 @@ class ContainerDataConfigSchedule(ContainerSchedule, DataConfigSchedule):
 
                 yield BackendSchedule.Result(
                     schedule=self,
-                    result=self._results['data_config'],
+                    result=Result(),
                     timestamp=time.time(),
                     key='data_config',
                 )
@@ -260,7 +260,10 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
 
                     if key_type not in self._results:
                         self._results[key_type] = {}
-                    self._results[key_type][key] = result_type(content["path"])
+                    self._results[key_type][key] = result_type(
+                        content["path"],
+                        name=content["name"]
+                    )
 
                     yield BackendSchedule.Result(
                         schedule=self,
@@ -300,6 +303,12 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
             logs = set(glob.glob(os.path.join(output_folder, 'log', 'pipeline_*', '*', 'pypeline.log'))) - sent_files
             crashes = set(glob.glob(os.path.join(output_folder, 'crash', 'crash-*.pklz'))) - sent_files
             for f in logs:
+                name = (
+                    f[len(output_folder):]
+                    if f.startswith(output_folder) else
+                    f
+                )
+
                 yield {
                     "type": "log",
                     "time": time.time(),
@@ -307,11 +316,18 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
                         "type": "file",
                         "filetype": "log",
                         "path": f,
+                        "name": name,
                     }
                 }
                 sent_files |= set([f])
 
             for f in crashes:
+                name = (
+                    f[len(output_folder):]
+                    if f.startswith(output_folder) else
+                    f
+                )
+
                 yield {
                     "type": "log",
                     "time": time.time(),
@@ -319,6 +335,7 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
                         "type": "file",
                         "filetype": "crash",
                         "path": f,
+                        "name": name,
                     }
                 }
                 sent_files |= set([f])
