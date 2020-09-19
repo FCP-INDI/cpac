@@ -421,4 +421,4 @@ async def start(address, scheduler):
 
     while True:
         await scheduler
-        await asyncio.sleep(5)
+        await asyncio.sleep(1)

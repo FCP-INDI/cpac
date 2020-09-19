@@ -11,7 +11,8 @@ import time
 import uuid
 
 import yaml
-from tornado.websocket import websocket_connect
+from tornado.websocket import websocket_connect, WebSocketError
+from tornado.httpclient import HTTPError
 
 from ...utils import yaml_parse
 from ..schedules import (DataConfigSchedule, DataSettingsSchedule,
@@ -347,9 +348,11 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
 
         while self._status is None:
             await asyncio.sleep(0.1)
+            yield
 
         while self._status != RunStatus.RUNNING:
             await asyncio.sleep(0.1)
+            yield
 
         port = self._run_logs_port
         uri = f"ws://localhost:{port}/log"
@@ -378,7 +381,8 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
                         }
                     except asyncio.TimeoutError:
                         await asyncio.sleep(0.1)
-            except:
+                        yield
+            except (WebSocketError, HTTPError, ConnectionError):
                 await asyncio.sleep(0.1)
                 yield
             finally:
