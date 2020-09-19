@@ -97,7 +97,6 @@ class SingularityBackend(ContainerBackend):
         ParticipantPipelineSchedule: SingularityParticipantPipelineSchedule,
     }
 
-    def __init__(self, scheduler=None, image=None):
-        # TODO test singularity is installed
-        self.scheduler = scheduler
+    def __init__(self, id, scheduler=None, image=None):
+        super().__init__(id=id, scheduler=scheduler)
         self.image = image or SingularityBackend.image

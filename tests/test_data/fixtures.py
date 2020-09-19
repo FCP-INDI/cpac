@@ -31,11 +31,11 @@ def event_loop(io_loop):
 
 def docker_backend():
     image = docker_build_image()
-    return DockerBackend(image=image)
+    return DockerBackend(id="docker", image=image)
 
 def singularity_backend():
     image = singularity_build_image()
-    return SingularityBackend(image=image)
+    return SingularityBackend(id="singularitu", image=image)
 
 def slurm_config():
     return {
@@ -71,7 +71,7 @@ def slurm_backend():
 
     time_diff = int(time.time() - start_at)
     logger.info(f'[Fixtures] SLURM cluster up ({timedelta(seconds=time_diff)})')
-    return SLURMBackend(**slurm_config())
+    return SLURMBackend(id="slurm", **slurm_config())
 
 backend_params = [singularity_backend, docker_backend, slurm_backend]
 
@@ -91,7 +91,3 @@ async def scheduler(request):
 def app(scheduler):
     app_obj.settings['scheduler'] = scheduler
     return app_obj
-
-@pytest.fixture
-def app_client(app):
-    return Client(app.url, app.port)

@@ -128,7 +128,8 @@ class Backend:
         ParticipantPipelineSchedule: None,
     }
 
-    def __init__(self, scheduler=None):
+    def __init__(self, id, scheduler=None):
+        self.id = id
         self.scheduler = scheduler
 
     def __getitem__(self, key):

@@ -10,19 +10,22 @@ from tornado.escape import json_decode
 from conftest import Constants
 from cpac import __version__
 from cpac.utils import generate_data_url
+from cpac.api.backends import available_backends
 from cpac.api.backends.base import RunStatus
 
-from fixtures import event_loop, scheduler, app, app_client
+from fixtures import event_loop, scheduler, app
 
 @pytest.mark.asyncio
-async def test_version(http_client, base_url, app):
+async def test_version(http_client, base_url, app, scheduler):
     response = await http_client.fetch(base_url, raise_error=False)
     assert response.code == 200
 
     content = json_decode(response.body)
     assert content['api'] == 'cpacpy'
     assert content['version'] == __version__
-    assert len(content['backends']) == 3  # @TODO create a custom config for the scheduler on test env
+    assert len(content['backends']) == 1
+    assert content['backends'][0]['id'] == scheduler.backend.id
+    assert available_backends[content['backends'][0]['backend']] == scheduler.backend.__class__
 
 
 @pytest.mark.asyncio
