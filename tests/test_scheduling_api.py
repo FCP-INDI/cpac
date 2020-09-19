@@ -71,7 +71,7 @@ async def test_data_settings(http_client, base_url, app, scheduler):
 
 
 @pytest.mark.asyncio
-async def test_data_config(http_client, base_url, app, scheduler):
+async def test_data_config_single(http_client, base_url, app, scheduler):
 
     with open(os.path.join(Constants.TESTS_DATA_PATH, 'data_config_template_single.yml'), 'r') as f:
         data_config = f.read()
@@ -153,3 +153,61 @@ async def test_data_config(http_client, base_url, app, scheduler):
 
     inputs = node['inputs']
     assert inputs['anatomical_brain'] == '/tmp/resting_preproc_sub-0051074_ses-1/anat_preproc_afni_0/anat_skullstrip_orig_vol/sub-0051074_T1w_resample_calc.nii.gz'
+
+
+async def create_schedule(http_client, base_url, data_config):
+    body = json.dumps({
+        'type': 'pipeline', 
+        'data_config': generate_data_url(data_config, 'text/yaml'),
+    })
+    response = await http_client.fetch(
+        f'{base_url}/schedule',
+        method='POST',
+        headers=None,
+        body=body,
+        raise_error=False
+    )
+    assert response.code == 200
+
+    body = json_decode(response.body)
+    assert 'schedule' in body
+    return body['schedule']
+
+
+async def get_schedule_result(http_client, base_url, schedule):
+
+    response = await http_client.fetch(f'{base_url}/schedule/{schedule}/result', raise_error=False)
+    body = json_decode(response.body)
+
+    assert 'result' in body
+    result = body['result']
+
+    assert 'data_config' in result
+    data_config = result['data_config']
+
+    assert len(data_config) == 4
+
+    # Look for the spawned child
+    assert 'children' in body
+    children = body['children']
+
+    assert len(children) == 4
+
+
+@pytest.mark.asyncio
+async def test_data_config(http_client, base_url, app, scheduler):
+
+    with open(os.path.join(Constants.TESTS_DATA_PATH, 'data_config_template.yml'), 'r') as f:
+        data_config = f.read()
+
+    schedule1 = await create_schedule(http_client, base_url, data_config)
+    schedule2 = await create_schedule(http_client, base_url, data_config)
+    schedule3 = await create_schedule(http_client, base_url, data_config)
+    schedule4 = await create_schedule(http_client, base_url, data_config)
+
+    await scheduler
+
+    await get_schedule_result(http_client, base_url, schedule1)
+    await get_schedule_result(http_client, base_url, schedule2)
+    await get_schedule_result(http_client, base_url, schedule3)
+    await get_schedule_result(http_client, base_url, schedule4)
