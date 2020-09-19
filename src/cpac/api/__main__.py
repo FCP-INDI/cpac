@@ -90,11 +90,14 @@ async def start(args):
     backend = args.backend
     cmd_args = vars(args)
 
-    backend = available_backends[backend](**{
-        arg.split('_', 1)[1]: val
-        for arg, val in cmd_args.items()
-        if arg.startswith(backend)
-    })
+    backend = available_backends[backend](
+        id=backend,
+        **{
+            arg.split('_', 1)[1]: val
+            for arg, val in cmd_args.items()
+            if arg.startswith(backend)
+        }
+    )
 
     async with Scheduler(backend, proxy=args.proxy) as scheduler:
         await start(args.address, scheduler)

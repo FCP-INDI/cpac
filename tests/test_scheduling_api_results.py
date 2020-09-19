@@ -10,7 +10,7 @@ from tornado.escape import json_decode
 from conftest import Constants
 from cpac.api.backends.base import CrashFileResult
 from cpac.api.schedules import ParticipantPipelineSchedule
-from fixtures import app, app_client, event_loop, scheduler
+from fixtures import app, event_loop, scheduler
 
 
 @pytest.mark.asyncio

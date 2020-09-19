@@ -95,8 +95,9 @@ class SLURMBackend(Backend):
         ParticipantPipelineSchedule: SLURMParticipantPipelineSchedule,
     }
 
-    def __init__(self, host, username, key, control, node_backend=None, pip_install=None, scheduler=None):
-        self.scheduler = scheduler
+    def __init__(self, id, host, username, key, control, node_backend=None, pip_install=None, scheduler=None):
+        super().__init__(id=id, scheduler=scheduler)
+
         self.host = host.split(':')
         self.username = username
         self.key = key

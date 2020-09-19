@@ -11,6 +11,7 @@ from tornado.concurrent import run_on_executor
 
 from cpac import __version__
 from .schedules import Schedule, DataSettingsSchedule, DataConfigSchedule, ParticipantPipelineSchedule
+from .backends import available_backends
 from .backends.base import Result, FileResult, CrashFileResult, LogFileResult
 
 import os
@@ -77,13 +78,18 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class MainHandler(BaseHandler):
     def get(self):
+        scheduler = self.application.settings.get("scheduler")
+        backend = scheduler.backend
+        types = {v: k for k, v in available_backends.items()}
+
         self.finish({
             "api": "cpacpy",
             "version": __version__,
             "backends": [
-                {"id": "docker", "backend": "docker", "tags": ["docker"]},
-                {"id": "singularity", "backend": "singularity", "tags": ["singularity"]},
-                {"id": "slurm", "backend": "slurm", "tags": ["slurm", "ssh", "singularity"]},
+                {
+                    "id": backend.id,
+                    "backend": types[backend.__class__]
+                },
             ]
         })
 
