@@ -44,17 +44,17 @@ class SLURMSchedule(BackendSchedule):
         pass
 
     async def run(self):
-        self._job_id = await self.backend.start_job(f'cpacpy_{repr(self)}', '')
+        self._job_id = self.backend.start_job(f'cpacpy_{repr(self)}', '')
         logger.info(f'[{self}] Job ID {self._job_id}')
 
         while self._status is not RunStatus.RUNNING:
             await asyncio.sleep(1)
-            status = await self.backend.queue_info(self._job_id)
+            status = self.backend.queue_info(self._job_id)
 
             self._status = status[self._job_id]['STATE']
             logger.info(f'[{self}] Job status {self._status}')
 
-        self._proxy_addr = await self.backend.proxy(self._job_id)
+        self._proxy_addr = self.backend.proxy(self._job_id)
         logger.info(f'[{self}] Job proxy {self._proxy_addr[0]}:{self._proxy_addr[1]}')
 
         status = None
@@ -70,8 +70,8 @@ class SLURMSchedule(BackendSchedule):
                         status = message.status
                 self._results = await client.result(self)
         finally:
-            await self.backend.unproxy(self._job_id)
-            await self.backend.cancel_job(self._job_id)
+            self.backend.unproxy(self._job_id)
+            self.backend.cancel_job(self._job_id)
             self._status = status if status else RunStatus.FAILURE
 
 
@@ -121,7 +121,6 @@ class SLURMBackend(Backend):
 
         self.connect()
 
-
     def connect(self):
         if os.path.exists(self.control):
             return
@@ -130,7 +129,8 @@ class SLURMBackend(Backend):
             'ssh',
             '-T',
             '-p', self.host[1],
-            '-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null', # TODO enable host key check
+            '-o', 'StrictHostKeyChecking=no',
+            '-o', 'UserKnownHostsFile=/dev/null', # TODO enable host key check
             '-i', self.key,
         ] + self._control_args + [
             f'{self.username}@{self.host[0]}'
@@ -169,7 +169,7 @@ class SLURMBackend(Backend):
         returncode = proc.returncode
         return returncode, stdout, stderr
 
-    async def queue_info(self, jobs=None):
+    def queue_info(self, jobs=None):
         query = []
         if jobs:
             jobs = [jobs] if type(jobs) is not list else jobs
@@ -216,11 +216,11 @@ class SLURMBackend(Backend):
             }
         return data_pieces
 
-    async def cancel_all(self):
-        status = await self.queue_info()
+    def cancel_all(self):
+        status = self.queue_info()
         ret, out, err = self.exec(['scancel'] + [str(j) for j in status.keys()])
 
-    async def start_job(self, job_name, time):
+    def start_job(self, job_name, time):
         slurm_template = pkgutil.get_data(__package__, 'data/slurm.sh').decode()
         slurm_script = slurm_template \
             .replace('$JOB_NAME', job_name) \
@@ -244,12 +244,12 @@ class SLURMBackend(Backend):
         except ValueError:
             raise Exception(error.decode())
 
-    async def cancel_job(self, job):
+    def cancel_job(self, job):
         logger.info(f'[SLURMBackend] Cancelling job {job}')
         ret, stdout, stderr = self.exec(['scancel', str(job)])
 
-    async def proxy(self, job_id):
-        status = (await self.queue_info(job_id))[job_id]
+    def proxy(self, job_id):
+        status = self.queue_info(job_id)[job_id]
         if status['STATE'] is not RunStatus.RUNNING:
             return
 
@@ -267,7 +267,7 @@ class SLURMBackend(Backend):
         Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate(b"\n")
         return ('localhost', port)
 
-    async def unproxy(self, job_id):
+    def unproxy(self, job_id):
         cmd = [
             'ssh',
             '-T',
