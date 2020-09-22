@@ -110,22 +110,8 @@ def main(args):
     setup_logging(args.loglevel)
 
     if args.command == 'scheduler':
-
         import asyncio
         asyncio.run(start(args))
-
-    # elif args.command == 'run':
-
-    #     if not args.address:
-    #         from theodore.scheduler.process import spawn_scheduler
-    #         spawn_scheduler(args.address, args.backend)
-
-    #     from theodore.scheduler.client import schedule, wait
-    #     from theodore.scheduler import SCHEDULER_ADDRESS
-
-    #     scheduler = args.address or SCHEDULER_ADDRESS
-
-    #     schedule(scheduler, args.backend, args.data_config, args.pipeline)
 
 
 def run():
