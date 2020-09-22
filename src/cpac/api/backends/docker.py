@@ -114,7 +114,7 @@ class DockerParticipantPipelineSchedule(ContainerParticipantPipelineSchedule,
 
 class DockerBackend(ContainerBackend):
 
-    image = 'fcpindi/c-pac:nightly'
+    image = 'fcpindi/c-pac:latest'
 
     base_schedule_class = DockerSchedule
 
