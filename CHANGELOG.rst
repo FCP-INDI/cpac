@@ -59,7 +59,7 @@ Version 0.1.4
 
 Version 0.1.3
 =============
-* ➕ Require ``docker-pycreds``
+* ➕ Require ``docker-pycreds``, ``websocket-client``
 
 Version 0.1.2
 =============
