@@ -77,23 +77,23 @@ def merge_async_iters(*aiters):
     return merged(), tasks, cancel_tasks
 
 
-def wait_for_port(address, timeout=5.0):
+def wait_for_port(address, timeout=None):
     host, port = address.split(':')
     start_time = time.perf_counter()
     while True:
         try:
-            with socket.create_connection((host, port), timeout=timeout):
+            with socket.create_connection((host, port), timeout=1):
                 break
         except OSError as ex:
             time.sleep(0.01)
-            if time.perf_counter() - start_time >= timeout:
-                raise TimeoutError('Waited too long for the port {} on host {} to start accepting '
-                                   'connections.'.format(port, host)) from ex
+            if timeout:
+                if time.perf_counter() - start_time >= timeout:
+                    raise TimeoutError('Waited too long for the port {} on host {} to start accepting '
+                                    'connections.'.format(port, host)) from ex
 
 
 def process(command, cwd=None):
-    return Popen(
-        command,
-        stdin=PIPE, stdout=PIPE, stderr=PIPE,
-        cwd=cwd
-    ).communicate(b"\n")
+    proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = proc.communicate(b"\n")
+    returncode = proc.returncode
+    return returncode, stdout, stderr
