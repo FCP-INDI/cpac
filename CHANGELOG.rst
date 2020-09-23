@@ -1,7 +1,7 @@
 =========
 Changelog
 =========
-`Version 0.3.0 <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.0>`_
+`Version 0.3.1 <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.1>`_
 =======================================================================
 * 🚸 Print without emoji if terminal can't handle extended Unicode set
 * 📚 Add PyPI badge to README
