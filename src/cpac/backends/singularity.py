@@ -18,7 +18,7 @@ class Singularity(Backend):
         if kwargs.get("working_dir") is not None:
             pwd = kwargs["working_dir"]
             os.chdir(pwd)
-        print(f"Loading {self.platform.symbol} {self.platform.name}")
+        self._print_loading_with_symbol(self.platform.name)
         if image and isinstance(image, str) and os.path.exists(image):
             self.image = image
         elif tag and isinstance(tag, str):  # pragma: no cover

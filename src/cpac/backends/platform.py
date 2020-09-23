@@ -66,11 +66,12 @@ class Backend(object):
             ) for j in self.bindings['volumes'][i]
         ])
         t.columns = ['local', self.platform.name, 'mode']
-        print(" ".join([
-            f"Loading {self.platform.symbol}",
-            self.image,
-            "with these directory bindings:"
-        ]))
+        self._print_loading_with_symbol(
+            " ".join([
+                self.image,
+                "with these directory bindings:"
+            ])
+        )
         print(textwrap.indent(
             tabulate(t.applymap(
                 lambda x: (
@@ -92,6 +93,14 @@ class Backend(object):
             os.path.realpath(binding_path_local),
             os.path.abspath(binding_path_remote)
         )
+
+    def _print_loading_with_symbol(self, message, prefix='Loading'):
+        if prefix is not None:
+            print(prefix, end=' ')
+        try:
+            print(' '.join([self.platform.symbol, message]))
+        except UnicodeEncodeError:
+            print(message)
 
     def _set_bindings(self, **kwargs):
         tag = kwargs.get('tag', None)
