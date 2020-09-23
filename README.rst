@@ -1,6 +1,6 @@
-========================================================================
-C-PAC Python Package |build-status| |github-version| |upload| |coverage|
-========================================================================
+========================================================================================
+C-PAC Python Package |build-status| |github-version| |upload| |pypi-version| |coverage|
+========================================================================================
 
 
 A Python package that wraps `C-PAC <http://fcp-indi.github.io>`_, enabling users to install cpac with `pip <https://pip.pypa.io>`_ and run from the command line.
@@ -98,6 +98,9 @@ Usage
 
 .. END USAGE
 
+.. |pypi-version| image:: https://badge.fury.io/py/cpac.svg
+    :target: https://pypi.org/project/cpac/
+    :alt: PyPI version
 .. |github-version| image:: https://img.shields.io/github/tag/FCP-INDI/cpac.svg
     :target: https://github.com/FCP-INDI/cpac/releases
     :alt: GitHub version
@@ -108,5 +111,6 @@ Usage
     :target: https://coveralls.io/github/FCP-INDI/cpac
     :alt: coverage badge
 .. |upload| image:: https://github.com/FCP-INDI/cpac/workflows/Upload%20Python%20Package/badge.svg
-    :target: https://pypi.org/project/cpac-py/
-    :alt: upload Python package
+    :target: https://pypi.org/project/cpac/
+    :alt: upload Python package to PyPI
+
