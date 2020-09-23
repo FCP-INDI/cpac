@@ -13,10 +13,7 @@ from .backends.base import BackendSchedule
 
 logger = logging.getLogger(__name__)
 
-
 MAX_PARALLEL = 10
-SCHEDULER_ADDRESS = ('localhost', 3333)
-
 
 class ScheduleTree:
 
