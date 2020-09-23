@@ -5,7 +5,6 @@ import collections
 import logging
 import asyncio
 from collections.abc import Iterable
-from concurrent.futures import ThreadPoolExecutor
 from appdirs import AppDirs
 
 from .schedules import Schedule
