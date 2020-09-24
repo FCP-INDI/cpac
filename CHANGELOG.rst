@@ -1,6 +1,11 @@
 =========
 Changelog
 =========
+`Version 0.3.1 <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.1>`_
+=======================================================================
+* 🚸 Print without emoji if terminal can't handle extended Unicode set
+* 📚 Add PyPI badge to README
+
 `Version 0.3.0 <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.0>`_
 =======================================================================
 * 📛 Rename project from `shnizzedy/cpac-python-package <https://github.com/shnizzedy/cpac-python-package>`_ to `FCP-INDI/cpac <https://github.com/FCP-INDI/cpac>`_

@@ -8,7 +8,7 @@ from cpac.backends.platform import Backend, Platform_Meta
 class Docker(Backend):
     def __init__(self, **kwargs):
         self.platform = Platform_Meta('Docker', '🐳')
-        print(f"Loading {self.platform.symbol} {self.platform.name}")
+        self._print_loading_with_symbol(self.platform.name)
         self.client = docker.from_env()
         try:
             self.client.ping()
