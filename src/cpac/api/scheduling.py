@@ -212,7 +212,8 @@ class Scheduler:
                 if sid in self._watchers[watcher_class]:
                     del self._watchers[watcher_class][sid]
 
-        logger.info(f"[Scheduler:{alloc()}] Schedule {schedule} is done ({await schedule.status})")
+        status = await schedule.status
+        logger.info(f"[Scheduler:{alloc()}] Schedule {schedule} is done ({status})")
 
         return schedule
 
