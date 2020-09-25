@@ -1,0 +1,9 @@
+coveralls
+pytest
+pytest-remotedata >= 0.3.2
+pytest-runner
+pytest-cov
+pytest-runner
+pytest-tornado
+pytest-asyncio
+sphinx
