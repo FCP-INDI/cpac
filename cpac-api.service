@@ -1,0 +1,14 @@
+[Unit]
+Description=API to allow CPAC Dashboard to communicate with CPAC CLI (e.g. for cluster)
+After=sshd.service
+
+[Service]
+Type=simple
+User=ubuntu
+ExecStart=/home/ubuntu/miniconda3/bin/python -m cpac.api scheduler --backend slurm \
+  --singularity-image /shared/C-PAC.simg --slurm-host localhost:22 --slurm-username ubuntu
+WorkingDirectory=/home/ubuntu
+
+[Install]
+Alias=cpac-api.service
+WantedBy=mult-user.target
