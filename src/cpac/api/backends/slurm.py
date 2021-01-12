@@ -119,6 +119,8 @@ class SLURMBackend(Backend):
             '-o', 'ControlPersist=15m',
         ]
 
+        logger.info(f'[{self}] Control {self.control} {self._control_args}')
+
         self.connect()
 
     def connect(self):
@@ -131,10 +133,17 @@ class SLURMBackend(Backend):
             '-p', self.host[1],
             '-o', 'StrictHostKeyChecking=no',
             '-o', 'UserKnownHostsFile=/dev/null', # TODO enable host key check
-            '-i', self.key,
-        ] + self._control_args + [
+        ]
+
+        if self.key:
+            cmd += [
+                '-i', self.key,
+            ] 
+            
+        cmd += self._control_args + [
             f'{self.username}@{self.host[0]}'
         ]
+
         stdout, stderr = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate(b"\n")
         # TODO handle exit code
         # print("Connect")

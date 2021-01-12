@@ -4,6 +4,8 @@
 import argparse
 import sys
 import logging
+import random
+import string
 
 from .. import __version__
 
@@ -25,7 +27,7 @@ def address(str):
 
 def parse_args(args):
     parser = argparse.ArgumentParser(
-        description='cpac: a Python package that simplifies using C-PAC.'
+        description='cpac: a Python package that simplifies using C-PAC. CCs development version'
     )
     
     parser.add_argument(
@@ -66,7 +68,8 @@ def parse_args(args):
     scheduler_parser.add_argument('--slurm-host', nargs='?')
     scheduler_parser.add_argument('--slurm-username', nargs='?')
     scheduler_parser.add_argument('--slurm-key', nargs='?')
-    scheduler_parser.add_argument('--slurm-control', nargs='?')
+    scheduler_parser.add_argument('--slurm-control', nargs='?',
+            default=f'~/.ssh/{"".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(24))}')
     scheduler_parser.add_argument('--slurm-pip-install', nargs='?')
 
     parsed = parser.parse_args(args)
