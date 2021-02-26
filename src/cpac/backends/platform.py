@@ -29,8 +29,10 @@ class Backend(object):
             self._load_logging()
         stderr = StringIO()
         with redirect_stderr(stderr):
+            del kwargs['command']
             crash_lines = list(self._read_crash(
-                f'{cpac_read_crash.__file__} {crashfile}'
+                f'{cpac_read_crash.__file__} {crashfile}',
+                **kwargs
             ))
             crash_message = ''.join([
                 l.decode('utf-8') if isinstance(l, bytes) else l for l in (

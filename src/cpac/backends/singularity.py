@@ -60,7 +60,7 @@ class Singularity(Backend):
             ] for local in self.volumes])))]
         )
 
-    def _try_to_stream(self, args, stream_command='run'):
+    def _try_to_stream(self, args, stream_command='run', **kwargs):
         self._bindings_as_option()
         try:
             if stream_command == 'run':
@@ -84,9 +84,11 @@ class Singularity(Backend):
         except CalledProcessError:  # pragma: no cover
             return
 
-    def _read_crash(self, read_crash_command):
+    def _read_crash(self, read_crash_command, **kwargs):
         return self._try_to_stream(
-            args={'command': read_crash_command}, stream_command='execute'
+            args={'command': read_crash_command},
+            stream_command='execute',
+            **kwargs
         )
 
     def run(self, flags=[], **kwargs):

@@ -38,8 +38,10 @@ class Docker(Backend):
                     else:
                         self.docker_kwargs[k] = v
 
-    def _read_crash(self, read_crash_command):
-        return(self._execute(command=read_crash_command, run_type='exec'))
+    def _read_crash(self, read_crash_command, **kwargs):
+        return self._execute(
+            command=read_crash_command, run_type='exec', **kwargs
+        )
 
     def run(self, flags=[], **kwargs):
         kwargs['command'] = [i for i in [
