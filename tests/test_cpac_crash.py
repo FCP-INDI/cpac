@@ -19,4 +19,6 @@ def test_cpac_crash(args, capsys):
     with mock.patch.object(sys, 'argv', argv):
         run()
         captured = capsys.readouterr()
-        assert("MemoryError" in captured.out or "MemoryError" in captured.err)
+        assert(
+            "MemoryError" in captured.out or "MemoryError" in captured.err
+        )
