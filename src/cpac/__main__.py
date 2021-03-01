@@ -183,6 +183,13 @@ def parse_args(args):
     )
     utils_parser.register('action', 'extend', ExtendAction)
 
+    subparsers.add_parser(
+        'pull',
+        add_help=True,
+        aliases=['upgrade'],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
     crash_parser = subparsers.add_parser(
         'crash',
         add_help=True,
@@ -290,6 +297,12 @@ def main(args):
                     arg_vars[arg] = pwd
         Backends(**arg_vars).run(
             flags=args.extra_args,
+            **arg_vars
+        )
+
+    if args.command in ['pull', 'upgrade']:
+        Backends(**arg_vars).pull(
+            force=True,
             **arg_vars
         )
 

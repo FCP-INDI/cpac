@@ -12,34 +12,8 @@ BINDING_MODES = {'ro': 'ro', 'w': 'rw', 'rw': 'rw'}
 class Singularity(Backend):
     def __init__(self, **kwargs):
         self.platform = Platform_Meta('Singularity', 'Ⓢ')
-        image = kwargs.get("image")
-        tag = kwargs.get("tag")
-        pwd = os.getcwd()
-        if kwargs.get("working_dir") is not None:
-            pwd = kwargs["working_dir"]
-            os.chdir(pwd)
         self._print_loading_with_symbol(self.platform.name)
-        if image and isinstance(image, str) and os.path.exists(image):
-            self.image = image
-        elif tag and isinstance(tag, str):  # pragma: no cover
-            self.image = Client.pull(
-                f"docker://{image}:{tag}",
-                pull_folder=pwd
-            )
-        else:  # pragma: no cover
-            try:
-                self.image = Client.pull(
-                    "shub://FCP-INDI/C-PAC",
-                    pull_folder=pwd
-                )
-            except Exception:
-                try:
-                    self.image = Client.pull(
-                        f"docker://fcpindi/c-pac:latest",
-                        pull_folder=pwd
-                    )
-                except Exception:
-                    raise OSError("Could not connect to Singularity")
+        self.pull(**kwargs, force=False)
         self.volumes = {}
         self.options = list(chain.from_iterable(kwargs[
             "container_options"
@@ -59,6 +33,43 @@ class Singularity(Backend):
                 ] if b is not None]) for binding in self.volumes[local]
             ] for local in self.volumes])))]
         )
+
+    def pull(self, force=False, **kwargs):
+        image = kwargs['image'] if kwargs.get(
+            'image'
+        ) is not None else 'fcpindi/c-pac'
+        tag = kwargs.get("tag")
+        pwd = os.getcwd()
+        if kwargs.get("working_dir") is not None:
+            pwd = kwargs["working_dir"]
+            os.chdir(pwd)
+        if (
+            not force and
+            image and isinstance(image, str) and os.path.exists(image)
+        ):
+            self.image = image
+        elif tag and isinstance(tag, str):  # pragma: no cover
+            self.image = Client.pull(
+                f"docker://{image}:{tag}",
+                force=force,
+                pull_folder=pwd
+            )
+        else:  # pragma: no cover
+            try:
+                self.image = Client.pull(
+                    "shub://FCP-INDI/C-PAC",
+                    force=force,
+                    pull_folder=pwd
+                )
+            except Exception:
+                try:
+                    self.image = Client.pull(
+                        f"docker://fcpindi/c-pac:latest",
+                        force=force,
+                        pull_folder=pwd
+                    )
+                except Exception:
+                    raise OSError("Could not connect to Singularity")
 
     def _try_to_stream(self, args, stream_command='run', **kwargs):
         self._bindings_as_option()

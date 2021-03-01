@@ -37,6 +37,22 @@ class Docker(Backend):
                             self.docker_kwargs[k] = [self.docker_kwargs[k], v]
                     else:
                         self.docker_kwargs[k] = v
+        image = kwargs['image'] if kwargs.get(
+            'image'
+        ) is not None else 'fcpindi/c-pac'
+        tag = self.bindings['tag'] if self.bindings.get(
+            'tag'
+        ) is not None else 'latest'
+        self.image = ':'.join([image, tag])
+
+    def pull(self, **kwargs):
+        image, tag = self.image.split(':')
+        [print(layer[k]) for layer in self.client.api.pull(
+                repository=image,
+                tag=tag,
+                stream=True,
+                decode=True
+            ) for k in layer if k in {'id', 'status', 'progress'}]
 
     def _read_crash(self, read_crash_command, **kwargs):
         return self._execute(
@@ -75,22 +91,10 @@ class Docker(Backend):
         self._execute(**kwargs)
 
     def _execute(self, command, run_type='run', **kwargs):
-        image = kwargs['image'] if kwargs.get(
-            'image'
-        ) is not None else 'fcpindi/c-pac'
-        tag = self.bindings['tag'] if self.bindings.get(
-            'tag'
-        ) is not None else 'latest'
-        self.image = ':'.join([image, tag])
         try:
             self.client.images.get(self.image)
         except docker.errors.ImageNotFound:
-            [print(layer[k]) for layer in self.client.api.pull(
-                repository=image,
-                tag=tag,
-                stream=True,
-                decode=True
-            ) for k in layer if k in {'id', 'status', 'progress'}]
+            self.pull(**kwargs)
 
         self._load_logging()
 
