@@ -4,6 +4,7 @@ Changelog
 `Version 0.3.2 <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.2>`_
 =======================================================================
 * ➖ Remove dependecy on Nipype
+* 🐛 Pass commandline arguments through to ``cpac crash``
 
 `Version 0.3.1 <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.1>`_
 =======================================================================
