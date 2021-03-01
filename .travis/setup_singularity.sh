@@ -13,20 +13,20 @@ echo "sregistry Version:"
 
 # Install Singularity
 
-SINGULARITY_BASE="${GOPATH}/src/github.com/sylabs/singularity"
+SINGULARITY_BASE="${GOPATH}/src/github.com/hpcng/singularity"
 export PATH="${GOPATH}/bin:${PATH}"
 
-mkdir -p "${GOPATH}/src/github.com/sylabs"
-cd "${GOPATH}/src/github.com/sylabs"
+mkdir -p "${GOPATH}/src/github.com/hpcng"
+cd "${GOPATH}/src/github.com/hpcng"
 
-git clone -b 2.6.1 https://github.com/sylabs/singularity
+git clone -b v3.7.1 https://github.com/hpcng/singularity
 cd singularity
 # These are the Singularity 2 installation commands:
-./autogen.sh
-./configure --prefix=/usr/local --sysconfdir=/etc
-make
-sudo make install
+# ./autogen.sh
+# ./configure --prefix=/usr/local --sysconfdir=/etc
+# make
+# sudo make install
 # These are the Singularity 3 installation commands:
-# ./mconfig -v -p /usr/local
-# make -j `nproc 2>/dev/null || echo 1` -C ./builddir all
-# sudo make -C ./builddir install
+./mconfig -v -p /usr/local
+make -j `nproc 2>/dev/null || echo 1` -C ./builddir all
+sudo make -C ./builddir install

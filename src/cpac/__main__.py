@@ -34,7 +34,8 @@ def parse_args(args):
     parser = argparse.ArgumentParser(
         description='cpac: a Python package that simplifies using C-PAC '
                     '<http://fcp-indi.github.io> containerized images. \n\n'
-                    'This commandline interface package is designed to ' 'minimize repetition.\nAs such, nearly all arguments are '
+                    'This commandline interface package is designed to '
+                    'minimize repetition.\nAs such, nearly all arguments are '
                     'optional.\n\nWhen launching a container, this package '
                     'will try to bind any paths mentioned in \n • the command'
                     '\n • the data configuration\n\nAn example minimal run '
