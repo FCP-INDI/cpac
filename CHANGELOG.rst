@@ -1,10 +1,11 @@
 =========
 Changelog
 =========
-`Version 0.3.2 <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.2>`_
-=======================================================================
+`Version 0.3.2: Pull / Upgrade <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.2>`_
+========================================================================================
 * ➖ Remove dependecy on Nipype
 * 🐛 Pass commandline arguments through to ``cpac crash``
+* 🚸 Add ``pull`` / ``upgrade`` command
 
 `Version 0.3.1 <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.1>`_
 =======================================================================
