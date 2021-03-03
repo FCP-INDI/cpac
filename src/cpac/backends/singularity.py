@@ -11,6 +11,7 @@ BINDING_MODES = {'ro': 'ro', 'w': 'rw', 'rw': 'rw'}
 
 class Singularity(Backend):
     def __init__(self, **kwargs):
+        super(Singularity, self).__init__(**kwargs)
         self.platform = Platform_Meta('Singularity', 'Ⓢ')
         self._print_loading_with_symbol(self.platform.name)
         self.pull(**kwargs, force=False)
@@ -18,6 +19,16 @@ class Singularity(Backend):
         self.options = list(chain.from_iterable(kwargs[
             "container_options"
         ])) if bool(kwargs.get("container_options")) else []
+        if isinstance(self.pipeline_config, str):
+            self.config = Client.execute(
+                image=self.image,
+                command=f'cat {self.pipeline_config}',
+                return_result=False
+            )
+        else:
+            self.config = self.pipeline_config
+        kwargs = self.collect_config_bindings(self.config, **kwargs)
+        del self.config
         self._set_bindings(**kwargs)
 
     def _bindings_as_option(self):
