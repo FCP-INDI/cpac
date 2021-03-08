@@ -7,6 +7,7 @@ import os
 import sys
 
 from docker.errors import DockerException, NotFound
+from itertools import chain
 
 from cpac import __version__
 from cpac.backends import Backends
@@ -30,16 +31,16 @@ def address(str):  # pragma: no cover
     return addr, port
 
 
-def parse_args(args):
-    '''Parse commandline arguments
+def _parser():
+    '''Generate parser.
 
     Parameters
     ----------
-    args : list
+    None
 
     Returns
     -------
-    parsed : Namespace
+    parser : argparse.ArgumentParser
     '''
     cwd = os.getcwd()
 
@@ -168,7 +169,7 @@ def parse_args(args):
         )
     run_parser.add_argument(
         '--data_config_file',
-        metavar="PATH"
+        metavar='PATH'
     )
     run_parser.add_argument(
         'extra_args',
@@ -205,8 +206,24 @@ def parse_args(args):
 
     crash_parser.add_argument(
         'crashfile',
-        help="path to crashfile"
+        help='path to crashfile'
     )
+
+    return parser
+
+
+def parse_args(args):
+    '''Parse commandline arguments
+
+    Parameters
+    ----------
+    args : list
+
+    Returns
+    -------
+    parsed : Namespace
+    '''
+    parser = _parser()
 
     parsed, extras = parser.parse_known_args(args)
     # try to parse extra args if out of sequence
@@ -343,6 +360,35 @@ def run():
     Consumes commandline arguments. Run `cpac --help` for usage string.
     '''
     args = sys.argv[1:]
+
+    # reorder args
+    command = None
+    command_index = 0
+    parser = _parser()
+    commands = list([cmd for cmd in parser._get_positional_actions(
+    ) if cmd.dest == 'command'][0].choices)
+    options = set(chain.from_iterable([
+        o.option_strings for o in parser._get_optional_actions()]))
+    for cmd in commands:
+        if command is None and cmd in args:
+            command_index = args.index(cmd)
+            command = args.pop(command_index)
+    reordered_args = []
+    option_value_setting = False
+    for i, arg in enumerate(args.copy()):
+        if i == command_index:
+            option_value_setting = False
+        elif arg in options:
+            reordered_args.append(args.pop(args.index(arg)))
+            option_value_setting = True
+        elif option_value_setting:
+            if arg.startswith('-'):
+                option_value_setting = False
+            else:
+                reordered_args.append(args.pop(args.index(arg)))
+    args = reordered_args + [command] + args
+
+    # parse args
     parsed = parse_args(args)
     if not parsed.platform and "--platform" not in args:
         if parsed.image and os.path.exists(parsed.image):

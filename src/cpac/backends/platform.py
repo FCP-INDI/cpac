@@ -51,7 +51,9 @@ class Backend(object):
                 **kwargs
             ))
             crash_message = ''.join([
-                l.decode('utf-8') if isinstance(l, bytes) else l for l in (
+                l.decode('utf-8') if isinstance(
+                    l, bytes
+                ) else l for l in (  # noqa: E741
                     [line[0] for line in crash_lines] if (
                         len(crash_lines) and isinstance(crash_lines[0], tuple)
                     ) else crash_lines
@@ -147,7 +149,8 @@ class Backend(object):
                 '  '
             ))
             print(
-                f"Logging messages will refer to the {self.platform.name} paths.\n"
+                f"Logging messages will refer to the {self.platform.name} "
+                "paths.\n"
             )
 
     def _prep_binding(self, binding_path_local, binding_path_remote):
