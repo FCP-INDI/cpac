@@ -30,21 +30,7 @@ class Docker(Backend):
         ) is not None else 'latest'
         self.image = ':'.join([image, tag])
 
-        if kwargs.get('command') not in {'pull', 'upgrade'}:
-            if isinstance(self.pipeline_config, str):
-                try:
-                    container = self.client.containers.create(image=self.image)
-                except ImageNotFound:
-                    container = self.pull(**kwargs)
-                stream = container.get_archive(path=self.pipeline_config)[0]
-                self.config = b''.join([
-                    l for l in stream  # noqa E741
-                ]).split(b'\x000000000')[-1].replace(b'\x00', b'').decode()
-                container.remove()
-            else:
-                self.config = self.pipeline_config
-            kwargs = self.collect_config_bindings(self.config, **kwargs)
-            self._set_bindings(**kwargs)
+        self._collect_config(**kwargs)
         self.docker_kwargs = {}
         if isinstance(kwargs.get('container_options'), list):
             for opt in kwargs['container_options']:
@@ -63,6 +49,24 @@ class Docker(Backend):
                             self.docker_kwargs[k] = [self.docker_kwargs[k], v]
                     else:
                         self.docker_kwargs[k] = v
+
+    def _collect_config(self, **kwargs):
+        if kwargs.get('command') not in {'pull', 'upgrade', None}:
+            self.pull()
+            if isinstance(self.pipeline_config, str):
+                try:
+                    container = self.client.containers.create(image=self.image)
+                except ImageNotFound:
+                    container = self.pull(**kwargs)
+                stream = container.get_archive(path=self.pipeline_config)[0]
+                self.config = b''.join([
+                    l for l in stream  # noqa E741
+                ]).split(b'\x000000000')[-1].replace(b'\x00', b'').decode()
+                container.remove()
+            else:
+                self.config = self.pipeline_config
+            kwargs = self.collect_config_bindings(self.config, **kwargs)
+            self._set_bindings(**kwargs)
 
     def pull(self, **kwargs):
         image, tag = self.image.split(':')

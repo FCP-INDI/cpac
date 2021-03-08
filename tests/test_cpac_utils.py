@@ -5,7 +5,7 @@ import sys
 from unittest import mock
 
 from cpac.__main__ import run
-from CONSTANTS import PLATFORM_ARGS
+from CONSTANTS import PLATFORM_ARGS, TAGS
 
 
 @pytest.mark.parametrize('args,platform', [
@@ -13,7 +13,10 @@ from CONSTANTS import PLATFORM_ARGS
     (PLATFORM_ARGS[1], 'singularity'),
     ('', '')
 ])
-def test_utils_help(args, capsys, platform):
+@pytest.mark.parametrize('tag', TAGS)
+def test_utils_help(args, tag, capsys, platform):
+    if tag is not None:
+        args = args + f' --tag {tag}'
     argv = ['cpac', *args.split(' '), 'utils', '--help']
     print(argv)
     with mock.patch.object(sys, 'argv', [arg for arg in argv if len(arg)]):
@@ -25,8 +28,11 @@ def test_utils_help(args, capsys, platform):
 
 
 @pytest.mark.parametrize('args', PLATFORM_ARGS)
-def test_utils_new_settings_template(args, tmp_path):
+@pytest.mark.parametrize('tag', TAGS)
+def test_utils_new_settings_template(args, tag, tmp_path):
     wd = tmp_path
+    if tag is not None:
+        args = args + f' --tag {tag}'
     argv = (
         f'cpac {args} --working_dir {wd} '
         f'utils data_config new_settings_template'

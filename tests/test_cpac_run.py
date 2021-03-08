@@ -6,13 +6,15 @@ from datetime import date
 from unittest import mock
 
 from cpac.__main__ import run
-from CONSTANTS import PLATFORM_ARGS
+from CONSTANTS import PLATFORM_ARGS, TAGS
 
 
-@pytest.mark.parametrize('args,helpflag', [
-    (arg, flag) for arg in PLATFORM_ARGS for flag in ['--help', '-h']
-])
-def test_run_help(args, capsys, helpflag):
+@pytest.mark.parametrize('args', PLATFORM_ARGS)
+@pytest.mark.parametrize('tag', TAGS)
+@pytest.mark.parametrize('helpflag', ['--help', '-h'])
+def test_run_help(args, tag, helpflag, capsys):
+    if tag is not None:
+        args = args + f' --tag {tag}'
     argv = ['cpac', *args.split(' '), 'run', helpflag]
     with mock.patch.object(sys, 'argv', argv):
         run()
@@ -21,8 +23,11 @@ def test_run_help(args, capsys, helpflag):
 
 
 @pytest.mark.parametrize('args', PLATFORM_ARGS)
-def test_run_test_config(args, tmp_path):
+@pytest.mark.parametrize('tag', TAGS)
+def test_run_test_config(args, tag, tmp_path):
     wd = tmp_path
+    if tag is not None:
+        args = args + f' --tag {tag}'
     argv = (
         f'cpac {args} run '
         f's3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU {wd} '
