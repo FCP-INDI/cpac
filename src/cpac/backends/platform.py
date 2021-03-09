@@ -62,6 +62,8 @@ class Backend(object):
             crash_message += stderr.getvalue()
             stderr.read()  # clear stderr
             print(crash_message.strip())
+            if hasattr(self, 'container'):
+                self.container.stop()
 
     def _bind_volume(self, local, remote, mode):
         local, remote = self._prep_binding(local, remote)

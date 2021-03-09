@@ -56,7 +56,8 @@ class Docker(Backend):
                 try:
                     container = self.client.containers.create(image=self.image)
                 except ImageNotFound:
-                    container = self.pull(**kwargs)
+                    self.pull(**kwargs)
+                    container = self.client.containers.create(image=self.image)
                 stream = container.get_archive(path=self.pipeline_config)[0]
                 self.config = b''.join([
                     l for l in stream  # noqa E741
@@ -137,6 +138,7 @@ class Docker(Backend):
                 **self.docker_kwargs
             )
             self._run = DockerRun(self.container)
+            self.container.stop()
         elif run_type == 'exec':
             self.container = self.client.containers.create(
                 self.image,
