@@ -52,7 +52,6 @@ class Docker(Backend):
 
     def _collect_config(self, **kwargs):
         if kwargs.get('command') not in {'pull', 'upgrade', None}:
-            self.pull()
             if isinstance(self.pipeline_config, str):
                 try:
                     container = self.client.containers.create(image=self.image)

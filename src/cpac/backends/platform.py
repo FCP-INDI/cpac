@@ -94,6 +94,15 @@ class Backend(object):
         return config.get('pipeline_setup', {}).get(config_key, {}).get('path')
 
     def collect_config_bindings(self, config, **kwargs):
+        kwargs['output_dir'] = kwargs.get(
+            'output_dir',
+            os.getcwd()
+        )
+        kwargs['working_dir'] = kwargs.get(
+            'working_dir',
+            os.getcwd()
+        )
+
         config_bindings = {}
         cwd = os.getcwd()
         for c_b in {
@@ -175,15 +184,6 @@ class Backend(object):
         tag = kwargs.get('tag', None)
         tag = tag if isinstance(tag, str) else None
 
-        output_dir = kwargs.get(
-            'output_dir',
-            tempfile.mkdtemp(prefix='cpac_pip_output_')
-        )
-        working_dir = kwargs.get(
-            'working_dir',
-            os.getcwd()
-        )
-
         for kwarg in [
             *kwargs.get('extra_args', []), kwargs.get('crashfile', '')
         ]:
@@ -201,8 +201,8 @@ class Backend(object):
             )
             for local in locals_from_data_config.locals:
                 self._bind_volume(local, local, 'r')
-        self._bind_volume(output_dir, output_dir, 'rw')
-        self._bind_volume(working_dir, working_dir, 'rw')
+        self._bind_volume(kwargs['output_dir'], kwargs['output_dir'], 'rw')
+        self._bind_volume(kwargs['working_dir'], kwargs['working_dir'], 'rw')
         if kwargs.get('custom_binding'):
             for d in kwargs['custom_binding']:
                 self._bind_volume(*d.split(':'), 'rw')

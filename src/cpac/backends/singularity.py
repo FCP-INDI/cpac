@@ -75,7 +75,7 @@ class Singularity(Backend):
             except Exception:
                 try:
                     self.image = Client.pull(
-                        f"docker://fcpindi/c-pac:latest",
+                        "docker://fcpindi/c-pac:latest",
                         force=force,
                         pull_folder=pwd
                     )
