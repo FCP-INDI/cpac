@@ -42,7 +42,7 @@ jobs:
         libgpgme11-dev \
         libseccomp-dev \
         squashfs-tools \
-        libssl1.0.0 libssl-dev \
+        libssl1.1 libssl-dev \
         libuuid1 uuid-dev
         if [[ "$COVERAGE" == "true" ]]; then
           pip install coverage coveralls
