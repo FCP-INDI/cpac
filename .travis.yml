@@ -51,7 +51,7 @@ before_script:
   - git config --global user.email "support@travis-ci.org"
   - git config --global user.name "Travis"
 script:
-  - travis_wait 20 coverage run --append -m pytest
+  - travis_wait 30 coverage run --append -m pytest
   - coverage report -m
 after_success:
   - if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; fi
