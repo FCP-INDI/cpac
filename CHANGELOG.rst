@@ -8,6 +8,7 @@ Changelog
 * 🚸 Add ``pull`` / ``upgrade`` command
 * ⚡️🐳 Stop Docker containers when finished
 * 👽 Handle changes from C-PAC 1.7 to 1.8
+* 👷 Move tests from Travis to GitHub Actions
 
 `Version 0.3.1 <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.1>`_
 =======================================================================

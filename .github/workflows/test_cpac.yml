@@ -1,0 +1,80 @@
+# This workflows will upload a Python Package using Twine when a release is created
+# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
+
+name: Test cpac
+
+on:
+  push
+
+jobs:
+  test_cpac:
+
+    runs-on: ubuntu-latest
+
+    env:
+      COVERAGE: true
+
+    strategy:
+      matrix:
+        go: [1.14]
+        python: [3.6, 3.7, 3.8]
+        singularity: [3.6.4]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go }}
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Set up Singularity
+      uses: eWaterCycle/setup-singularity@v5
+      with:
+        singularity-version: ${{ matrix.singularity }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get install libarchive-dev \
+        libffi-dev \
+        flawfinder \
+        libgpgme11-dev \
+        libseccomp-dev \
+        squashfs-tools \
+        libssl1.0.0 libssl-dev \
+        libuuid1 uuid-dev
+        if [[ "$COVERAGE" == "true" ]]; then
+          pip install coverage coveralls
+        fi
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        pip install nipype
+    - name: Install cpac
+      run: cd $GITHUB_WORKSPACE && pip install -e .
+    - name: Test cpac
+      run: |
+        coverage run --append -m pytest
+        coverage report -m
+    - name: Report coverage
+      run: if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; fi
+    - name: Upload cpac for subsequent jobs
+      uses: actions/upload-artifact@v2
+      with:
+        name: workspace_artifacts
+        path: $GITHUB_WORKSPACE
+  update_README:
+    # Only update README if tests succeed
+    needs: test_cpac
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cpac
+      run: cd $GITHUB_WORKSPACE && pip install .
+    - name: Configure Git credentials
+      uses: oleksiyrudenko/gha-git-credentials@v2.1
+      with:
+        global: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Update README
+      run: bash ${GITHUB_WORKSPACE}/.github/workflows/update_README_usage.sh
