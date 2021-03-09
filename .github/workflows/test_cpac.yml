@@ -11,9 +11,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    env:
-      COVERAGE: true
-
     strategy:
       matrix:
         go: [1.14]
@@ -44,12 +41,9 @@ jobs:
         squashfs-tools \
         libssl1.1 libssl-dev \
         libuuid1 uuid-dev
-        if [[ "$COVERAGE" == "true" ]]; then
-          pip install coverage coveralls
-        fi
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
-        pip install nipype
+        pip install coverage coveralls nipype
     - name: Install cpac
       run: cd $GITHUB_WORKSPACE && pip install -e .
     - name: Test cpac
@@ -57,7 +51,9 @@ jobs:
         coverage run --append -m pytest
         coverage report -m
     - name: Report coverage
-      run: if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; fi
+      uses: coverallsapp/github-action@v1.1.2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload cpac for subsequent jobs
       uses: actions/upload-artifact@v2
       with:
