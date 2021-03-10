@@ -16,6 +16,8 @@ jobs:
         go: [1.14]
         python: [3.6, 3.7, 3.8]
         singularity: [3.6.4]
+        platform: ['docker', 'singularity']
+        tag: ['latest', 'dev-v1.8']
 
     steps:
     - uses: actions/checkout@v2
@@ -48,7 +50,7 @@ jobs:
       run: cd $GITHUB_WORKSPACE && pip install -e .
     - name: Test cpac
       run: |
-        coverage run --append -m pytest
+        coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
         coverage report -m
     - name: Report coverage
       uses: coverallsapp/github-action@v1.1.2

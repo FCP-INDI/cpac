@@ -1,14 +1,9 @@
-import pytest
-
 from contextlib import redirect_stdout
 from io import StringIO, TextIOWrapper, BytesIO
 
 from cpac.backends import Backends
-from CONSTANTS import TAGS
 
 
-@pytest.mark.parametrize('platform', ['docker', 'singularity'])
-@pytest.mark.parametrize('tag', TAGS)
 def test_loading_message(platform, tag):
     redirect_out = StringIO()
     with redirect_stdout(redirect_out):
