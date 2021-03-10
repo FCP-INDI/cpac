@@ -15,6 +15,51 @@ jobs:
       matrix:
         go: [1.14]
         python: [3.6, 3.7, 3.8]
+        platform: ['docker']
+        tag: ['latest', 'dev-v1.8']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go }}
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get install libarchive-dev \
+        libffi-dev \
+        flawfinder \
+        libgpgme11-dev \
+        libseccomp-dev \
+        squashfs-tools \
+        libssl1.1 libssl-dev \
+        libuuid1 uuid-dev
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        pip install coverage coveralls nipype
+    - name: Install cpac
+      run: cd $GITHUB_WORKSPACE && pip install -e .
+    - name: Test cpac
+      run: |
+        coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
+        coverage report -m
+    - name: Report coverage
+      uses: AndreMiras/coveralls-python-action@v20201129
+      with:
+        parallel: True
+        flag-name: Test cpac ${{ matrix.platform }} with Python {{ matrix.python }}
+      continue-on-error: true
+  test_cpac_singularity:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        go: [1.14]
+        python: [3.6, 3.7, 3.8]
         singularity: [3.6.4]
         platform: ['docker', 'singularity']
         tag: ['latest', 'dev-v1.8']
@@ -53,9 +98,20 @@ jobs:
         coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
         coverage report -m
     - name: Report coverage
-      uses: coverallsapp/github-action@v1.1.2
+      uses: AndreMiras/coveralls-python-action@v20201129
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        parallel: True
+        flag-name: Test cpac ${{ matrix.platform }} with Python {{ matrix.python }}
+      continue-on-error: true
+  finalize_coverage-report:
+    needs: test_cpac
+    runs-on: ubuntu-latest
+    steps:
+    - name: Finalize coverage report
+      uses: AndreMiras/coveralls-python-action@v20201129
+      with:
+        parallel-finished: true
+      continue-on-error: true
   update_README:
     # Only update README if tests succeed
     needs: test_cpac
