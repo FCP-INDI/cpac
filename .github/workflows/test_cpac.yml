@@ -54,11 +54,6 @@ jobs:
       uses: coverallsapp/github-action@v1.1.2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Upload cpac for subsequent jobs
-      uses: actions/upload-artifact@v2
-      with:
-        name: workspace_artifacts
-        path: $GITHUB_WORKSPACE
   update_README:
     # Only update README if tests succeed
     needs: test_cpac
