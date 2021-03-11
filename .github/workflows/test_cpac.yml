@@ -15,11 +15,11 @@ jobs:
 
     strategy:
       matrix:
+        platform: [docker, singularity]
+        tag: [latest, dev-v1.8]
         go: [1.14]
         python: [3.6, 3.7, 3.8]
         singularity: [3.6.4]
-        platform: [docker, singularity]
-        tag: [latest, dev-v1.8]
         exclude:
           - platform: singularity
             tag: dev-v1.8
@@ -55,8 +55,14 @@ jobs:
     - name: Install cpac
       run: cd $GITHUB_WORKSPACE && pip install -e .
     - name: Test cpac
+      if: ${{ matrix.platform == 'docker' }}
       run: |
         coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
+        coverage report -m
+    - name: Test cpac
+      if: ${{ matrix.platform == 'singularity' }}
+      run: |
+        coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} .
         coverage report -m
     - name: Report coverage
       uses: AndreMiras/coveralls-python-action@v20201129
