@@ -32,8 +32,8 @@ Usage
     usage: cpac [-h] [--version] [-o [OPT [OPT ...]]]
                 [-B [CUSTOM_BINDING [CUSTOM_BINDING ...]]]
                 [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
-                [--working_dir PATH] [--temp_dir PATH] [-v] [-vv]
-                {run,group,utils,crash} ...
+                [--working_dir PATH] [-v] [-vv]
+                {run,group,utils,pull,upgrade,crash} ...
     
     cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io> containerized images. 
     
@@ -59,7 +59,7 @@ Usage
     	cpac run --help
     
     positional arguments:
-      {run,group,utils,crash}
+      {run,group,utils,pull,upgrade,crash}
     
     optional arguments:
       -h, --help            show this help message and exit
@@ -92,7 +92,6 @@ Usage
                             Docker if image is an image name.
       --tag TAG             tag of the Docker image to use (eg, "latest" or "nightly").
       --working_dir PATH    working directory
-      --temp_dir PATH       directory for temporary files
       -v, --verbose         set loglevel to INFO
       -vv, --very-verbose   set loglevel to DEBUG
 
