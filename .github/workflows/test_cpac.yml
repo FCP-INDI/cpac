@@ -39,6 +39,9 @@ jobs:
       uses: eWaterCycle/setup-singularity@v5
       with:
         singularity-version: ${{ matrix.singularity }}
+    - name: Prepare Singularity cache snf tmp directories
+      if: ${{ matrix.platform == 'singularity' }}
+      run: mkdir -p ${SINGULARITY_CACHEDIR} && mkdir -p ${SINGULARITY_TMPDIR}
     - name: Install dependencies
       run: |
         sudo apt-get install libarchive-dev \
