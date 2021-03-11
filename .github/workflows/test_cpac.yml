@@ -4,7 +4,9 @@
 name: Test cpac
 
 on:
-  push
+  push:
+    paths-ignore:
+    - README.rst
 
 jobs:
   test_cpac_docker:
