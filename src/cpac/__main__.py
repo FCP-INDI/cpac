@@ -224,22 +224,7 @@ def parse_args(args):
     parsed : Namespace
     '''
     parser = _parser()
-
     parsed, extras = parser.parse_known_args(args)
-    # try to parse extra args if out of sequence
-    # if not '--help' in args and not '-h' in args:
-    #     reparse = []
-    #     flag_arg = False
-    #     for extra in extras:
-    #         if flag_arg:
-    #             reparse[-1] = '='.join(reparse[-1], extra)
-    #         else:
-    #             reparse.append(extra)
-    #         if extra.startswith('-'):
-    #             flag_arg = True
-    #         else:
-    #             flag_arg = False
-    #     parsed, extras = parser.parse_known_args(reparse, parsed)
 
     parsed.extra_args = [
         *(parsed.extra_args if hasattr(parsed, 'extra_args') else []),
@@ -373,6 +358,9 @@ def run():
         if command is None and cmd in args:
             command_index = args.index(cmd)
             command = args.pop(command_index)
+    if command is None:
+        parser.print_help()
+        parser.exit()
     reordered_args = []
     option_value_setting = False
     for i, arg in enumerate(args.copy()):
@@ -387,7 +375,6 @@ def run():
             else:
                 reordered_args.append(args.pop(args.index(arg)))
     args = reordered_args + [command] + args
-
     # parse args
     parsed = parse_args(args)
     if not parsed.platform and "--platform" not in args:
