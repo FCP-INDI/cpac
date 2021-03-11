@@ -32,8 +32,8 @@ Usage
     usage: cpac [-h] [--version] [-o [OPT [OPT ...]]]
                 [-B [CUSTOM_BINDING [CUSTOM_BINDING ...]]]
                 [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
-                [--working_dir PATH] [--temp_dir PATH] [-v] [-vv]
-                {run,group,utils,crash} ...
+                [--working_dir PATH] [-v] [-vv]
+                {run,group,utils,pull,upgrade,crash} ...
     
     cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io> containerized images. 
     
@@ -59,7 +59,7 @@ Usage
     	cpac run --help
     
     positional arguments:
-      {run,group,utils,crash}
+      {run,group,utils,pull,upgrade,crash}
     
     optional arguments:
       -h, --help            show this help message and exit
@@ -92,7 +92,6 @@ Usage
                             Docker if image is an image name.
       --tag TAG             tag of the Docker image to use (eg, "latest" or "nightly").
       --working_dir PATH    working directory
-      --temp_dir PATH       directory for temporary files
       -v, --verbose         set loglevel to INFO
       -vv, --very-verbose   set loglevel to DEBUG
 
@@ -104,9 +103,9 @@ Usage
 .. |github-version| image:: https://img.shields.io/github/tag/FCP-INDI/cpac.svg
     :target: https://github.com/FCP-INDI/cpac/releases
     :alt: GitHub version
-.. |build-status| image:: https://travis-ci.org/FCP-INDI/cpac.svg
-    :target: https://travis-ci.org/FCP-INDI/cpac
-    :alt: Travis CI build status
+.. |build-status| image:: https://github.com/FCP-INDI/cpac/actions/workflows/test_cpac.yml/badge.svg
+    :target: https://github.com/FCP-INDI/cpac/actions/workflows/test_cpac.yml
+    :alt: GitHub Action: Test cpac
 .. |coverage| image:: https://coveralls.io/repos/github/FCP-INDI/cpac/badge.svg
     :target: https://coveralls.io/github/FCP-INDI/cpac
     :alt: coverage badge

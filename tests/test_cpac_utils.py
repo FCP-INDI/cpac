@@ -1,20 +1,16 @@
 import os
-import pytest
 import sys
 
 from unittest import mock
 
 from cpac.__main__ import run
-from CONSTANTS import PLATFORM_ARGS
+from CONSTANTS import set_commandline_args
 
 
-@pytest.mark.parametrize('args,platform', [
-    (PLATFORM_ARGS[0], 'docker'),
-    (PLATFORM_ARGS[1], 'singularity'),
-    ('', '')
-])
-def test_utils_help(args, capsys, platform):
+def test_utils_help(capsys, platform, tag):
+    args = set_commandline_args(platform, tag)
     argv = ['cpac', *args.split(' '), 'utils', '--help']
+    print(argv)
     with mock.patch.object(sys, 'argv', [arg for arg in argv if len(arg)]):
         run()
         captured = capsys.readouterr()
@@ -23,11 +19,11 @@ def test_utils_help(args, capsys, platform):
         assert 'COMMAND' in captured.out
 
 
-@pytest.mark.parametrize('args', PLATFORM_ARGS)
-def test_utils_new_settings_template(args, tmp_path):
+def test_utils_new_settings_template(platform, tag, tmp_path):
+    args = set_commandline_args(platform, tag)
     wd = tmp_path
     argv = (
-        f'cpac {args} --working_dir {wd} --temp_dir {wd} '
+        f'cpac {args} --working_dir {wd} '
         f'utils data_config new_settings_template'
     ).split(' ')
     with mock.patch.object(sys, 'argv', argv):

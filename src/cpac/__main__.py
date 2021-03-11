@@ -6,6 +6,9 @@ import logging
 import os
 import sys
 
+from docker.errors import DockerException, NotFound
+from itertools import chain
+
 from cpac import __version__
 from cpac.backends import Backends
 
@@ -28,7 +31,17 @@ def address(str):  # pragma: no cover
     return addr, port
 
 
-def parse_args(args):
+def _parser():
+    '''Generate parser.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    parser : argparse.ArgumentParser
+    '''
     cwd = os.getcwd()
 
     parser = argparse.ArgumentParser(
@@ -51,13 +64,13 @@ def parse_args(args):
         conflict_handler='resolve',
         formatter_class=argparse.RawTextHelpFormatter
     )
-    
+
     parser.add_argument(
         '--version',
         action='version',
         version='cpac {ver}'.format(ver=__version__)
     )
-    
+
     parser.add_argument(
         '-o', '--container_option',
         dest='container_option',
@@ -74,7 +87,8 @@ def parse_args(args):
         dest='custom_binding',
         nargs='*',
         help='directories to bind with a different path in\nthe container '
-             'than the real path of the directory.\nOne or more pairs in the ' 'format:\n\treal_path:container_path\n(eg, '
+             'than the real path of the directory.\nOne or more pairs in the '
+             'format:\n\treal_path:container_path\n(eg, '
              '/home/C-PAC/run5/outputs:/outputs).\nUse absolute paths for '
              'both paths.\n\nThis flag can take multiple arguments so cannot '
              'be\nthe final argument before the command argument (i.e.,\nrun '
@@ -104,15 +118,8 @@ def parse_args(args):
 
     parser.add_argument(
         '--working_dir',
-        default=cwd,
         help='working directory',
-        metavar='PATH'
-    )
-
-    parser.add_argument(
-        '--temp_dir',
-        default='/tmp',
-        help='directory for temporary files',
+        default=cwd,
         metavar='PATH'
     )
 
@@ -162,7 +169,7 @@ def parse_args(args):
         )
     run_parser.add_argument(
         '--data_config_file',
-        metavar="PATH"
+        metavar='PATH'
     )
     run_parser.add_argument(
         'extra_args',
@@ -183,6 +190,13 @@ def parse_args(args):
     )
     utils_parser.register('action', 'extend', ExtendAction)
 
+    subparsers.add_parser(
+        'pull',
+        add_help=True,
+        aliases=['upgrade'],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
     crash_parser = subparsers.add_parser(
         'crash',
         add_help=True,
@@ -192,9 +206,24 @@ def parse_args(args):
 
     crash_parser.add_argument(
         'crashfile',
-        help="path to crashfile"
+        help='path to crashfile'
     )
 
+    return parser
+
+
+def parse_args(args):
+    '''Parse commandline arguments
+
+    Parameters
+    ----------
+    args : list
+
+    Returns
+    -------
+    parsed : Namespace
+    '''
+    parser = _parser()
     parsed, extras = parser.parse_known_args(args)
 
     parsed.extra_args = [
@@ -212,31 +241,16 @@ def setup_logging(loglevel):
 
 
 def main(args):
-    original_args = args
-    args = parse_args(args[1:])
+    '''Connect to C-PAC container and perform specified action
 
-    if not args.platform and "--platform" not in original_args:
-        if args.image and os.path.exists(args.image):
-            args.platform = 'singularity'
-        else:
-            try:
-                main([
-                    original_args[0],
-                    '--platform',
-                    'docker',
-                    *original_args[1:]
-                ])
-            except Exception:  # pragma: no cover
-                main([
-                    original_args[0],
-                    '--platform',
-                    'singularity',
-                    *original_args[1:]
-                ])
-            return  # pragma: no cover
-    else:
-        del original_args
+    Parameters
+    ----------
+    args : Namespace
 
+    Returns
+    -------
+    None
+    '''
     if any([
         '--data_config_file' in arg for arg in args.extra_args
     ]):
@@ -275,6 +289,7 @@ def main(args):
     setup_logging(args.loglevel)
 
     arg_vars = vars(args)
+
     if args.command == 'run':
         if any([
             '--help' in arg_vars,
@@ -293,6 +308,12 @@ def main(args):
             **arg_vars
         )
 
+    if args.command in ['pull', 'upgrade']:
+        Backends(**arg_vars).pull(
+            force=True,
+            **arg_vars
+        )
+
     if args.command in clargs:
         Backends(**arg_vars).clarg(
             args.command,
@@ -308,7 +329,67 @@ def main(args):
 
 
 def run():
-    main(sys.argv)
+    '''Function to try Docker first and fall back on Singularity if
+    Docker fails if --platform is not specified.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    Consumes commandline arguments. Run `cpac --help` for usage string.
+    '''
+    args = sys.argv[1:]
+
+    # reorder args
+    command = None
+    command_index = 0
+    parser = _parser()
+    commands = list([cmd for cmd in parser._get_positional_actions(
+    ) if cmd.dest == 'command'][0].choices)
+    options = set(chain.from_iterable([
+        o.option_strings for o in parser._get_optional_actions()]))
+    for cmd in commands:
+        if command is None and cmd in args:
+            command_index = args.index(cmd)
+            command = args.pop(command_index)
+    if command is None:
+        parser.print_help()
+        parser.exit()
+    reordered_args = []
+    option_value_setting = False
+    for i, arg in enumerate(args.copy()):
+        if i == command_index:
+            option_value_setting = False
+        elif arg in options:
+            reordered_args.append(args.pop(args.index(arg)))
+            option_value_setting = True
+        elif option_value_setting:
+            if arg.startswith('-'):
+                option_value_setting = False
+            else:
+                reordered_args.append(args.pop(args.index(arg)))
+    args = reordered_args + [command] + args
+    # parse args
+    parsed = parse_args(args)
+    if not parsed.platform and "--platform" not in args:
+        if parsed.image and os.path.exists(parsed.image):
+            parsed.platform = 'singularity'
+        else:
+            parsed.platform = 'docker'
+        try:
+            main(parsed)
+        # fall back on Singularity if Docker not found
+        except (DockerException, NotFound):  # pragma: no cover
+            parsed.platform = 'singularity'
+            main(parsed)
+    else:
+        main(parsed)
 
 
 if __name__ == "__main__":

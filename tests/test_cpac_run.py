@@ -6,13 +6,12 @@ from datetime import date
 from unittest import mock
 
 from cpac.__main__ import run
-from CONSTANTS import PLATFORM_ARGS
+from CONSTANTS import set_commandline_args
 
 
-@pytest.mark.parametrize('args,helpflag', [
-    (arg, flag) for arg in PLATFORM_ARGS for flag in ['--help', '-h']
-])
-def test_run_help(args, capsys, helpflag):
+@pytest.mark.parametrize('helpflag', ['--help', '-h'])
+def test_run_help(capsys, helpflag, platform, tag):
+    args = set_commandline_args(platform, tag)
     argv = ['cpac', *args.split(' '), 'run', helpflag]
     with mock.patch.object(sys, 'argv', argv):
         run()
@@ -20,9 +19,9 @@ def test_run_help(args, capsys, helpflag):
         assert 'participant' in captured.out or 'participant' in captured.err
 
 
-@pytest.mark.parametrize('args', PLATFORM_ARGS)
-def test_run_test_config(args, tmp_path):
+def test_run_test_config(platform, tag, tmp_path):
     wd = tmp_path
+    args = set_commandline_args(platform, tag)
     argv = (
         f'cpac {args} run '
         f's3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU {wd} '

@@ -1,15 +1,13 @@
-import pytest
-
 from contextlib import redirect_stdout
-from cpac.backends import Backends
 from io import StringIO, TextIOWrapper, BytesIO
 
+from cpac.backends import Backends
 
-@pytest.mark.parametrize('platform', ['docker', 'singularity'])
-def test_loading_message(platform):
+
+def test_loading_message(platform, tag):
     redirect_out = StringIO()
     with redirect_stdout(redirect_out):
-        loaded = Backends(platform)
+        loaded = Backends(platform, tag=tag)
     with_symbol = ' '.join([
         'Loading',
         loaded.platform.symbol,
@@ -20,7 +18,7 @@ def test_loading_message(platform):
     redirect_out = TextIOWrapper(
         BytesIO(), encoding='latin-1', errors='strict', write_through=True)
     with redirect_stdout(redirect_out):
-        loaded = Backends(platform)
+        loaded = Backends(platform, tag=tag)
     without_symbol = ' '.join([
         'Loading',
         loaded.platform.name

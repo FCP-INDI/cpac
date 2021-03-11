@@ -1,15 +1,14 @@
 import os
-import pytest
 import sys
 
 from unittest import mock
 
 from cpac.__main__ import run
-from CONSTANTS import PLATFORM_ARGS
+from CONSTANTS import set_commandline_args
 
 
-@pytest.mark.parametrize('args', PLATFORM_ARGS)
-def test_cpac_crash(args, capsys):
+def test_cpac_crash(capsys, platform, tag):
+    args = set_commandline_args(platform, tag)
     crashfile = os.path.join(
         os.path.dirname(__file__), 'test_data', 'test_pickle.pklz'
     )
