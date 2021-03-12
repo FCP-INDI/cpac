@@ -11,7 +11,7 @@ from io import StringIO
 from tabulate import tabulate
 
 from cpac.helpers import cpac_read_crash, get_extra_arg_value
-from cpac.utils import Locals_to_bind, Permission_mode
+from cpac.utils import Locals_to_bind, PermissionMode
 
 Platform_Meta = namedtuple('Platform_Meta', 'name symbol')
 
@@ -67,7 +67,7 @@ class Backend(object):
 
     def _bind_volume(self, local, remote, mode):
         local, remote = self._prep_binding(local, remote)
-        b = {'bind': remote, 'mode': Permission_mode(mode)}
+        b = {'bind': remote, 'mode': PermissionMode(mode)}
         if local in self.volumes:
             if remote in [binding['bind'] for binding in self.volumes[local]]:
                 for i, binding in enumerate(self.volumes[local]):

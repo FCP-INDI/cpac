@@ -7,11 +7,16 @@ on:
   push:
     paths-ignore:
     - README.rst
+  pull_request:
+  pull_request_target:
 
 jobs:
   test_cpac:
 
     runs-on: ubuntu-latest
+    env:
+      SINGULARITY_CACHEDIR: $GITHUB_WORKSPACE/.singularity/cache
+      SINGULARITY_TMPDIR: $GITHUB_WORKSPACE/.singularity/tmp
 
     strategy:
       matrix:
@@ -20,9 +25,6 @@ jobs:
         go: [1.14]
         python: [3.6, 3.7, 3.8]
         singularity: [3.6.4]
-        exclude:
-          - platform: singularity
-            tag: dev-v1.8
 
     steps:
     - uses: actions/checkout@v2
@@ -39,6 +41,9 @@ jobs:
       uses: eWaterCycle/setup-singularity@v5
       with:
         singularity-version: ${{ matrix.singularity }}
+    - name: Prepare Singularity cache and tmp directories
+      if: ${{ matrix.platform == 'singularity' }}
+      run: mkdir -p ${SINGULARITY_CACHEDIR} && mkdir -p ${SINGULARITY_TMPDIR}
     - name: Install dependencies
       run: |
         sudo apt-get install libarchive-dev \
@@ -54,15 +59,24 @@ jobs:
         pip install coverage coveralls nipype
     - name: Install cpac
       run: cd $GITHUB_WORKSPACE && pip install -e .
-    - name: Test cpac
-      if: ${{ matrix.platform == 'docker' }}
+    - name: Test cpac, platform and tag specified
       run: |
         coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
         coverage report -m
-    - name: Test cpac
-      if: ${{ matrix.platform == 'singularity' }}
+    - name: Test cpac, platform specified, tag unspecified
+      if: ${{ matrix.tag == 'latest' }}
       run: |
         coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} .
+        coverage report -m
+    - name: Test cpac, platform unspecified, tag specified
+      if: ${{ matrix.platform == 'docker' }}
+      run: |
+        coverage run --append -m pytest --doctest-modules --tag ${{ matrix.tag }} .
+        coverage report -m
+    - name: Test cpac, platform and tag unspecified
+      if: ${{ matrix.platform == 'docker' }} && ${{ matrix.tag }} == 'latest'
+      run: |
+        coverage run --append -m pytest --doctest-modules .
         coverage report -m
     - name: Report coverage
       uses: AndreMiras/coveralls-python-action@v20201129

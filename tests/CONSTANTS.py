@@ -3,7 +3,37 @@ import os
 from cpac.utils import ls_newest
 
 
-def set_commandline_args(platform, tag):
+def args_before_after(argv, args):
+    '''Function to create a mock sys.argv with arguments before
+    and one with arguments after the command and its arguments.
+
+    Parameters
+    ----------
+    argv : str
+        the command and its arguments
+
+    args : str
+        --platform and --image arguments (if any)
+
+    Returns
+    -------
+    before : list
+        f'cpac {args} {argv}'.split(' ')
+    after : list
+        f'cpac {argv} {args}'.split(' ')
+    '''
+    if argv.startswith('cpac'):
+        argv = argv.lstrip('cpac').strip()
+    if args is not None and len(args):
+        before = f'cpac {args} {argv}'.split(' ')
+        after = f'cpac {argv} {args}'.split(' ')
+    else:
+        before = f'cpac {argv}'.split(' ')
+        after = before
+    return before, after
+
+
+def set_commandline_args(platform, tag, sep=' '):
     '''Function to turn pytest commandline options into mock
     cpac commandline option strings
 
@@ -23,8 +53,10 @@ def set_commandline_args(platform, tag):
             args = args + PLATFORM_ARGS[0]
         elif platform.lower() == 'singularity':
             args = args + PLATFORM_ARGS[1]
+        if sep != ' ':
+            args = args.replace(' ', sep)
     if tag and tag is not None:
-        args = args + f' --tag {tag}'
+        args = args + f' --tag{sep}{tag}'
     return args
 
 

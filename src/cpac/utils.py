@@ -68,11 +68,42 @@ class Locals_to_bind():
         ])}
 
 
-class Permission_mode():
+class PermissionMode():
     """
     Class to overload comparison operators to compare file permissions levels.
 
     'rw' > 'w' > 'r'
+
+    Examples
+    --------
+    >>> PermissionMode('ro') > PermissionMode('rw')
+    False
+    >>> PermissionMode('rw') > PermissionMode('r')
+    True
+    >>> PermissionMode('r') > PermissionMode('r')
+    False
+    >>> PermissionMode('ro') >= PermissionMode('rw')
+    False
+    >>> PermissionMode('rw') >= PermissionMode('r')
+    True
+    >>> PermissionMode('r') >= PermissionMode('r')
+    True
+    >>> PermissionMode('ro') < PermissionMode('rw')
+    True
+    >>> PermissionMode('rw') < PermissionMode('r')
+    False
+    >>> PermissionMode('r') < PermissionMode('r')
+    False
+    >>> PermissionMode('ro') <= PermissionMode('rw')
+    True
+    >>> PermissionMode('ro') <= PermissionMode('ro')
+    True
+    >>> PermissionMode('rw') <= PermissionMode('ro')
+    False
+    >>> PermissionMode('ro') == PermissionMode('rw')
+    False
+    >>> PermissionMode('ro') == PermissionMode('r')
+    True
     """
     defined_modes = {'rw', 'w', 'r', 'ro'}
 
@@ -80,13 +111,17 @@ class Permission_mode():
 
         self.mode = fs_str.mode if isinstance(
             fs_str,
-            Permission_mode
+            PermissionMode
         ) else 'ro' if fs_str == 'r' else fs_str
-        self.defined = self.mode in Permission_mode.defined_modes
+        self.defined = self.mode in PermissionMode.defined_modes
         self._warn_if_undefined()
 
     def __repr__(self):
         return(self.mode)
+
+    def __eq__(self, other):
+        for permission in (self, other):
+            return self.mode == other.mode
 
     def __gt__(self, other):
         for permission in (self, other):
@@ -140,7 +175,7 @@ class Permission_mode():
                 f'\'{self.mode}\' is not a fully-configured permission '
                 f'level in {dist_name}. Configured permission levels are '
                 f'''{", ".join([
-                    f"'{mode}'" for mode in Permission_mode.defined_modes
+                    f"'{mode}'" for mode in PermissionMode.defined_modes
                 ])}''',
                 UserWarning
             )
