@@ -3,14 +3,26 @@ import sys
 from unittest import mock
 
 from cpac.__main__ import run
-from CONSTANTS import set_commandline_args
+from CONSTANTS import args_before_after, set_commandline_args
 
 
-def test_utils_help(capsys, platform, tag):
+def test_utils_help(capsys, platform=None, tag=None):
+    def run_test(argv, platform):
+        with mock.patch.object(sys, 'argv', argv):
+            run()
+            captured = capsys.readouterr()
+            if platform is not None:
+                assert platform.title() in captured.out
+            assert 'COMMAND' in captured.out
+
+    argv = 'group --help'
     args = set_commandline_args(platform, tag)
-    argv = ['cpac', *args.split(' '), 'group', '--help']
-    with mock.patch.object(sys, 'argv', [arg for arg in argv if len(arg)]):
-        run()
-        captured = capsys.readouterr()
-        assert platform.title() in captured.out
-        assert 'COMMAND' in captured.out
+    if len(args):
+        before, after = args_before_after(argv, args)
+        # test with args before command
+        run_test(before, platform)
+        # test with args after command
+        run_test(after, platform)
+    else:
+        # test without --platform and --tag args
+        run_test(f'cpac {argv}'.split(' '), platform)
