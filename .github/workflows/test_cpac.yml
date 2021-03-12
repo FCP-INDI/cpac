@@ -1,0 +1,125 @@
+# This workflows will upload a Python Package using Twine when a release is created
+# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
+
+name: Test cpac
+
+on:
+  push:
+    paths-ignore:
+    - README.rst
+  pull_request:
+  pull_request_target:
+
+jobs:
+  test_cpac:
+
+    runs-on: ubuntu-latest
+    env:
+      SINGULARITY_CACHEDIR: $GITHUB_WORKSPACE/.singularity/cache
+      SINGULARITY_TMPDIR: $GITHUB_WORKSPACE/.singularity/tmp
+
+    strategy:
+      matrix:
+        platform: [docker, singularity]
+        tag: [latest, dev-v1.8]
+        go: [1.14]
+        python: [3.6, 3.7, 3.8]
+        singularity: [3.6.4]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go }}
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Set up Singularity
+      if: ${{ matrix.platform == 'singularity' }}
+      uses: eWaterCycle/setup-singularity@v5
+      with:
+        singularity-version: ${{ matrix.singularity }}
+    - name: Prepare Singularity cache and tmp directories
+      if: ${{ matrix.platform == 'singularity' }}
+      run: mkdir -p ${SINGULARITY_CACHEDIR} && mkdir -p ${SINGULARITY_TMPDIR}
+    - name: Install dependencies
+      run: |
+        sudo apt-get install libarchive-dev \
+        libffi-dev \
+        flawfinder \
+        libgpgme11-dev \
+        libseccomp-dev \
+        squashfs-tools \
+        libssl1.1 libssl-dev \
+        libuuid1 uuid-dev
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        pip install coverage coveralls nipype
+    - name: Install cpac
+      run: cd $GITHUB_WORKSPACE && pip install -e .
+    - name: Test cpac, platform and tag specified
+      run: |
+        coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
+        coverage report -m
+    - name: Test cpac, platform specified, tag unspecified
+      if: ${{ matrix.tag == 'latest' }}
+      run: |
+        coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} .
+        coverage report -m
+    - name: Test cpac, platform unspecified, tag specified
+      if: ${{ matrix.platform == 'docker' }}
+      run: |
+        coverage run --append -m pytest --doctest-modules --tag ${{ matrix.tag }} .
+        coverage report -m
+    - name: Test cpac, platform and tag unspecified
+      if: ${{ matrix.platform == 'docker' }} && ${{ matrix.tag }} == 'latest'
+      run: |
+        coverage run --append -m pytest --doctest-modules .
+        coverage report -m
+    - name: Report coverage
+      uses: AndreMiras/coveralls-python-action@v20201129
+      with:
+        parallel: True
+        flag-name: Test cpac ${{ matrix.platform }} with Python ${{ matrix.python }}
+      continue-on-error: true
+  finalize_coverage-report:
+    needs: 
+      - test_cpac
+    runs-on: ubuntu-latest
+    steps:
+    - name: Finalize coverage report
+      uses: AndreMiras/coveralls-python-action@v20201129
+      with:
+        parallel-finished: true
+      continue-on-error: true
+  update_README:
+    # Only update README if tests succeed
+    needs:
+      - test_cpac
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cpac
+      run: cd $GITHUB_WORKSPACE && pip install .
+    - name: Configure Git credentials
+      uses: oleksiyrudenko/gha-git-credentials@v2.1
+      with:
+        global: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Update README
+      run: |
+        (head -n $(read -d : <<< $(less README.rst | grep ".. BEGIN USAGE" -n); expr $REPLY + 1) README.rst; \
+        printf ".. code-block:: shell\n\n    cpac --help\n"; \
+        cpac --help | sed 's/^/    /'; \
+        tail --lines=+$(read -d : <<< $(less README.rst | grep ".. END USAGE" -n); expr $REPLY - 1) README.rst\
+        ) > tempREADME &&
+        mv tempREADME README.rst &
+        wait %1
+        if [[ $(git diff --numstat README.rst) ]]; then
+            git add README.rst
+            git commit -m ":memo: Update usage from helpstring"
+            git push origin HEAD:${GITHUB_REF}
+        fi
+      shell: bash

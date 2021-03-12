@@ -1,5 +1,3 @@
-import setuptools
-
 from pip._internal.utils.misc import get_installed_distributions
 from setuptools.config import read_configuration
 
@@ -12,7 +10,7 @@ def test_requirements():
         )
     }
     with open('requirements.txt', 'r') as req:
-        requirements['requirements.txt']=requirements_list(
+        requirements['requirements.txt'] = requirements_list(
             req.readlines()
         )
     for req in requirements['requirements.txt']:
@@ -24,12 +22,12 @@ def test_requirements():
                 'but not in setup.cfg'
             )
             assert package_in_list(
-                req, requirements_list(get_installed_distributions()
-            )), (
+                req, requirements_list(get_installed_distributions())
+            ), (
                 f'package {req} is in requirements.txt '
                 'but not installed'
             )
-            
+
 
 def test_version():
     from cpac import __version__
@@ -43,9 +41,9 @@ class Requirement():
         self.version = {
             "==": package[1]
         } if len(package) == 2 else {
-            package[i]: package[i+1] for i in range(len(package)) if i%2
+            package[i]: package[i+1] for i in range(len(package)) if i % 2
         }
-    
+
     def __repr__(self):
         return ' '.join([
             f'{self.package}',
@@ -59,13 +57,13 @@ def package_in_list(package, version_list):
     """
     Helper function to check if a case-insensitive named package
     is included in a list of Requirements
-    
+
     Parameters
     ----------
     package: str
-    
+
     version_list: list
-    
+
     Returns
     -------
     bool
@@ -81,12 +79,12 @@ def requirements_list(requirements):
     """
     Helper function to split coerce a list of requirements into
     a list of Requirements
-    
+
     Parameters
     ----------
     requirements: list
         list of requirment strings
-        
+
     Returns
     -------
     list

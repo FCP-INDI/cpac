@@ -1,5 +1,6 @@
 import docker
 
+from docker.errors import ImageNotFound
 from requests.exceptions import ConnectionError
 
 from cpac.backends.platform import Backend, Platform_Meta
@@ -7,6 +8,7 @@ from cpac.backends.platform import Backend, Platform_Meta
 
 class Docker(Backend):
     def __init__(self, **kwargs):
+        super(Docker, self).__init__(**kwargs)
         self.platform = Platform_Meta('Docker', '🐳')
         self._print_loading_with_symbol(self.platform.name)
         self.client = docker.from_env()
@@ -18,7 +20,17 @@ class Docker(Backend):
                 "Is Docker running?"
             )
         self.volumes = {}
-        self._set_bindings(**kwargs)
+
+        image = kwargs['image'] if kwargs.get(
+            'image'
+        ) is not None else 'fcpindi/c-pac'
+
+        tag = kwargs['tag'] if kwargs.get(
+            'tag'
+        ) is not None else 'latest'
+        self.image = ':'.join([image, tag])
+
+        self._collect_config(**kwargs)
         self.docker_kwargs = {}
         if isinstance(kwargs.get('container_options'), list):
             for opt in kwargs['container_options']:
@@ -38,8 +50,37 @@ class Docker(Backend):
                     else:
                         self.docker_kwargs[k] = v
 
-    def _read_crash(self, read_crash_command):
-        return(self._execute(command=read_crash_command, run_type='exec'))
+    def _collect_config(self, **kwargs):
+        if kwargs.get('command') not in {'pull', 'upgrade', None}:
+            if isinstance(self.pipeline_config, str):
+                try:
+                    container = self.client.containers.create(image=self.image)
+                except ImageNotFound:  # pragma: no cover
+                    self.pull(**kwargs)
+                    container = self.client.containers.create(image=self.image)
+                stream = container.get_archive(path=self.pipeline_config)[0]
+                self.config = b''.join([
+                    l for l in stream  # noqa E741
+                ]).split(b'\x000000000')[-1].replace(b'\x00', b'').decode()
+                container.remove()
+            else:
+                self.config = self.pipeline_config
+            kwargs = self.collect_config_bindings(self.config, **kwargs)
+            self._set_bindings(**kwargs)
+
+    def pull(self, **kwargs):
+        image, tag = self.image.split(':')
+        [print(layer[k]) for layer in self.client.api.pull(
+                repository=image,
+                tag=tag,
+                stream=True,
+                decode=True
+            ) for k in layer if k in {'id', 'status', 'progress'}]
+
+    def _read_crash(self, read_crash_command, **kwargs):
+        return self._execute(
+            command=read_crash_command, run_type='exec', **kwargs
+        )
 
     def run(self, flags=[], **kwargs):
         kwargs['command'] = [i for i in [
@@ -73,22 +114,10 @@ class Docker(Backend):
         self._execute(**kwargs)
 
     def _execute(self, command, run_type='run', **kwargs):
-        image = kwargs['image'] if kwargs.get(
-            'image'
-        ) is not None else 'fcpindi/c-pac'
-        tag = self.bindings['tag'] if self.bindings.get(
-            'tag'
-        ) is not None else 'latest'
-        self.image = ':'.join([image, tag])
         try:
             self.client.images.get(self.image)
-        except docker.errors.ImageNotFound:
-            [print(layer[k]) for layer in self.client.api.pull(
-                repository=image,
-                tag=tag,
-                stream=True,
-                decode=True
-            ) for k in layer if k in {'id', 'status', 'progress'}]
+        except docker.errors.ImageNotFound:  # pragma: no cover
+            self.pull(**kwargs)
 
         self._load_logging()
 
@@ -109,6 +138,7 @@ class Docker(Backend):
                 **self.docker_kwargs
             )
             self._run = DockerRun(self.container)
+            self.container.stop()
         elif run_type == 'exec':
             self.container = self.client.containers.create(
                 self.image,
@@ -135,7 +165,9 @@ class Docker(Backend):
 class DockerRun(object):
     def __init__(self, container):
         self.container = container
-        [print(l.decode('utf-8'), end='') for l in self.container.attach(
+        [print(
+            l.decode('utf-8'), end=''
+        ) for l in self.container.attach(  # noqa E741
             logs=True,
             stderr=True,
             stdout=True,

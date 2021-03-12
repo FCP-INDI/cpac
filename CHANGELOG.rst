@@ -1,6 +1,15 @@
 =========
 Changelog
 =========
+`Version 0.3.2: Pull / Upgrade <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.2>`_
+========================================================================================
+* ➖ Remove dependecy on Nipype
+* 🐛 Pass commandline arguments through to ``cpac crash``
+* 🚸 Add ``pull`` / ``upgrade`` command
+* ⚡️🐳 Stop Docker containers when finished
+* 👽 Handle changes from C-PAC 1.7 to 1.8
+* 👷 Move tests from Travis to GitHub Actions
+
 `Version 0.3.1 <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.1>`_
 =======================================================================
 * 🚸 Print without emoji if terminal can't handle extended Unicode set
