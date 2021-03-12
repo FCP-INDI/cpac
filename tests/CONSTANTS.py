@@ -33,7 +33,7 @@ def args_before_after(argv, args):
     return before, after
 
 
-def set_commandline_args(platform, tag):
+def set_commandline_args(platform, tag, sep=' '):
     '''Function to turn pytest commandline options into mock
     cpac commandline option strings
 
@@ -53,8 +53,10 @@ def set_commandline_args(platform, tag):
             args = args + PLATFORM_ARGS[0]
         elif platform.lower() == 'singularity':
             args = args + PLATFORM_ARGS[1]
+        if sep != ' ':
+            args = args.replace(' ', sep)
     if tag and tag is not None:
-        args = args + f' --tag {tag}'
+        args = args + f' --tag{sep}{tag}'
     return args
 
 

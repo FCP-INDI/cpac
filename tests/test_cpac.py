@@ -1,3 +1,4 @@
+import pytest
 import sys
 
 from contextlib import redirect_stdout
@@ -31,7 +32,8 @@ def test_loading_message(platform, tag):
     assert without_symbol in redirect_out.buffer.getvalue().decode()
 
 
-def test_pull(capsys, platform=None, tag=None):
+@pytest.mark.parametrize('argsep', [' ', '='])
+def test_pull(argsep, capsys, platform=None, tag=None):
     def run_test(argv):
         with mock.patch.object(sys, 'argv', argv):
             run()
@@ -41,7 +43,7 @@ def test_pull(capsys, platform=None, tag=None):
                 checkstring in captured.out + captured.err
             )
 
-    args = set_commandline_args(platform, tag)
+    args = set_commandline_args(platform, tag, argsep)
 
     # test args before command
     run_test(f'cpac {args} pull'.split(' '))

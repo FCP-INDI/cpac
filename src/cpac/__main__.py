@@ -256,7 +256,7 @@ def main(args):
     ]):
         try:
             args.data_config_file = args.extra_args[
-                args.extra_args.index('--data_config_file')+1
+                args.extra_args.index('--data_config_file') + 1
             ]
         except ValueError:
             try:

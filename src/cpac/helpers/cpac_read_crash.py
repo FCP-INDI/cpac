@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+'''cpac_read_crash.py
+
+`cpac_read_crash` is intended to be run inside a C-PAC container.
+The current run environment does not include the package `nipype`.
+'''
 
 import os
 import re
@@ -12,10 +17,7 @@ path_regex = re.compile(
 
 class NoNipype(ModuleNotFoundError):
     def __init__(self, msg=None, *args, **kwargs):
-        no_nipype_message = '`cpac_read_crash` is intended to be run ' \
-                            'inside a C-PAC container.\nThe current run ' \
-                            'environment does not include the package ' \
-                            '`nipype`.'
+        no_nipype_message = __doc__.lstrip('cpac_read_crash.py').lstrip()
         self.msg = '\n'.join([
             msg, no_nipype_message
         ]) if msg is not None else no_nipype_message

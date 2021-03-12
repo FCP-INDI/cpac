@@ -1,3 +1,4 @@
+import pytest
 import sys
 
 from unittest import mock
@@ -6,7 +7,8 @@ from cpac.__main__ import run
 from CONSTANTS import args_before_after, set_commandline_args
 
 
-def test_utils_help(capsys, platform=None, tag=None):
+@pytest.mark.parametrize('argsep', [' ', '='])
+def test_utils_help(argsep, capsys, platform=None, tag=None):
     def run_test(argv, platform):
         with mock.patch.object(sys, 'argv', argv):
             run()
@@ -16,7 +18,7 @@ def test_utils_help(capsys, platform=None, tag=None):
             assert 'COMMAND' in captured.out
 
     argv = 'group --help'
-    args = set_commandline_args(platform, tag)
+    args = set_commandline_args(platform, tag, argsep)
     if len(args):
         before, after = args_before_after(argv, args)
         # test with args before command

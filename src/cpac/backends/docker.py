@@ -55,7 +55,7 @@ class Docker(Backend):
             if isinstance(self.pipeline_config, str):
                 try:
                     container = self.client.containers.create(image=self.image)
-                except ImageNotFound:
+                except ImageNotFound:  # pragma: no cover
                     self.pull(**kwargs)
                     container = self.client.containers.create(image=self.image)
                 stream = container.get_archive(path=self.pipeline_config)[0]
@@ -116,7 +116,7 @@ class Docker(Backend):
     def _execute(self, command, run_type='run', **kwargs):
         try:
             self.client.images.get(self.image)
-        except docker.errors.ImageNotFound:
+        except docker.errors.ImageNotFound:  # pragma: no cover
             self.pull(**kwargs)
 
         self._load_logging()
