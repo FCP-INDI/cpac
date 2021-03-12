@@ -315,6 +315,13 @@ def main(args):
         )
 
     if args.command in clargs:
+        # utils doesn't have '-h' flag for help
+        if args.command == 'utils' and '-h' in arg_vars.get('extra_args', []):
+            arg_vars['extra_args'] = [
+                arg if arg != '-h' else '--help' for arg in arg_vars[
+                    'extra_args'
+                ]
+            ]
         Backends(**arg_vars).clarg(
             args.command,
             flags=args.extra_args,
@@ -354,6 +361,9 @@ def run():
     ) if cmd.dest == 'command'][0].choices)
     options = set(chain.from_iterable([
         o.option_strings for o in parser._get_optional_actions()]))
+    # keep help option with specific command
+    for option in {'-h', '--help'}:
+        options.discard(option)
     for cmd in commands:
         if command is None and cmd in args:
             command_index = args.index(cmd)
@@ -366,7 +376,7 @@ def run():
     for i, arg in enumerate(args.copy()):
         if i == command_index:
             option_value_setting = False
-        elif arg in options:
+        if arg in options:
             reordered_args.append(args.pop(args.index(arg)))
             option_value_setting = True
         elif option_value_setting:
