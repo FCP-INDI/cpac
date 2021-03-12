@@ -366,7 +366,7 @@ def run():
     for i, arg in enumerate(args.copy()):
         if i == command_index:
             option_value_setting = False
-        elif arg in options:
+        if arg in options:
             reordered_args.append(args.pop(args.index(arg)))
             option_value_setting = True
         elif option_value_setting:
