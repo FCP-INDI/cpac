@@ -206,7 +206,8 @@ def _parser():
 
     crash_parser.add_argument(
         'crashfile',
-        help='path to crashfile'
+        help='path to crashfile, to read a crashfile from C-PAC < 1.8.0.\n'
+             'Crashfiles in C-PAC >= 1.8.0 are plain text files.'
     )
 
     return parser
