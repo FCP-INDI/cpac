@@ -74,7 +74,7 @@ def _parser():
     parser.add_argument(
         '-o', '--container_option',
         dest='container_option',
-        nargs='*',
+        action='append',
         help='parameters and flags to pass through to Docker or Singularity\n'
              '\nThis flag can take multiple arguments so cannot '
              'be\nthe final argument before the command argument (i.e.,\nrun '
@@ -85,7 +85,7 @@ def _parser():
     parser.add_argument(
         '-B', '--custom_binding',
         dest='custom_binding',
-        nargs='*',
+        action='append',
         help='directories to bind with a different path in\nthe container '
              'than the real path of the directory.\nOne or more pairs in the '
              'format:\n\treal_path:container_path\n(eg, '

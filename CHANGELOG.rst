@@ -10,6 +10,7 @@ Changelog
 * 👽 Handle changes from C-PAC 1.7 to 1.8
 * 👷 Move tests from Travis to GitHub Actions
 * 📝 Note needlessness of crash command for C-PAC ≥ 1.8.0
+* 🚸 Use repeated flags in place of multi-value tags
 
 `Version 0.3.1 <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.1>`_
 =======================================================================
