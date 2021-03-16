@@ -29,8 +29,7 @@ Usage
 .. code-block:: shell
 
     cpac --help
-    usage: cpac [-h] [--version] [-o [OPT [OPT ...]]]
-                [-B [CUSTOM_BINDING [CUSTOM_BINDING ...]]]
+    usage: cpac [-h] [--version] [-o OPT] [-B CUSTOM_BINDING]
                 [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
                 [--working_dir PATH] [-v] [-vv]
                 {run,group,utils,pull,upgrade,crash} ...
@@ -64,13 +63,13 @@ Usage
     optional arguments:
       -h, --help            show this help message and exit
       --version             show program's version number and exit
-      -o [OPT [OPT ...]], --container_option [OPT [OPT ...]]
+      -o OPT, --container_option OPT
                             parameters and flags to pass through to Docker or Singularity
                             
                             This flag can take multiple arguments so cannot be
                             the final argument before the command argument (i.e.,
                             run or any other command that does not start with - or --)
-      -B [CUSTOM_BINDING [CUSTOM_BINDING ...]], --custom_binding [CUSTOM_BINDING [CUSTOM_BINDING ...]]
+      -B CUSTOM_BINDING, --custom_binding CUSTOM_BINDING
                             directories to bind with a different path in
                             the container than the real path of the directory.
                             One or more pairs in the format:
