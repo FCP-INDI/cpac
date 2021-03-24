@@ -27,6 +27,8 @@ class Singularity(Backend):
             )
         else:
             self.config = self.pipeline_config
+        if isinstance(self.config, list) and len(self.config):
+            self.config = self.config[0]
         kwargs = self.collect_config_bindings(self.config, **kwargs)
         del self.config
         self._set_bindings(**kwargs)
