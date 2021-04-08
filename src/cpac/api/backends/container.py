@@ -228,11 +228,14 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
         if self.execution_params:
             command += ['--pipeline_override',
                         'maximumMemoryPerParticipant: %d'
-                        % int(self.execution_params['parallelPipeline'])]
+                        % int(self.execution_params['parallelPipeline'])] \
+                if 'parallelPipeline' in self.execution_params else []
             command += ['--n_cpus',
-                        str(self.execution_params['corePerPipeline'])]
+                        str(self.execution_params['corePerPipeline'])] \
+                if 'corePerPipeline' in self.execution_params else []
             command += ['--mem_gb',
-                        str(self.execution_params['memPerPipeline'])]
+                        str(self.execution_params['memPerPipeline'])] \
+                if 'memPerPipeline' in self.execution_params else []
 
         print("cmd", command)
         self._status = None
