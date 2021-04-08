@@ -213,6 +213,7 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
 
         self._run_logs_port = find_free_port()
 
+        # TODO params
         command = [
             '/', '/output', 'participant',
             '--monitoring', str(self._run_logs_port),
@@ -225,6 +226,16 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
         if pipeline:
             command += ['--pipeline_file', pipeline]
 
+        if self.execution_params:
+            command += ['--pipeline_override',
+                        'maximumMemoryPerParticipant: %d'
+                        % int(self.execution_params['parallelPipeline'])]
+            command += ['--n_cpus %d'
+                        % int(self.execution_params['corePerPipeline'])]
+            command += ['--mem_gb %d'
+                        % int(self.execution_params['memPerPipeline'])]
+
+        print("cmd", command)
         self._status = None
         self._run_logs_last = None
         self._run_logs_messages = asyncio.Queue()
