@@ -142,7 +142,6 @@ class Backend:
     def specialize(self, schedule):
         if self[schedule.__class__] is None:
             raise ValueError(f"Mapped scheduled class for {schedule.__class__.__name__} does not exist.")
-        print("m0--", self,schedule.__class__, self[schedule.__class__])
         backend_schedule = self[schedule.__class__](backend=self)
         backend_schedule.__setstate__(schedule.__getstate__())
         return backend_schedule

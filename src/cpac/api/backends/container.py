@@ -213,7 +213,6 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
 
         self._run_logs_port = find_free_port()
 
-        # TODO params
         command = [
             '/', '/output', 'participant',
             '--monitoring', str(self._run_logs_port),
@@ -230,10 +229,10 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
             command += ['--pipeline_override',
                         'maximumMemoryPerParticipant: %d'
                         % int(self.execution_params['parallelPipeline'])]
-            command += ['--n_cpus %d'
-                        % int(self.execution_params['corePerPipeline'])]
-            command += ['--mem_gb %d'
-                        % int(self.execution_params['memPerPipeline'])]
+            command += ['--n_cpus',
+                        str(self.execution_params['corePerPipeline'])]
+            command += ['--mem_gb',
+                        str(self.execution_params['memPerPipeline'])]
 
         print("cmd", command)
         self._status = None
