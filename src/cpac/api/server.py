@@ -119,6 +119,7 @@ class ScheduleHandler(BaseHandler):
 
         elif self.json["type"] == "pipeline":
 
+            execution_params = self.json.get("profile")
             data_config = self.json.get("data_config")
             if not data_config:
                 return self.bad_request()
@@ -157,6 +158,7 @@ class ScheduleHandler(BaseHandler):
 
             schedule = scheduler.schedule(
                 DataConfigSchedule(
+                    execution_params=execution_params,
                     data_config=data_config_file,
                     pipeline=pipeline_file,
                     schedule_participants=bool(self.json.get("data_config"))

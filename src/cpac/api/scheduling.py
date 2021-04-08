@@ -134,6 +134,7 @@ class Scheduler:
 
         return schedule
 
+    # job: schedule; listener: function. add a listener to the job
     def watch(self, schedule, function, children=False, watcher_classes=None):
         sid = repr(schedule)
         watcher_classes = watcher_classes or self.events
@@ -173,6 +174,7 @@ class Scheduler:
                 logger.info(f"[Scheduler:{alloc()}] Got message {message.__class__.__name__} from schedule {schedule} ({len(watchers)})")
 
                 if isinstance(message, Schedule.Spawn):
+                    print("m1")
 
                     name = message.name
                     subschedule = message.child
@@ -186,7 +188,6 @@ class Scheduler:
                                 children = watcher["children"]
                                 if not children:
                                     continue
-
                                 self.watch(
                                     schedule=subschedule,
                                     function=watcher["function"],
