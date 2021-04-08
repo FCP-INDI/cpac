@@ -174,7 +174,6 @@ class Scheduler:
                 logger.info(f"[Scheduler:{alloc()}] Got message {message.__class__.__name__} from schedule {schedule} ({len(watchers)})")
 
                 if isinstance(message, Schedule.Spawn):
-                    print("m1")
 
                     name = message.name
                     subschedule = message.child
