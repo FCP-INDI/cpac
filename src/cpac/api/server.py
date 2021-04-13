@@ -13,6 +13,7 @@ from cpac import __version__
 from .schedules import Schedule, DataSettingsSchedule, DataConfigSchedule, ParticipantPipelineSchedule
 from .backends import available_backends
 from .backends.base import Result, FileResult, CrashFileResult, LogFileResult
+from .authKey import AuthKey
 
 import os
 import time
@@ -77,10 +78,16 @@ class BaseHandler(tornado.web.RequestHandler):
 
 
 class MainHandler(BaseHandler):
-    def get(self):
+    def post(self):
         scheduler = self.application.settings.get("scheduler")
         backend = scheduler.backend
         types = {v: k for k, v in available_backends.items()}
+
+        ifWrongAuthKey = False
+
+        if 'authKey' not in self.json or self.json['authKey'] != \
+                AuthKey.getKey():
+            ifWrongAuthKey = True
 
         self.finish({
             "api": "cpacpy",
@@ -90,7 +97,8 @@ class MainHandler(BaseHandler):
                     "id": backend.id,
                     "backend": types[backend.__class__]
                 },
-            ]
+            ],
+            "authKeyError": True if ifWrongAuthKey else False
         })
 
 
