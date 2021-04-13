@@ -87,8 +87,10 @@ async def start(args):
     from cpac.api.server import start
     from cpac.api.backends import available_backends
     from cpac.api.scheduling import Scheduler
+    from cpac.api.authKey import AuthKey
 
     print("Running server")
+    print("Auth key: ", AuthKey.generateKey())
 
     backend = args.backend
     cmd_args = vars(args)
