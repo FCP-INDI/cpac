@@ -7,7 +7,7 @@ class AuthKey:
     @staticmethod
     def generateKey():
         if not AuthKey.key:
-            AuthKey.key = uuid.uuid1()
+            AuthKey.key = str(uuid.uuid1())
         return AuthKey.key
 
     @staticmethod

@@ -85,10 +85,9 @@ class MainHandler(BaseHandler):
 
         ifWrongAuthKey = False
 
-        if 'authKey' not in self.json or self.json['authKey'] != \
-                AuthKey.getKey():
+        if 'authKey' not in self.json or self.json['authKey'].strip() != \
+                AuthKey.getKey().strip():
             ifWrongAuthKey = True
-
         self.finish({
             "api": "cpacpy",
             "version": __version__,
