@@ -107,6 +107,10 @@ class ScheduleHandler(BaseHandler):
         if "type" not in self.json:
             return self.bad_request()
 
+        if 'authKey' not in self.json or self.json['authKey'].strip() != \
+                AuthKey.getKey().strip():
+            return self.finish({"authKeyError": True})
+
         scheduler = self.application.settings.get("scheduler")
 
         if self.json["type"] == "data_settings":
@@ -200,7 +204,11 @@ class ScheduleHandler(BaseHandler):
 
 
 class StatusHandler(BaseHandler):
-    async def get(self, result=None):
+    async def post(self, result=None):
+        if 'authKey' not in self.json or self.json['authKey'].strip() != \
+                AuthKey.getKey().strip():
+            return self.finish({"authKeyError": True})
+
         scheduler = self.application.settings.get('scheduler')
         schedule_status = await scheduler.statuses
 
@@ -210,7 +218,11 @@ class StatusHandler(BaseHandler):
 
 
 class MetadataScheduleHandler(BaseHandler):
-    async def get(self, schedule):
+    async def post(self, schedule):
+        if 'authKey' not in self.json or self.json['authKey'].strip() != \
+                AuthKey.getKey().strip():
+            return self.finish({"authKeyError": True})
+
         scheduler = self.application.settings.get('scheduler')
         try:
             schedule_tree = scheduler[schedule]
@@ -229,7 +241,11 @@ class MetadataScheduleHandler(BaseHandler):
 
 
 class StatusScheduleHandler(BaseHandler):
-    async def get(self, schedule):
+    async def post(self, schedule):
+        if 'authKey' not in self.json or self.json['authKey'].strip() != \
+                AuthKey.getKey().strip():
+            return self.finish({"authKeyError": True})
+
         scheduler = self.application.settings.get('scheduler')
         try:
             schedule_tree = scheduler[schedule]
@@ -245,7 +261,11 @@ class StatusScheduleHandler(BaseHandler):
 
 
 class ResultScheduleHandler(BaseHandler):
-    async def get(self, schedule, result=None):
+    async def post(self, schedule, result=None):
+        if 'authKey' not in self.json or self.json['authKey'].strip() != \
+                AuthKey.getKey().strip():
+            return self.finish({"authKeyError": True})
+
         scheduler = self.application.settings.get('scheduler')
 
         try:
