@@ -71,6 +71,9 @@ class BaseHandler(tornado.web.RequestHandler):
             except ValueError:
                 pass
 
+        if self.request.method in ['OPTIONS']:
+            return
+
         token = self.request.headers.get('Authorization')
         if not token:
             self.send_error(401)
