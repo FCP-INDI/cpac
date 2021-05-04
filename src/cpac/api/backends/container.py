@@ -84,7 +84,10 @@ class ContainerDataSettingsSchedule(ContainerSchedule, DataSettingsSchedule):
                 self.data_settings = yaml_parse(self.data_settings)
 
         with open(data_settings_file, 'w') as f:
+            old_loc = self.data_settings['outputSubjectListLocation']
+            self.data_settings['outputSubjectListLocation'] = '/output_folder'
             yaml.dump(self.data_settings, f)
+            self.data_settings['outputSubjectListLocation'] = old_loc
 
         command = [
             '/',
@@ -105,7 +108,7 @@ class ContainerDataSettingsSchedule(ContainerSchedule, DataSettingsSchedule):
             )
 
         try:
-            files = glob.glob(os.path.join(output_folder, 'cpac_data_config_*.yml'))
+            files = glob.glob(os.path.join(output_folder, '*data_config*.yml'))
             if files:
                 with open(files[0]) as f:
                     self._results['data_config'] = yaml.safe_load(f)
