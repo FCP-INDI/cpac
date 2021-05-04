@@ -84,7 +84,10 @@ class ContainerDataSettingsSchedule(ContainerSchedule, DataSettingsSchedule):
                 self.data_settings = yaml_parse(self.data_settings)
 
         with open(data_settings_file, 'w') as f:
+            old_loc = self.data_settings['outputSubjectListLocation']
+            self.data_settings['outputSubjectListLocation'] = '/output_folder'
             yaml.dump(self.data_settings, f)
+            self.data_settings['outputSubjectListLocation'] = old_loc
 
         command = [
             '/',
