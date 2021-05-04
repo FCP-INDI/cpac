@@ -132,7 +132,7 @@ class SLURMBackend(Backend):
             ] 
             
         cmd += self._control_args + [
-            f'{self.username}@{self.host[0]}'
+            f'{self.username}@{self.host[0]}', 'date', '+%s'
         ]
 
         logger.info(f'[SlurmBackend] Cmd: {cmd}')
