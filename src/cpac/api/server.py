@@ -1,3 +1,4 @@
+import re
 import asyncio
 import tornado.escape
 import tornado.web
@@ -112,6 +113,16 @@ class BaseHandler(tornado.web.RequestHandler):
             except ValueError:
                 pass
 
+        token = self.request.headers.get('Authorization')
+        if not token:
+            self.send_error(401)
+            return
+
+        _, token, *_ = re.split(r'\s', token) + ['', '']
+        if token != AuthKey.getKey():
+            self.send_error(401)
+            return
+
     def get_argument(self, arg, default=None):
         if self.request.method in ['POST', 'PUT'] and self.json:
             return self.json.get(arg, default)
@@ -120,16 +131,12 @@ class BaseHandler(tornado.web.RequestHandler):
 
 
 class MainHandler(BaseHandler):
-    def post(self):
+    def get(self):
+
         scheduler = self.application.settings.get("scheduler")
         backend = scheduler.backend
         types = {v: k for k, v in available_backends.items()}
 
-        ifWrongAuthKey = False
-
-        if 'authKey' not in self.json or self.json['authKey'].strip() != \
-                AuthKey.getKey().strip():
-            ifWrongAuthKey = True
         self.finish({
             "api": "cpacpy",
             "version": __version__,
@@ -138,8 +145,7 @@ class MainHandler(BaseHandler):
                     "id": backend.id,
                     "backend": types[backend.__class__]
                 },
-            ],
-            "authKeyError": True if ifWrongAuthKey else False
+            ]
         })
 
 
