@@ -254,7 +254,7 @@ class ScheduleHandler(BaseHandler):
 
 
 class StatusHandler(BaseHandler):
-    async def post(self, result=None):
+    async def get(self, result=None):
         # if 'authKey' not in self.json or self.json['authKey'].strip() != \
         #         AuthKey.getKey().strip():
         #     return self.finish({"authKeyError": True})
@@ -268,7 +268,7 @@ class StatusHandler(BaseHandler):
 
 
 class MetadataScheduleHandler(BaseHandler):
-    async def post(self, schedule):
+    async def get(self, schedule):
         # if 'authKey' not in self.json or self.json['authKey'].strip() != \
         #         AuthKey.getKey().strip():
         #     return self.finish({"authKeyError": True})
@@ -291,7 +291,7 @@ class MetadataScheduleHandler(BaseHandler):
 
 
 class StatusScheduleHandler(BaseHandler):
-    async def post(self, schedule):
+    async def get(self, schedule):
         # if 'authKey' not in self.json or self.json['authKey'].strip() != \
         #         AuthKey.getKey().strip():
         #     return self.finish({"authKeyError": True})
