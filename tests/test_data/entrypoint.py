@@ -115,7 +115,8 @@ elif args.analysis_level == "participant":
     err_subjects = ('0050959', '0051558', '0050952', '0051575')
     sleep_between_nodes = 0.001
     
-    with open('/code/cpac_output/log/pipeline_analysis/sub-1_ses-1/callback_new.log') as f:
+    with open('/code/cpac_output/log/pipeline_analysis/sub-1_ses-1'
+              '/callback_new.log') as f:
         node_logs = [json.loads(l.strip()) for l in list(f)]
 
     print('Nodes:', len(node_logs))
@@ -139,6 +140,36 @@ elif args.analysis_level == "participant":
             )
 
             logger.info(f"{node}")
+
+        # infoList = []
+        # for i, node in enumerate(node_logs):
+        #     if 'start' in node:
+        #         if i > 0 and 'start' not in node_logs[i - 1]:
+        #             await websocket.send(
+        #                 json.dumps({"time": time.time(),
+        #                             "message": {"info": infoList}})
+        #             )
+        #             infoList = []
+        #
+        #         node['start'] = str(
+        #             starting + datetime.timedelta(seconds=node['start']))
+        #         node['finish'] = str(
+        #             starting + datetime.timedelta(seconds=node['finish']))
+        #     infoList.append({
+        #         "time": time.time(),
+        #         "message": node
+        #     })
+        #     if len(infoList) > 2000:
+        #         await websocket.send(
+        #             json.dumps({"time": time.time(), "message": {"info": infoList}})
+        #         )
+        #         infoList = []
+        #
+        # logger.info(f"{node}")
+        # if infoList:
+        #     await websocket.send(
+        #         json.dumps({"time": time.time(), "message": {"info": infoList}})
+        #     )
 
         while True:
             await asyncio.sleep(1)

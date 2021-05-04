@@ -1,0 +1,9 @@
+{"id": "cpac_sub-1_ses-1.id_string_dseg-sagittal-qc_317", "hash": "c0a1f9c75815cf78749d1bd4b220c7e4"}
+{"id": "cpac_sub-1_ses-1.json_dseg-sagittal-qc_317", "hash": "77a12bc387f9a062b6da3a9ebf81f91e"}
+{"id": "cpac_sub-1_ses-1.id_string_dseg-axial-qc_316", "hash": "26054a0debce942bc25fb705bf0500f6"}
+{"id": "cpac_sub-1_ses-1.json_dseg-axial-qc_316", "hash": "ad0f4fecc40d61b2bdc7c8b5835d418d"}
+{"id": "cpac_sub-1_ses-1.write_composite_inv_xfm", "hash": "4bb1f803e931137f9bdd65897c4b0910"}
+{"id": "cpac_sub-1_ses-1.id_string_dseg-sagittal-qc_317", "hash": "c0a1f9c75815cf78749d1bd4b220c7e4", "start": 1036.512474, "finish": 1036.714387, "runtime_threads": 29, "runtime_memory_gb": 0.34814453125, "estimated_memory_gb": 2.0, "num_threads": 1}
+{"id": "cpac_sub-1_ses-1.json_dseg-sagittal-qc_317", "hash": "77a12bc387f9a062b6da3a9ebf81f91e", "start": 1038.526554, "finish": 1038.729388, "runtime_threads": 0, "runtime_memory_gb": 0.35681915234375, "estimated_memory_gb": 2.0, "num_threads": 1}
+{"id": "cpac_sub-1_ses-1.id_string_dseg-axial-qc_316", "hash": "26054a0debce942bc25fb705bf0500f6", "start": 1036.561777, "finish": 1036.764097, "runtime_threads": 0, "runtime_memory_gb": 0.3866462705078125, "estimated_memory_gb": 2.0, "num_threads": 1}
+{"id": "cpac_sub-1_ses-1.json_dseg-axial-qc_316", "hash": "ad0f4fecc40d61b2bdc7c8b5835d418d", "start": 1038.529077, "finish": 1038.731541, "runtime_threads": 0, "runtime_memory_gb": 0.34814453125, "estimated_memory_gb": 2.0, "num_threads": 1}

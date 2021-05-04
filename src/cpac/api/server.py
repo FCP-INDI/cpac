@@ -23,9 +23,51 @@ import tempfile
 import logging
 import collections
 import dataclasses
+from datetime import datetime
+import time
 
 _logger = logging.getLogger(__name__)
 
+class NodeQueue:
+    def __init__(self):
+        self.schedules = {}
+
+    def add_log(self, schedule, message):
+        if repr(schedule) not in self.schedules:
+            self.schedules[repr(schedule)] = {'message': []}
+            self.set_timer(schedule)
+        self.schedules[repr(schedule)]['message'].append(message)
+
+    def get_interval(self, schedule):
+        rp = repr(schedule)
+        if rp not in self.schedules:
+            return 0
+        return (datetime.now() - self.schedules[rp]['lastSendTime']).seconds
+
+    def set_timer(self, schedule):
+        rp = repr(schedule)
+        if rp not in self.schedules:
+            self.schedules[rp] = {'message': []}
+        self.schedules[rp]['lastSendTime'] = datetime.now()
+        return self.schedules[rp]['lastSendTime']
+
+    def get_message_list(self, schedule):
+        rp = repr(schedule)
+        if rp not in self.schedules:
+            return []
+        return self.schedules[rp]['message'][:]
+
+    def clean_message_list(self, schedule):
+        rp = repr(schedule)
+        if rp not in self.schedules:
+            return []
+        result = self.schedules[rp]['message'][:]
+        self.schedules[rp]['message'] = []
+        return result
+
+    def clean_all(self):
+        self.schedules = {}
+        return True
 
 class CustomEncoder(json.JSONEncoder):
     def default(self, o):
@@ -355,7 +397,7 @@ class ResultScheduleHandler(BaseHandler):
         }, cls=CustomEncoder))
 
 
-def schedule_watch_wrapper(scheduler, socket, message_id):
+def schedule_watch_wrapper(scheduler, socket, message_id, message_list):
 
     def schedule_watch(self, schedule, message):
         content = {
@@ -370,10 +412,59 @@ def schedule_watch_wrapper(scheduler, socket, message_id):
         if message_id:
             content['__cpacpy_message_id'] = message_id
 
-        try:
-            socket.write_message(json.dumps(content, cls=CustomEncoder))
-        except tornado.websocket.WebSocketClosedError:
-            pass
+        if message.__class__.__name__ == "Log":
+            # print("hi", len(message_list.get_message_list(schedule)))
+            message_list.add_log(schedule, content)
+            if message_list.get_interval(schedule) > 1:
+                node_message = message_list.get_message_list(schedule)
+                message_list.set_timer(schedule)
+                message_list.clean_message_list(schedule)
+                if node_message:
+                    try:
+                        node_message = {
+                            "type": "watch",
+                            "__cpacpy_message_id": message_id,
+                            "data": {
+                                "id": repr(schedule),
+                                "type": 'Log',
+                                "message": {"content": node_message,
+                                            "schedule": repr(schedule)},
+                            }
+                        }
+                        print(node_message)
+                        socket.write_message(json.dumps(node_message,
+                                                        cls=CustomEncoder))
+                    except tornado.websocket.WebSocketClosedError:
+                        pass
+        elif message.__class__.__name__ == "End":
+            node_message = message_list.get_message_list(schedule)
+            if node_message:
+                message_list.clean_message_list(schedule)
+                try:
+                    node_message = {
+                        "type": "watch",
+                        "__cpacpy_message_id": message_id,
+                        "data": {
+                            "id": repr(schedule),
+                            "type": 'Log',
+                            "message": {"content": node_message,
+                                        "schedule": repr(schedule)},
+                        }
+                    }
+                    print(node_message)
+                    socket.write_message(json.dumps(node_message,
+                                                    cls=CustomEncoder))
+                except tornado.websocket.WebSocketClosedError:
+                    pass
+            try:
+                socket.write_message(json.dumps(content, cls=CustomEncoder))
+            except tornado.websocket.WebSocketClosedError:
+                pass
+        else:
+            try:
+                socket.write_message(json.dumps(content, cls=CustomEncoder))
+            except tornado.websocket.WebSocketClosedError:
+                pass
 
     return schedule_watch
 
@@ -381,6 +472,7 @@ def schedule_watch_wrapper(scheduler, socket, message_id):
 class WatchScheduleHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
+        self.message_list = NodeQueue()
         self.write_message(json.dumps({'connected': True}))
         _logger.debug("Websocket connected")
 
@@ -416,7 +508,7 @@ class WatchScheduleHandler(tornado.websocket.WebSocketHandler):
             schedule = scheduler[message["schedule"]].schedule
             scheduler.watch(
                 schedule,
-                schedule_watch_wrapper(scheduler, self, message_id),
+                schedule_watch_wrapper(scheduler, self, message_id, self.message_list),
                 children="children" in message and message["children"],
                 watcher_classes=watchers
             )

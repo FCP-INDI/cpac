@@ -28,7 +28,7 @@ class FileResult(Result):
         self._name = name or path
 
     async def __aenter__(self):
-        self._stream = open(self._path)
+        self._stream = open(self._path, 'rb')
         return self._stream
 
     async def __aexit__(self, exc_type, exc, tb):
