@@ -154,13 +154,12 @@ class MainHandler(BaseHandler):
 
 class ScheduleHandler(BaseHandler):
     def post(self):
-
         if "type" not in self.json:
             return self.bad_request()
 
-        if 'authKey' not in self.json or self.json['authKey'].strip() != \
-                AuthKey.getKey().strip():
-            return self.finish({"authKeyError": True})
+        # if 'authKey' not in self.json or self.json['authKey'].strip() != \
+        #         AuthKey.getKey().strip():
+        #     return self.finish({"authKeyError": True})
 
         scheduler = self.application.settings.get("scheduler")
 
@@ -256,9 +255,9 @@ class ScheduleHandler(BaseHandler):
 
 class StatusHandler(BaseHandler):
     async def post(self, result=None):
-        if 'authKey' not in self.json or self.json['authKey'].strip() != \
-                AuthKey.getKey().strip():
-            return self.finish({"authKeyError": True})
+        # if 'authKey' not in self.json or self.json['authKey'].strip() != \
+        #         AuthKey.getKey().strip():
+        #     return self.finish({"authKeyError": True})
 
         scheduler = self.application.settings.get('scheduler')
         schedule_status = await scheduler.statuses
@@ -270,9 +269,9 @@ class StatusHandler(BaseHandler):
 
 class MetadataScheduleHandler(BaseHandler):
     async def post(self, schedule):
-        if 'authKey' not in self.json or self.json['authKey'].strip() != \
-                AuthKey.getKey().strip():
-            return self.finish({"authKeyError": True})
+        # if 'authKey' not in self.json or self.json['authKey'].strip() != \
+        #         AuthKey.getKey().strip():
+        #     return self.finish({"authKeyError": True})
 
         scheduler = self.application.settings.get('scheduler')
         try:
@@ -293,9 +292,9 @@ class MetadataScheduleHandler(BaseHandler):
 
 class StatusScheduleHandler(BaseHandler):
     async def post(self, schedule):
-        if 'authKey' not in self.json or self.json['authKey'].strip() != \
-                AuthKey.getKey().strip():
-            return self.finish({"authKeyError": True})
+        # if 'authKey' not in self.json or self.json['authKey'].strip() != \
+        #         AuthKey.getKey().strip():
+        #     return self.finish({"authKeyError": True})
 
         scheduler = self.application.settings.get('scheduler')
         try:
@@ -312,11 +311,10 @@ class StatusScheduleHandler(BaseHandler):
 
 
 class ResultScheduleHandler(BaseHandler):
-    async def post(self, schedule, result=None):
-        if 'authKey' not in self.json or self.json['authKey'].strip() != \
-                AuthKey.getKey().strip():
-            return self.finish({"authKeyError": True})
-
+    async def get(self, schedule, result=None):
+        # if 'authKey' not in self.json or self.json['authKey'].strip() != \
+        #         AuthKey.getKey().strip():
+        #     return self.finish({"authKeyError": True})
         scheduler = self.application.settings.get('scheduler')
 
         try:
@@ -422,7 +420,6 @@ def schedule_watch_wrapper(scheduler, socket, message_id, message_list):
             content['__cpacpy_message_id'] = message_id
 
         if message.__class__.__name__ == "Log":
-            # print("hi", len(message_list.get_message_list(schedule)))
             message_list.add_log(schedule, content)
             if message_list.get_interval(schedule) > 1:
                 node_message = message_list.get_message_list(schedule)
@@ -440,7 +437,6 @@ def schedule_watch_wrapper(scheduler, socket, message_id, message_list):
                                             "schedule": repr(schedule)},
                             }
                         }
-                        print(node_message)
                         socket.write_message(json.dumps(node_message,
                                                         cls=CustomEncoder))
                     except tornado.websocket.WebSocketClosedError:
@@ -460,7 +456,6 @@ def schedule_watch_wrapper(scheduler, socket, message_id, message_list):
                                         "schedule": repr(schedule)},
                         }
                     }
-                    print(node_message)
                     socket.write_message(json.dumps(node_message,
                                                     cls=CustomEncoder))
                 except tornado.websocket.WebSocketClosedError:
