@@ -33,6 +33,7 @@ class SLURMSchedule(BackendSchedule):
         pass
 
     async def run(self):
+        logger.info(f'[{self}] Running')
         self._job_id = self.backend.start_job(f'cpacpy_{repr(self)}', '')
         logger.info(f'[{self}] Job ID {self._job_id}')
 
