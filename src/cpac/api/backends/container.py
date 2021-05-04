@@ -108,7 +108,7 @@ class ContainerDataSettingsSchedule(ContainerSchedule, DataSettingsSchedule):
             )
 
         try:
-            files = glob.glob(os.path.join(output_folder, 'cpac_data_config_*.yml'))
+            files = glob.glob(os.path.join(output_folder, '*data_config*.yml'))
             if files:
                 with open(files[0]) as f:
                     self._results['data_config'] = yaml.safe_load(f)
