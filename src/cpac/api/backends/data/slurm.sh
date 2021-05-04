@@ -30,7 +30,12 @@ PIP_INSTALL=($PIP_INSTALL)
 PIP_INSTALL=${PIP_INSTALL:-"git+https://github.com/radiome-lab/cpac.git@feature/progress-tracking"}
 pip install "${PIP_INSTALL[@]}"
 
-python -m cpac.api -v scheduler --address 0.0.0.0:3333 --proxy --backend singularity --singularity-image /opt/cpacpy-singularity_test.simg &
+python -m cpac.api -v scheduler \
+  --address 0.0.0.0:3333 \
+  --proxy \
+  --backend singularity \
+  --singularity-image $IMAGE &
+
 SERVER=$!
 while kill -0 $SERVER 2> /dev/null; do
   sleep 1

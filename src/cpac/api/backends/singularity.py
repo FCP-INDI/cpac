@@ -25,7 +25,7 @@ class SingularitySchedule(ContainerSchedule):
         proc_command = [
             'singularity',
             'run',
-            '--fakeroot',
+            # '--fakeroot',
         ]
 
         if port:
