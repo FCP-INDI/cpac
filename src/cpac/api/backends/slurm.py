@@ -109,12 +109,13 @@ class SLURMBackend(Backend):
             '-o', 'ControlPersist=15m',
         ]
 
-        logger.info(f'[{self}] Control {self.control} {self._control_args}')
+        logger.info(f'[SlurmBackend] Control {self.control} {self._control_args}')
 
         self.connect()
 
     def connect(self):
         if os.path.exists(self.control):
+            logger.info(f'[SlurmBackend] Using existing connection')
             return
 
         cmd = [
