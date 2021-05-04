@@ -71,6 +71,7 @@ def parse_args(args):
     scheduler_parser.add_argument('--slurm-control', nargs='?',
             default=f'~/.ssh/{"".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(24))}')
     scheduler_parser.add_argument('--slurm-pip-install', nargs='?')
+    scheduler_parser.add_argument('--slurm-singularity-image', nargs='?')
 
     parsed = parser.parse_args(args)
 
