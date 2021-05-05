@@ -33,6 +33,7 @@ class SLURMSchedule(BackendSchedule):
         pass
 
     async def run(self):
+        logger.info(f'[{self}] Running')
         self._job_id = self.backend.start_job(f'cpacpy_{repr(self)}', '')
         logger.info(f'[{self}] Job ID {self._job_id}')
 
@@ -84,6 +85,9 @@ class SLURMBackend(Backend):
         ParticipantPipelineSchedule: SLURMParticipantPipelineSchedule,
     }
 
+    singularity_image = 'shub://FCP-INDI/C-PAC:latest'
+    pip_install = 'git+https://github.com/radiome-lab/cpac.git@feature/progress-tracking'
+
     def __init__(self, id, host, username, key, control, singularity_image, node_backend=None, pip_install=None, scheduler=None):
         super().__init__(id=id, scheduler=scheduler)
 
@@ -91,8 +95,11 @@ class SLURMBackend(Backend):
         self.username = username
         self.key = key
         self.node_backend = node_backend
-        self.pip_install = pip_install
-        self.singularity_image = singularity_image
+        if pip_install:
+            self.pip_install = pip_install
+        if singularity_image:
+            self.singularity_image = singularity_image
+
 
         self._forwards = {}
 
@@ -109,12 +116,13 @@ class SLURMBackend(Backend):
             '-o', 'ControlPersist=15m',
         ]
 
-        logger.info(f'[{self}] Control {self.control} {self._control_args}')
+        logger.info(f'[SlurmBackend] Control {self.control} {self._control_args}')
 
         self.connect()
 
     def connect(self):
         if os.path.exists(self.control):
+            logger.info(f'[SlurmBackend] Using existing connection')
             return
 
         cmd = [
@@ -131,7 +139,7 @@ class SLURMBackend(Backend):
             ] 
             
         cmd += self._control_args + [
-            f'{self.username}@{self.host[0]}'
+            f'{self.username}@{self.host[0]}', 'date', '+%s'
         ]
 
         logger.info(f'[SlurmBackend] Cmd: {cmd}')
@@ -169,7 +177,8 @@ class SLURMBackend(Backend):
             '-p', self.host[1],
         ] + self._control_args + [
             'dummy',
-        ] + command
+            f'exec $SHELL -l -c "{" ".join(command)}"'
+        ]
 
         logger.info(f'[SlurmBackend] Cmd: {cmd}')
         proc = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)

@@ -26,8 +26,7 @@ else
   source $SCRATCH_DIR/miniconda/bin/activate
 fi
 
-PIP_INSTALL=($PIP_INSTALL)
-PIP_INSTALL=${PIP_INSTALL:-"git+https://github.com/radiome-lab/cpac.git@feature/progress-tracking"}
+PIP_INSTALL="$PIP_INSTALL"
 pip install "${PIP_INSTALL[@]}"
 
 python -m cpac.api -v scheduler \
