@@ -1,28 +1,17 @@
 import asyncio
-import copy
-import glob
-import hashlib
-import json
 import logging
 import os
 import pkgutil
-import shutil
 import tempfile
-import time
-import uuid
 from functools import reduce
 from subprocess import PIPE, STDOUT, Popen
 
-import yaml
-from tornado.websocket import websocket_connect
-
 from cpac.api.client import Client
 
-from ...utils import yaml_parse
 from ..schedules import (DataConfigSchedule, DataSettingsSchedule,
                          ParticipantPipelineSchedule, Schedule)
 from .base import Backend, BackendSchedule, RunStatus
-from .utils import find_free_port, merge_async_iters
+from .utils import find_free_port
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +33,7 @@ class SLURMSchedule(BackendSchedule):
         pass
 
     async def run(self):
+        logger.info(f'[{self}] Running')
         self._job_id = self.backend.start_job(f'cpacpy_{repr(self)}', '')
         logger.info(f'[{self}] Job ID {self._job_id}')
 
@@ -95,14 +85,21 @@ class SLURMBackend(Backend):
         ParticipantPipelineSchedule: SLURMParticipantPipelineSchedule,
     }
 
-    def __init__(self, id, host, username, key, control, node_backend=None, pip_install=None, scheduler=None):
+    singularity_image = 'shub://FCP-INDI/C-PAC:latest'
+    pip_install = 'git+https://github.com/radiome-lab/cpac.git@feature/progress-tracking'
+
+    def __init__(self, id, host, username, key, control, singularity_image, node_backend=None, pip_install=None, scheduler=None):
         super().__init__(id=id, scheduler=scheduler)
 
         self.host = host.split(':')
         self.username = username
         self.key = key
         self.node_backend = node_backend
-        self.pip_install = pip_install
+        if pip_install:
+            self.pip_install = pip_install
+        if singularity_image:
+            self.singularity_image = singularity_image
+
 
         self._forwards = {}
 
@@ -119,12 +116,13 @@ class SLURMBackend(Backend):
             '-o', 'ControlPersist=15m',
         ]
 
-        logger.info(f'[{self}] Control {self.control} {self._control_args}')
+        logger.info(f'[SlurmBackend] Control {self.control} {self._control_args}')
 
         self.connect()
 
     def connect(self):
         if os.path.exists(self.control):
+            logger.info(f'[SlurmBackend] Using existing connection')
             return
 
         cmd = [
@@ -141,10 +139,13 @@ class SLURMBackend(Backend):
             ] 
             
         cmd += self._control_args + [
-            f'{self.username}@{self.host[0]}'
+            f'{self.username}@{self.host[0]}', 'date', '+%s'
         ]
 
+        logger.info(f'[SlurmBackend] Cmd: {cmd}')
         stdout, stderr = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate(b"\n")
+        logger.info(f'[SlurmBackend] {stdout}')
+        logger.info(f'[SlurmBackend] {stderr}')
         # TODO handle exit code
         # print("Connect")
         # print(stdout)
@@ -158,7 +159,11 @@ class SLURMBackend(Backend):
             src,
             f'dummy:{dst}'
         ]
+
+        logger.info(f'[SlurmBackend] Cmd: {cmd}')
         stdout, stderr = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate(b"\n")
+        logger.info(f'[SlurmBackend] {stdout}')
+        logger.info(f'[SlurmBackend] {stderr}')
         # TODO handle exit code
         # print("Copy")
         # print(stdout)
@@ -172,10 +177,16 @@ class SLURMBackend(Backend):
             '-p', self.host[1],
         ] + self._control_args + [
             'dummy',
-        ] + command
+            f'exec $SHELL -l -c "{" ".join(command)}"'
+        ]
+
+        logger.info(f'[SlurmBackend] Cmd: {cmd}')
         proc = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         stdout, stderr = proc.communicate(b"\n")
         returncode = proc.returncode
+        logger.info(f'[SlurmBackend] {returncode}')
+        logger.info(f'[SlurmBackend] {stdout}')
+        logger.info(f'[SlurmBackend] {stderr}')
         return returncode, stdout, stderr
 
     def queue_info(self, jobs=None):
@@ -232,6 +243,7 @@ class SLURMBackend(Backend):
     def start_job(self, job_name, time):
         slurm_template = pkgutil.get_data(__package__, 'data/slurm.sh').decode()
         slurm_script = slurm_template \
+            .replace('$IMAGE', self.singularity_image) \
             .replace('$JOB_NAME', job_name) \
             .replace('$PIP_INSTALL', self.pip_install) \
             .replace('$TIME', '0-05:00:00')

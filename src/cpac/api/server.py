@@ -1,3 +1,4 @@
+import re
 import asyncio
 import tornado.escape
 import tornado.web
@@ -13,6 +14,7 @@ from cpac import __version__
 from .schedules import Schedule, DataSettingsSchedule, DataConfigSchedule, ParticipantPipelineSchedule
 from .backends import available_backends
 from .backends.base import Result, FileResult, CrashFileResult, LogFileResult
+from .authKey import AuthKey
 
 import os
 import time
@@ -22,9 +24,51 @@ import tempfile
 import logging
 import collections
 import dataclasses
+from datetime import datetime
+import time
 
 _logger = logging.getLogger(__name__)
 
+class NodeQueue:
+    def __init__(self):
+        self.schedules = {}
+
+    def add_log(self, schedule, message):
+        if repr(schedule) not in self.schedules:
+            self.schedules[repr(schedule)] = {'message': []}
+            self.set_timer(schedule)
+        self.schedules[repr(schedule)]['message'].append(message)
+
+    def get_interval(self, schedule):
+        rp = repr(schedule)
+        if rp not in self.schedules:
+            return 0
+        return (datetime.now() - self.schedules[rp]['lastSendTime']).seconds
+
+    def set_timer(self, schedule):
+        rp = repr(schedule)
+        if rp not in self.schedules:
+            self.schedules[rp] = {'message': []}
+        self.schedules[rp]['lastSendTime'] = datetime.now()
+        return self.schedules[rp]['lastSendTime']
+
+    def get_message_list(self, schedule):
+        rp = repr(schedule)
+        if rp not in self.schedules:
+            return []
+        return self.schedules[rp]['message'][:]
+
+    def clean_message_list(self, schedule):
+        rp = repr(schedule)
+        if rp not in self.schedules:
+            return []
+        result = self.schedules[rp]['message'][:]
+        self.schedules[rp]['message'] = []
+        return result
+
+    def clean_all(self):
+        self.schedules = {}
+        return True
 
 class CustomEncoder(json.JSONEncoder):
     def default(self, o):
@@ -69,6 +113,19 @@ class BaseHandler(tornado.web.RequestHandler):
             except ValueError:
                 pass
 
+        if self.request.method in ['OPTIONS']:
+            return
+
+        token = self.request.headers.get('Authorization')
+        if not token:
+            self.send_error(401)
+            return
+
+        _, token, *_ = re.split(r'\s+', token) + ['', '']
+        if token != AuthKey.getKey():
+            self.send_error(401)
+            return
+
     def get_argument(self, arg, default=None):
         if self.request.method in ['POST', 'PUT'] and self.json:
             return self.json.get(arg, default)
@@ -78,6 +135,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class MainHandler(BaseHandler):
     def get(self):
+
         scheduler = self.application.settings.get("scheduler")
         backend = scheduler.backend
         types = {v: k for k, v in available_backends.items()}
@@ -96,9 +154,12 @@ class MainHandler(BaseHandler):
 
 class ScheduleHandler(BaseHandler):
     def post(self):
-
         if "type" not in self.json:
             return self.bad_request()
+
+        # if 'authKey' not in self.json or self.json['authKey'].strip() != \
+        #         AuthKey.getKey().strip():
+        #     return self.finish({"authKeyError": True})
 
         scheduler = self.application.settings.get("scheduler")
 
@@ -119,6 +180,7 @@ class ScheduleHandler(BaseHandler):
 
         elif self.json["type"] == "pipeline":
 
+            execution_params = self.json.get("profile")
             data_config = self.json.get("data_config")
             if not data_config:
                 return self.bad_request()
@@ -157,6 +219,7 @@ class ScheduleHandler(BaseHandler):
 
             schedule = scheduler.schedule(
                 DataConfigSchedule(
+                    execution_params=execution_params,
                     data_config=data_config_file,
                     pipeline=pipeline_file,
                     schedule_participants=bool(self.json.get("data_config"))
@@ -192,6 +255,10 @@ class ScheduleHandler(BaseHandler):
 
 class StatusHandler(BaseHandler):
     async def get(self, result=None):
+        # if 'authKey' not in self.json or self.json['authKey'].strip() != \
+        #         AuthKey.getKey().strip():
+        #     return self.finish({"authKeyError": True})
+
         scheduler = self.application.settings.get('scheduler')
         schedule_status = await scheduler.statuses
 
@@ -202,6 +269,10 @@ class StatusHandler(BaseHandler):
 
 class MetadataScheduleHandler(BaseHandler):
     async def get(self, schedule):
+        # if 'authKey' not in self.json or self.json['authKey'].strip() != \
+        #         AuthKey.getKey().strip():
+        #     return self.finish({"authKeyError": True})
+
         scheduler = self.application.settings.get('scheduler')
         try:
             schedule_tree = scheduler[schedule]
@@ -221,6 +292,10 @@ class MetadataScheduleHandler(BaseHandler):
 
 class StatusScheduleHandler(BaseHandler):
     async def get(self, schedule):
+        # if 'authKey' not in self.json or self.json['authKey'].strip() != \
+        #         AuthKey.getKey().strip():
+        #     return self.finish({"authKeyError": True})
+
         scheduler = self.application.settings.get('scheduler')
         try:
             schedule_tree = scheduler[schedule]
@@ -237,6 +312,9 @@ class StatusScheduleHandler(BaseHandler):
 
 class ResultScheduleHandler(BaseHandler):
     async def get(self, schedule, result=None):
+        # if 'authKey' not in self.json or self.json['authKey'].strip() != \
+        #         AuthKey.getKey().strip():
+        #     return self.finish({"authKeyError": True})
         scheduler = self.application.settings.get('scheduler')
 
         try:
@@ -326,7 +404,7 @@ class ResultScheduleHandler(BaseHandler):
         }, cls=CustomEncoder))
 
 
-def schedule_watch_wrapper(scheduler, socket, message_id):
+def schedule_watch_wrapper(scheduler, socket, message_id, message_list):
 
     def schedule_watch(self, schedule, message):
         content = {
@@ -341,10 +419,56 @@ def schedule_watch_wrapper(scheduler, socket, message_id):
         if message_id:
             content['__cpacpy_message_id'] = message_id
 
-        try:
-            socket.write_message(json.dumps(content, cls=CustomEncoder))
-        except tornado.websocket.WebSocketClosedError:
-            pass
+        if message.__class__.__name__ == "Log":
+            message_list.add_log(schedule, content)
+            if message_list.get_interval(schedule) > 1:
+                node_message = message_list.get_message_list(schedule)
+                message_list.set_timer(schedule)
+                message_list.clean_message_list(schedule)
+                if node_message:
+                    try:
+                        node_message = {
+                            "type": "watch",
+                            "__cpacpy_message_id": message_id,
+                            "data": {
+                                "id": repr(schedule),
+                                "type": 'Log',
+                                "message": {"content": node_message,
+                                            "schedule": repr(schedule)},
+                            }
+                        }
+                        socket.write_message(json.dumps(node_message,
+                                                        cls=CustomEncoder))
+                    except tornado.websocket.WebSocketClosedError:
+                        pass
+        elif message.__class__.__name__ == "End":
+            node_message = message_list.get_message_list(schedule)
+            if node_message:
+                message_list.clean_message_list(schedule)
+                try:
+                    node_message = {
+                        "type": "watch",
+                        "__cpacpy_message_id": message_id,
+                        "data": {
+                            "id": repr(schedule),
+                            "type": 'Log',
+                            "message": {"content": node_message,
+                                        "schedule": repr(schedule)},
+                        }
+                    }
+                    socket.write_message(json.dumps(node_message,
+                                                    cls=CustomEncoder))
+                except tornado.websocket.WebSocketClosedError:
+                    pass
+            try:
+                socket.write_message(json.dumps(content, cls=CustomEncoder))
+            except tornado.websocket.WebSocketClosedError:
+                pass
+        else:
+            try:
+                socket.write_message(json.dumps(content, cls=CustomEncoder))
+            except tornado.websocket.WebSocketClosedError:
+                pass
 
     return schedule_watch
 
@@ -352,6 +476,7 @@ def schedule_watch_wrapper(scheduler, socket, message_id):
 class WatchScheduleHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
+        self.message_list = NodeQueue()
         self.write_message(json.dumps({'connected': True}))
         _logger.debug("Websocket connected")
 
@@ -387,7 +512,7 @@ class WatchScheduleHandler(tornado.websocket.WebSocketHandler):
             schedule = scheduler[message["schedule"]].schedule
             scheduler.watch(
                 schedule,
-                schedule_watch_wrapper(scheduler, self, message_id),
+                schedule_watch_wrapper(scheduler, self, message_id, self.message_list),
                 children="children" in message and message["children"],
                 watcher_classes=watchers
             )

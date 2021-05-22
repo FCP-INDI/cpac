@@ -8,7 +8,7 @@ import logging
 import os
 import shutil
 import sys
-import threading
+import datetime
 import time
 
 import yaml
@@ -112,39 +112,64 @@ elif args.analysis_level == "participant":
         data_config = yaml.safe_load(f)[0]
 
     subject_id = data_config['subject_id']
-
     err_subjects = ('0050959', '0051558', '0050952', '0051575')
+    sleep_between_nodes = 0.001
+    
+    with open('/code/cpac_output/log/pipeline_analysis/sub-1_ses-1'
+              '/callback_new.log') as f:
+        node_logs = [json.loads(l.strip()) for l in list(f)]
 
-    nodes = [
-        f"resting_preproc_sub-{subject_id}.1_anat_pipeline.1_normalize",
-        f"resting_preproc_sub-{subject_id}.1_anat_pipeline.2_skullstrip",
-        f"resting_preproc_sub-{subject_id}.1_anat_pipeline.3_segmentation",
-        f"resting_preproc_sub-{subject_id}.2_func_pipeline.4_skullstrip",
-        f"resting_preproc_sub-{subject_id}.2_func_pipeline.5_registration",
-        f"resting_preproc_sub-{subject_id}.2_func_pipeline.6_nuisance_regression",
-    ]
-
-    sleep_between_nodes = 1.0
+    print('Nodes:', len(node_logs))
 
     async def socketee(websocket, path):
         if path != '/log':
             return
 
-        for i, node in enumerate(nodes):
-            start = time.time()
-            await asyncio.sleep(sleep_between_nodes)
+        starting = datetime.datetime.now()
 
-            await websocket.send(json.dumps({
-                "time": time.time(),
-                "message": {
-                    "id": node,
-                    "hash": f"{i:032}",
-                    "start": start,
-                    "end": time.time(),
-                }
-            }))
+        for i, node in enumerate(node_logs):
+            if 'start' in node:
+                node['start'] = str(starting + datetime.timedelta(seconds=node['start']))
+                node['finish'] = str(starting + datetime.timedelta(seconds=node['finish']))
+
+            await websocket.send(
+                json.dumps({
+                    "time": time.time(),
+                    "message": node
+                })
+            )
 
             logger.info(f"{node}")
+
+        # infoList = []
+        # for i, node in enumerate(node_logs):
+        #     if 'start' in node:
+        #         if i > 0 and 'start' not in node_logs[i - 1]:
+        #             await websocket.send(
+        #                 json.dumps({"time": time.time(),
+        #                             "message": {"info": infoList}})
+        #             )
+        #             infoList = []
+        #
+        #         node['start'] = str(
+        #             starting + datetime.timedelta(seconds=node['start']))
+        #         node['finish'] = str(
+        #             starting + datetime.timedelta(seconds=node['finish']))
+        #     infoList.append({
+        #         "time": time.time(),
+        #         "message": node
+        #     })
+        #     if len(infoList) > 2000:
+        #         await websocket.send(
+        #             json.dumps({"time": time.time(), "message": {"info": infoList}})
+        #         )
+        #         infoList = []
+        #
+        # logger.info(f"{node}")
+        # if infoList:
+        #     await websocket.send(
+        #         json.dumps({"time": time.time(), "message": {"info": infoList}})
+        #     )
 
         while True:
             await asyncio.sleep(1)
@@ -181,7 +206,7 @@ elif args.analysis_level == "participant":
 
     async def wait_some():
         await asyncio.sleep(3)
-        await asyncio.sleep(len(nodes) * sleep_between_nodes)
+        await asyncio.sleep(len(node_logs) * sleep_between_nodes)
         await asyncio.sleep(1)
 
     async def main():

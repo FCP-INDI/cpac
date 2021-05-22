@@ -11,8 +11,6 @@ from .container import (ContainerBackend, ContainerDataConfigSchedule,
                         ContainerParticipantPipelineSchedule,
                         ContainerSchedule)
 
-from .utils import find_free_port
-
 logger = logging.getLogger(__name__)
 
 
@@ -25,7 +23,7 @@ class SingularitySchedule(ContainerSchedule):
         proc_command = [
             'singularity',
             'run',
-            '--fakeroot',
+            # '--fakeroot',
         ]
 
         if port:

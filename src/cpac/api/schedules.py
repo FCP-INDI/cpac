@@ -94,17 +94,21 @@ class DataSettingsSchedule(Schedule):
 
 class DataConfigSchedule(Schedule):
 
-    def __init__(self, data_config, pipeline=None, schedule_participants=True, parent=None):
+    def __init__(self, data_config, pipeline=None,
+                 schedule_participants=True, parent=None,
+                 execution_params=None):
         super().__init__(parent=parent)
         self.data_config = data_config
         self.pipeline = pipeline
         self.schedule_participants = schedule_participants
+        self.execution_params = execution_params
 
     def __json__(self):
         return {
             "data_config": self.data_config,
             "pipeline": self.pipeline,
             "schedule_participants": self.schedule_participants,
+            "execution_params": self.execution_params,
         }
 
     async def post(self):
@@ -124,21 +128,26 @@ class DataConfigSchedule(Schedule):
                 yield Schedule.Spawn(
                     schedule=self,
                     name='/'.join(subject_id),
-                    child=ParticipantPipelineSchedule(pipeline=self.pipeline, subject=subject),
+                    child=ParticipantPipelineSchedule(
+                        pipeline=self.pipeline, subject=subject,
+                        execution_params=self.execution_params),
                 )
 
 
 class ParticipantPipelineSchedule(Schedule):
 
-    def __init__(self, subject, pipeline=None, parent=None):
+    def __init__(self, subject, pipeline=None, parent=None,
+                 execution_params=None):
         super().__init__(parent=parent)
         self.subject = subject  # TODO rename to participant
         self.pipeline = pipeline
+        self.execution_params = execution_params
 
     def __json__(self):
         return {
             "subject": self.subject,
             "pipeline": self.pipeline,
+            "execution_params": self.execution_params,
         }
 
 schedules = [

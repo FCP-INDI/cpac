@@ -28,7 +28,7 @@ class FileResult(Result):
         self._name = name or path
 
     async def __aenter__(self):
-        self._stream = open(self._path)
+        self._stream = open(self._path, 'rb')
         return self._stream
 
     async def __aexit__(self, exc_type, exc, tb):
@@ -142,7 +142,6 @@ class Backend:
     def specialize(self, schedule):
         if self[schedule.__class__] is None:
             raise ValueError(f"Mapped scheduled class for {schedule.__class__.__name__} does not exist.")
-
         backend_schedule = self[schedule.__class__](backend=self)
         backend_schedule.__setstate__(schedule.__getstate__())
         return backend_schedule
