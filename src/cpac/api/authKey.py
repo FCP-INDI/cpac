@@ -5,11 +5,11 @@ class AuthKey:
     key = None
 
     @staticmethod
-    def generateKey():
+    def generate_key():
         if not AuthKey.key:
             AuthKey.key = str(uuid.uuid1())
         return AuthKey.key
 
     @staticmethod
-    def getKey():
+    def get_key():
         return AuthKey.key

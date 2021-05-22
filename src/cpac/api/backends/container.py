@@ -227,20 +227,18 @@ class ContainerParticipantPipelineSchedule(ContainerSchedule,
 
         if pipeline:
             command += ['--pipeline_file', pipeline]
-
         if self.execution_params:
-            command += ['--pipeline_override',
-                        'maximumMemoryPerParticipant: %d'
-                        % int(self.execution_params['parallelPipeline'])] \
-                if 'parallelPipeline' in self.execution_params else []
-            command += ['--n_cpus',
-                        str(self.execution_params['corePerPipeline'])] \
-                if 'corePerPipeline' in self.execution_params else []
-            command += ['--mem_gb',
-                        str(self.execution_params['memPerPipeline'])] \
-                if 'memPerPipeline' in self.execution_params else []
+            if 'parallelPipeline' in self.execution_params:
+                parallel_pipelines = int(self.execution_params['parallelPipeline'])
+                command += ['--pipeline_override',
+                            f'maximumMemoryPerParticipant: {parallel_pipelines}']
+            if 'corePerPipeline' in self.execution_params:
+                command += ['--n_cpus',
+                            str(self.execution_params['corePerPipeline'])]
+            if 'memPerPipeline' in self.execution_params:
+                command += ['--mem_gb',
+                            str(self.execution_params['memPerPipeline'])]
 
-        print("cmd", command)
         self._status = None
         self._run_logs_last = None
         self._run_logs_messages = asyncio.Queue()
