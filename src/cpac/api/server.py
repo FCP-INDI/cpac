@@ -122,7 +122,7 @@ class BaseHandler(tornado.web.RequestHandler):
             return
 
         _, token, *_ = re.split(r'\s+', token) + ['', '']
-        if token != AuthKey.getKey():
+        if token != AuthKey.get_key():
             self.send_error(401)
             return
 
