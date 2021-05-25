@@ -91,7 +91,7 @@ async def start(args):
     from cpac.api.authKey import AuthKey
 
     print("Running server")
-    print("Auth key: ", AuthKey.generateKey())
+    print("Auth key: ", AuthKey.generate_key())
 
     backend = args.backend
     cmd_args = vars(args)
