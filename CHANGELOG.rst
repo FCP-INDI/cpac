@@ -1,6 +1,10 @@
 =========
 Changelog
 =========
+`Version 0.3.3: Minimal configs <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.3>`_
+========================================================================================
+* 🐛 Resolves issue where minimal configs would cause wrapper to crash
+
 `Version 0.3.2: Pull / Upgrade <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.2>`_
 ========================================================================================
 * ➖ Remove dependecy on Nipype
