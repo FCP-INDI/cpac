@@ -8,6 +8,10 @@ from unittest import mock
 from cpac.__main__ import run
 from CONSTANTS import args_before_after, set_commandline_args
 
+MINIMAL_CONFIG = os.path.join(
+    os.path.dirname(__file__), 'test_data', 'minimal.min.yml'
+)
+
 
 @pytest.mark.parametrize('helpflag', ['--help', '-h'])
 @pytest.mark.parametrize('argsep', [' ', '='])
@@ -32,7 +36,10 @@ def test_run_help(argsep, capsys, helpflag, platform=None, tag=None):
 
 
 @pytest.mark.parametrize('argsep', [' ', '='])
-def test_run_test_config(argsep, tmp_path, platform=None, tag=None):
+@pytest.mark.parametrize('pipeline_file', [None, MINIMAL_CONFIG])
+def test_run_test_config(
+    argsep, pipeline_file, tmp_path, platform=None, tag=None
+):
     def run_test(argv):
         with mock.patch.object(sys, 'argv', argv):
             run()
@@ -42,10 +49,11 @@ def test_run_test_config(argsep, tmp_path, platform=None, tag=None):
 
     wd = tmp_path
     args = set_commandline_args(platform, tag, argsep)
+    pipeline = '' if pipeline_file is None else f' {pipeline_file}'
     argv = (
         'run '
         f's3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU {wd} '
-        'test_config --participant_ndx=2'
+        f'test_config --participant_ndx=2{pipeline}'
     )
     if len(args):
         before, after = args_before_after(argv, args)

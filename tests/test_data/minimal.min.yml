@@ -1,0 +1,5 @@
+FROM: default
+
+pipeline_setup:
+
+  pipeline_name: test-minimal-imports
