@@ -49,7 +49,10 @@ def test_run_test_config(
 
     wd = tmp_path
     args = set_commandline_args(platform, tag, argsep)
-    pipeline = '' if pipeline_file is None else f' {pipeline_file}'
+    pipeline = '' if pipeline_file is None else ' '.join([
+        ' --pipeline_file',
+        pipeline_file
+    ])
     argv = (
         'run '
         f's3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU {wd} '

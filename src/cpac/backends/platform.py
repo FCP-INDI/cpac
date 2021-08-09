@@ -9,6 +9,7 @@ from collections import namedtuple
 from contextlib import redirect_stderr
 from io import StringIO
 from tabulate import tabulate
+from warnings import warn
 
 from cpac.helpers import cpac_read_crash, get_extra_arg_value
 from cpac.utils import Locals_to_bind, PermissionMode
@@ -83,6 +84,7 @@ class Backend(object):
             self.volumes[local] = [b]
 
     def _collect_config_binding(self, config, config_key):
+        config_binding = None
         if isinstance(config, str):
             if os.path.exists(config):
                 path = os.path.dirname(config)
@@ -93,7 +95,21 @@ class Backend(object):
                     f'yaml.dump(Configuration({config}).dict())"'
                 )
             config = yaml.safe_load(config)
-        return config.get('pipeline_setup', {}).get(config_key, {}).get('path')
+        pipeline_setup = config.get('pipeline_setup', {})
+        minimal = pipeline_setup.get('FROM', False)
+        if isinstance(pipeline_setup, dict):
+            config_binding = pipeline_setup.get(config_key, {}).get('path')
+        else:
+            minimal = True
+        if minimal:
+            warn(
+                'This run is using a minimal pipeline configuration. If this '
+                'configuration imports a configuration that requires paths to '
+                'be bound from your real environment to your container, you '
+                'need to bind those paths manually with the `-B` flag.',
+                UserWarning
+            )
+        return config_binding
 
     def collect_config_bindings(self, config, **kwargs):
         kwargs['output_dir'] = kwargs.get(
