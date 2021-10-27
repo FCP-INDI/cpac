@@ -33,9 +33,11 @@ jobs:
       with:
         go-version: ${{ matrix.go }}
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
+    - name: Install --upgrade pip setuptools wheel
+      run: python -m pip install --upgrade pip setuptools wheel
     - name: Set up Singularity
       if: ${{ matrix.platform == 'singularity' }}
       uses: eWaterCycle/setup-singularity@v5
