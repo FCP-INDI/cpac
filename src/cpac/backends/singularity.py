@@ -68,19 +68,12 @@ class Singularity(Backend):
         else:  # pragma: no cover
             try:
                 self.image = Client.pull(
-                    "shub://FCP-INDI/C-PAC",
+                    "docker://fcpindi/c-pac:latest",
                     force=force,
                     pull_folder=pwd
                 )
             except Exception:
-                try:
-                    self.image = Client.pull(
-                        "docker://fcpindi/c-pac:latest",
-                        force=force,
-                        pull_folder=pwd
-                    )
-                except Exception:
-                    raise OSError("Could not connect to Singularity")
+                raise OSError("Could not connect to Singularity")
 
     def _try_to_stream(self, args, stream_command='run', **kwargs):
         self._bindings_as_option()
