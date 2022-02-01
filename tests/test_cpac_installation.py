@@ -1,4 +1,5 @@
-from pip._internal.utils.misc import get_installed_distributions
+"""Test if cpac is installed as expected"""
+from pkg_resources import working_set
 from setuptools.config import read_configuration
 
 
@@ -22,7 +23,7 @@ def test_requirements():
                 'but not in setup.cfg'
             )
             assert package_in_list(
-                req, requirements_list(get_installed_distributions())
+                req, requirements_list(working_set)
             ), (
                 f'package {req} is in requirements.txt '
                 'but not installed'

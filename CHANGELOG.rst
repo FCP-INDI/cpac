@@ -1,8 +1,9 @@
 =========
 Changelog
 =========
-`Version 0.3.3: Minimal configs <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.3>`_
-========================================================================================
+`Version 0.4.0: Goodbye Singularity Hub <https://github.com/FCP-INDI/cpac/releases/tag/v0.4.0>`_
+================================================================================================
+* 👽 Drop call to now-deprecated Singularity Hub
 * 🐛 Resolves issue where minimal configs would cause wrapper to crash
 
 `Version 0.3.2: Pull / Upgrade <https://github.com/FCP-INDI/cpac/releases/tag/v0.3.2>`_
