@@ -82,7 +82,7 @@ if __name__ == '__main__':
                         default='efficiency')
     parser.add_argument("--filter_group", "-g", action="store",
                         choices=['lowest', 'highest'], default='lowest')
-    parser.add_argument("--filter_count", "-c", action="store", type=int,
+    parser.add_argument("--filter_count", "-n", action="store", type=int,
                         default=10)
 
     res = parser.parse_args()
