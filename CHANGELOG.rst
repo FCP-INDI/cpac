@@ -1,6 +1,10 @@
 =========
 Changelog
 =========
+`Unreleased`
+================================================================================================
+* 🧮 Evaluates memory usage for specific nodes from `callback.log` files
+
 `Version 0.4.0: Goodbye Singularity Hub <https://github.com/FCP-INDI/cpac/releases/tag/v0.4.0>`_
 ================================================================================================
 * 👽 Drop call to now-deprecated Singularity Hub
