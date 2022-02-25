@@ -1,6 +1,10 @@
 #!/usr/bin/env python
-'''cpac_parse_resources.py
+r'''cpac_parse_resources.py
 
+When provided with a `callback.log` file, this utility can sort through
+the memory `runtime` usage, `estimate`, and associated `efficiency`, to
+identify the `n` tasks with the `highest` or `lowest` of each of these
+categories.
 `cpac_parse_resources` is intended to be run outside a C-PAC container.
 '''
 import configparser
