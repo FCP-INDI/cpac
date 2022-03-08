@@ -1,4 +1,5 @@
 docker >= 4.2.1
+dockerpty
 docker-pycreds
 pandas >= 0.23.4
 pyyaml

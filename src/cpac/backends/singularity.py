@@ -15,7 +15,6 @@ class Singularity(Backend):
         self.platform = Platform_Meta('Singularity', 'Ⓢ')
         self._print_loading_with_symbol(self.platform.name)
         self.pull(**kwargs, force=False)
-        self.volumes = {}
         self.options = list(chain.from_iterable(kwargs[
             "container_options"
         ])) if bool(kwargs.get("container_options")) else []

@@ -1,5 +1,7 @@
-import docker
+import os
 
+import docker
+import dockerpty
 from docker.errors import ImageNotFound
 from requests.exceptions import ConnectionError
 
@@ -19,7 +21,6 @@ class Docker(Backend):
                 f"Could not connect to {self.platform.name}. "
                 "Is Docker running?"
             )
-        self.volumes = {}
 
         image = kwargs['image'] if kwargs.get(
             'image'
@@ -53,11 +54,19 @@ class Docker(Backend):
     def _collect_config(self, **kwargs):
         if kwargs.get('command') not in {'pull', 'upgrade', None}:
             if isinstance(self.pipeline_config, str):
+                container_kwargs = {'image': self.image}
+                if os.path.exists(self.pipeline_config):
+                    container_kwargs['volumes'] = {self.pipeline_config: {
+                        'bind': self.pipeline_config,
+                        'mode': 'ro',
+                    }}
                 try:
-                    container = self.client.containers.create(image=self.image)
+                    container = self.client.containers.create(
+                        **container_kwargs)
                 except ImageNotFound:  # pragma: no cover
                     self.pull(**kwargs)
-                    container = self.client.containers.create(image=self.image)
+                    container = self.client.containers.create(
+                        **container_kwargs)
                 stream = container.get_archive(path=self.pipeline_config)[0]
                 self.config = b''.join([
                     l for l in stream  # noqa E741
@@ -84,9 +93,9 @@ class Docker(Backend):
 
     def run(self, flags=[], **kwargs):
         kwargs['command'] = [i for i in [
-            kwargs['bids_dir'],
-            kwargs['output_dir'],
-            kwargs['level_of_analysis'],
+            kwargs.get('bids_dir'),
+            kwargs.get('output_dir'),
+            kwargs.get('level_of_analysis'),
             *flags
         ] if (i is not None and len(i))]
         self._execute(**kwargs)
@@ -121,37 +130,34 @@ class Docker(Backend):
 
         self._load_logging()
 
+        shared_kwargs = {
+            'image': self.image,
+            'user': ':'.join([
+                str(self.bindings['uid']),
+                str(self.bindings['gid'])
+            ]),
+            'volumes': self._volumes_to_docker_mounts(),
+            'working_dir': kwargs.get('working_dir', '/tmp'),
+            **self.docker_kwargs
+        }
+
         if run_type == 'run':
             self.container = self.client.containers.run(
-                self.image,
+                **shared_kwargs,
                 command=command,
                 detach=True,
                 stderr=True,
                 stdout=True,
-                remove=True,
-                user=':'.join([
-                    str(self.bindings['uid']),
-                    str(self.bindings['gid'])
-                ]),
-                volumes=self._volumes_to_docker_mounts(),
-                working_dir=kwargs.get('working_dir', '/tmp'),
-                **self.docker_kwargs
+                remove=True
             )
             self._run = DockerRun(self.container)
             self.container.stop()
         elif run_type == 'exec':
             self.container = self.client.containers.create(
-                self.image,
+                **shared_kwargs,
                 auto_remove=True,
                 entrypoint='/bin/bash',
-                stdin_open=True,
-                user=':'.join([
-                    str(self.bindings['uid']),
-                    str(self.bindings['gid'])
-                ]),
-                volumes=self._volumes_to_docker_mounts(),
-                working_dir=kwargs.get('working_dir', '/tmp'),
-                **self.docker_kwargs
+                stdin_open=True
             )
             self.container.start()
             return(self.container.exec_run(
@@ -160,6 +166,16 @@ class Docker(Backend):
                 stderr=True,
                 stream=True
             )[1])
+        elif run_type == 'enter':
+            self.container = self.client.containers.create(
+                **shared_kwargs,
+                auto_remove=True,
+                entrypoint='/bin/bash',
+                stdin_open=True,
+                tty=True,
+                detach=False
+            )
+            dockerpty.start(self.client.api, self.container.id)
 
 
 class DockerRun(object):

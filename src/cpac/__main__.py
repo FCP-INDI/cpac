@@ -143,6 +143,10 @@ def _parser():
 
     subparsers = parser.add_subparsers(dest='command')
 
+    enter_parser = subparsers.add_parser(
+        'enter', add_help=True, help='Enter a new C-PAC container via BASH')
+    enter_parser.register('action', 'extend', ExtendAction)
+
     run_parser = subparsers.add_parser(
         'run',
         add_help=False,
@@ -309,13 +313,20 @@ def main(args):
             **arg_vars
         )
 
-    if args.command in ['pull', 'upgrade']:
+    elif args.command == 'enter':
+        Backends(**arg_vars).run(
+            run_type='enter',
+            flags=args.extra_args,
+            **arg_vars
+        )
+
+    elif args.command in ['pull', 'upgrade']:
         Backends(**arg_vars).pull(
             force=True,
             **arg_vars
         )
 
-    if args.command in clargs:
+    elif args.command in clargs:
         # utils doesn't have '-h' flag for help
         if args.command == 'utils' and '-h' in arg_vars.get('extra_args', []):
             arg_vars['extra_args'] = [
@@ -329,7 +340,7 @@ def main(args):
             **arg_vars
         )
 
-    if args.command == 'crash':
+    elif args.command == 'crash':
         Backends(**arg_vars).read_crash(
             flags=args.extra_args,
             **arg_vars

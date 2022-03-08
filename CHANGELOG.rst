@@ -3,7 +3,9 @@ Changelog
 =========
 `Unreleased`
 ================================================================================================
-* 🧮 Evaluates memory usage for specific nodes from `callback.log` files
+* 🧮 Evaluates memory usage for specific nodes from ``callback.log`` files
+* ✨ Adds ``enter`` comand to enter a container's ``BASH``
+* 🐛 Fixes issue where custom pipeline configurations were not binding to temporary container prior to checking for bind paths
 
 `Version 0.4.0: Goodbye Singularity Hub <https://github.com/FCP-INDI/cpac/releases/tag/v0.4.0>`_
 ================================================================================================

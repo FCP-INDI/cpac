@@ -35,6 +35,7 @@ class Backend(object):
                         '/code/CPAC/resources/configs',
                         f'pipeline_config_{pipeline_config}.yml'
                     ])
+        self.volumes = {'/etc/passwd': [{'bind': '/etc/passwd', 'mode': 'ro'}]}
 
     def start(self, pipeline_config, subject_config):
         raise NotImplementedError()
