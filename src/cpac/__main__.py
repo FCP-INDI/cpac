@@ -353,11 +353,15 @@ def run():
     Consumes commandline arguments. Run `cpac --help` for usage string.
     '''
     args = sys.argv[1:]
-
     # reorder args
     command = None
     command_index = 0
     parser = _parser()
+    if args and (
+        args[0] == '--version' or args[0] == '--help' or args[0 == '-h']
+    ):
+        parse_args(args)
+    # pylint: disable=protected-access
     commands = list([cmd for cmd in parser._get_positional_actions(
     ) if cmd.dest == 'command'][0].choices)
     options = set(chain.from_iterable([
