@@ -3,17 +3,17 @@ import os
 import docker
 import dockerpty
 from docker.errors import ImageNotFound
-from requests.exceptions import ConnectionError
 
-from cpac.backends.platform import Backend, Platform_Meta
+from cpac.backends.platform import Backend, PlatformMeta
 
 
 class Docker(Backend):
     def __init__(self, **kwargs):
-        super(Docker, self).__init__(**kwargs)
-        self.platform = Platform_Meta('Docker', '🐳')
+        super().__init__(**kwargs)
+        self.platform = PlatformMeta('Docker', '🐳')
         self._print_loading_with_symbol(self.platform.name)
         self.client = docker.from_env()
+        self.platform.version = self.client.version().get('Version', 'unknown')
         try:
             self.client.ping()
         except (docker.errors.APIError, ConnectionError):  # pragma: no cover
@@ -128,14 +128,12 @@ class Docker(Backend):
         except docker.errors.ImageNotFound:  # pragma: no cover
             self.pull(**kwargs)
 
-        self._load_logging()
+        if run_type != 'version':
+            self._load_logging()
 
         shared_kwargs = {
             'image': self.image,
-            'user': ':'.join([
-                str(self.bindings['uid']),
-                str(self.bindings['gid'])
-            ]),
+            'user': str(self.bindings['uid']),
             'volumes': self._volumes_to_docker_mounts(),
             'working_dir': kwargs.get('working_dir', '/tmp'),
             **self.docker_kwargs
@@ -152,6 +150,8 @@ class Docker(Backend):
             )
             self._run = DockerRun(self.container)
             self.container.stop()
+        elif run_type == 'version':
+            self.get_version()
         elif run_type == 'exec':
             self.container = self.client.containers.create(
                 **shared_kwargs,
@@ -177,9 +177,27 @@ class Docker(Backend):
             )
             dockerpty.start(self.client.api, self.container.id)
 
+    def get_response(self, command, **kwargs):
+        """Method to return the response of running a command in the
+        Docker container.
 
-class DockerRun(object):
+        Parameters
+        ----------
+        command : str
+
+        Returns
+        -------
+        str
+        """
+        full_response = []
+        for response in self._execute(command, run_type='exec', **kwargs):
+            full_response.append(response.decode())
+        return ''.join(full_response)
+
+
+class DockerRun:
     def __init__(self, container):
+        # pylint: disable=expression-not-assigned
         self.container = container
         [print(
             l.decode('utf-8'), end=''

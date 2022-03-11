@@ -19,7 +19,7 @@ Dependencies
 * At least one of:
 
   * `Docker <https://www.docker.com>`_
-  * `Singularity <https://sylabs.io/singularity>`_ ≥2.5&≤3.0
+  * `Singularity <https://sylabs.io/singularity>`_ ≥2.5
 
 Usage
 =====

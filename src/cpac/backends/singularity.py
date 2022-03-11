@@ -2,17 +2,17 @@ import os
 
 from itertools import chain
 from spython.main import Client
-from subprocess import CalledProcessError
 
-from cpac.backends.platform import Backend, Platform_Meta
+from cpac.backends.platform import Backend, PlatformMeta
 
 BINDING_MODES = {'ro': 'ro', 'w': 'rw', 'rw': 'rw'}
 
 
 class Singularity(Backend):
     def __init__(self, **kwargs):
-        super(Singularity, self).__init__(**kwargs)
-        self.platform = Platform_Meta('Singularity', 'Ⓢ')
+        super().__init__(**kwargs)
+        self.platform = PlatformMeta('Singularity', 'Ⓢ')
+        self.platform.version = Client.version().split(' ')[-1]
         self._print_loading_with_symbol(self.platform.name)
         self.pull(**kwargs, force=False)
         self.options = list(chain.from_iterable(kwargs[
@@ -71,17 +71,42 @@ class Singularity(Backend):
                     force=force,
                     pull_folder=pwd
                 )
-            except Exception:
-                raise OSError("Could not connect to Singularity")
+            except Exception as exception:
+                raise OSError(
+                    "Could not connect to Singularity"
+                ) from exception
 
-    def _try_to_stream(self, args, stream_command='run', **kwargs):
+    def get_response(self, command, **kwargs):
+        """Method to return the response of running a command in the
+        Singularity container.
+
+        Parameters
+        ----------
+        command : str
+
+        Returns
+        -------
+        str
+        """
+        full_response = []
+        for response in self._try_to_stream(
+            args={'command': command},
+            stream_command='execute',
+            silent=True,
+            **kwargs
+        ):
+            full_response.append(response)
+        return ''.join(full_response)
+
+    def _try_to_stream(self, args, stream_command='run', silent=False,
+                       **kwargs):
         self._bindings_as_option()
         if stream_command == 'run':
             for line in Client.run(
                 Client.instance(self.image),
                 args=args,
                 options=self.options,
-                stream=True,
+                stream=not silent,
                 return_result=True,
                 **kwargs
             ):
@@ -91,8 +116,8 @@ class Singularity(Backend):
                 self.image,
                 command=args['command'].split(' '),
                 options=self.options,
-                stream=True,
-                quiet=False,
+                stream=not silent,
+                quiet=silent,
                 **kwargs
             ):
                 yield line
@@ -131,6 +156,8 @@ class Singularity(Backend):
                     *flags
                 ]).strip(' ')
             )]
+        elif run_type == 'version':
+            self.get_version()
         else:
             [print(o, end='') for o in self._try_to_stream(
                 args=' '.join(flags).strip(' '),

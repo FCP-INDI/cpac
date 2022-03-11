@@ -68,7 +68,10 @@ def _parser():
     parser.add_argument(
         '--version',
         action='version',
-        version='cpac {ver}'.format(ver=__version__)
+        version='cpac (convenience wrapper) version {ver}\nFor C-PAC version, '
+                'run `cpac version` with any cpac options (e.g., '
+                '`--platform`, `--image`, `--tag`) that you would use '
+                'while running'.format(ver=__version__)
     )
 
     parser.add_argument(
@@ -145,7 +148,6 @@ def _parser():
 
     enter_parser = subparsers.add_parser(
         'enter', add_help=True, help='Enter a new C-PAC container via BASH')
-    enter_parser.register('action', 'extend', ExtendAction)
 
     run_parser = subparsers.add_parser(
         'run',
@@ -154,7 +156,6 @@ def _parser():
     )
 
     help_call = '--help' in sys.argv or '-h' in sys.argv
-    run_parser.register('action', 'extend', ExtendAction)
     # run_parser.add_argument('--address', action='store', type=address)
 
     if not help_call:
@@ -185,14 +186,16 @@ def _parser():
         add_help=False,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    group_parser.register('action', 'extend', ExtendAction)
 
     utils_parser = subparsers.add_parser(
         'utils',
         add_help=False,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    utils_parser.register('action', 'extend', ExtendAction)
+
+    version_parser = subparsers.add_parser(
+        'version', add_help=True,
+        help='Print the version of C-PAC that cpac is using.')
 
     subparsers.add_parser(
         'pull',
@@ -206,13 +209,16 @@ def _parser():
         add_help=True,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    crash_parser.register('action', 'extend', ExtendAction)
 
     crash_parser.add_argument(
         'crashfile',
         help='path to crashfile, to read a crashfile from C-PAC < 1.8.0.\n'
              'Crashfiles in C-PAC >= 1.8.0 are plain text files.'
     )
+
+    for subparser in [crash_parser, enter_parser, group_parser, run_parser,
+                      utils_parser, version_parser]:
+        subparser.register('action', 'extend', ExtendAction)
 
     return parser
 
@@ -313,9 +319,9 @@ def main(args):
             **arg_vars
         )
 
-    elif args.command == 'enter':
+    elif args.command in ['enter', 'version']:
         Backends(**arg_vars).run(
-            run_type='enter',
+            run_type=args.command,
             flags=args.extra_args,
             **arg_vars
         )

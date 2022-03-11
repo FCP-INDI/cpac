@@ -1,23 +1,51 @@
 import os
-import pandas as pd
-import pwd
 import tempfile
 import textwrap
-import yaml
 
+from abc import ABC, abstractmethod
 from collections import namedtuple
 from contextlib import redirect_stderr
 from io import StringIO
-from tabulate import tabulate
 from warnings import warn
+
+import pandas as pd
+import yaml
+
+from tabulate import tabulate
 
 from cpac.helpers import cpac_read_crash, get_extra_arg_value
 from cpac.utils import Locals_to_bind, PermissionMode
+from cpac import __version__ as cpac_version
 
-Platform_Meta = namedtuple('Platform_Meta', 'name symbol')
+
+class CpacVersion:
+    """Class to hold the version of C-PAC running in the container"""
+    # pylint: disable=too-few-public-methods
+    def __init__(self, backend):
+        self.versions = namedtuple('versions', 'cpac CPAC')
+        self.versions.cpac = cpac_version
+        self.versions.CPAC = backend.get_response('cat /code/version').rstrip()
+        self.platform = backend.platform
+
+    def __str__(self):
+        return (f'cpac (convenience wrapper) version {self.versions.cpac}\n'
+                f'C-PAC version {self.versions.CPAC} running on '
+                f'{self.platform.name} version {self.platform.version}')
 
 
-class Backend(object):
+class PlatformMeta:
+    """Class to hold platform metadata"""
+    # pylint: disable=too-few-public-methods
+    def __init__(self, name, symbol):
+        self.name = name
+        self.symbol = symbol
+        self.version = 'unknown'
+
+    def __str__(self):
+        return f'{self.symbol} {self.name}'
+
+
+class Backend(ABC):
     def __init__(self, **kwargs):
         # start with default pipline, but prefer pipeline config over preconfig
         # over default
@@ -36,11 +64,17 @@ class Backend(object):
                         f'pipeline_config_{pipeline_config}.yml'
                     ])
         self.volumes = {'/etc/passwd': [{'bind': '/etc/passwd', 'mode': 'ro'}]}
+        # initilizing these for overriding on load
+        self.bindings = {}
+        self.container = None
+        self.image = None
+        self.platform = None
+        self._run = None
 
-    def start(self, pipeline_config, subject_config):
-        raise NotImplementedError()
-
-    def read_crash(self, crashfile, flags=[], **kwargs):
+    @abstractmethod
+    def read_crash(self, crashfile, flags=None, **kwargs):
+        if flags is None:
+            flags = []
         os.chmod(cpac_read_crash.__file__, 0o775)
         self._set_crashfile_binding(crashfile)
         if self.platform.name == 'Singularity':
@@ -69,15 +103,14 @@ class Backend(object):
 
     def _bind_volume(self, local, remote, mode):
         local, remote = self._prep_binding(local, remote)
-        b = {'bind': remote, 'mode': PermissionMode(mode)}
+        b = {'bind': remote,  # pylint: disable=invalid-name
+             'mode': PermissionMode(mode)}
         if local in self.volumes:
             if remote in [binding['bind'] for binding in self.volumes[local]]:
                 for i, binding in enumerate(self.volumes[local]):
                     self.volumes[local][i] = {
                         'bind': remote,
-                        'mode': max([
-                            self.volumes[local][i]['mode'], b['mode']
-                        ])
+                        'mode': max([binding['mode'], b['mode']])
                     }
             else:
                 self.volumes[local].append(b)
@@ -155,13 +188,42 @@ class Backend(object):
         kwargs['config_bindings'] = config_bindings
         return kwargs
 
+    def get_response(self, command, **kwargs):
+        """Method to return the response of running a command in the
+        container. Implemented in the subclasses.
+
+        Parameters
+        ----------
+        command : str
+
+        Returns
+        -------
+        str
+        """
+        raise NotImplementedError()
+
+    def get_version(self):
+        """Method to get the version of C-PAC running in container.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        CpacVersion
+        """
+        version = CpacVersion(self)
+        print(version)
+        return version
+
     def _load_logging(self):
-        t = pd.DataFrame([
+        table = pd.DataFrame([
             (i, j['bind'], j['mode']) for i in self.bindings['volumes'].keys(
             ) for j in self.bindings['volumes'][i]
         ])
-        if not t.empty:
-            t.columns = ['local', self.platform.name, 'mode']
+        if not table.empty:
+            table.columns = ['local', self.platform.name, 'mode']
             self._print_loading_with_symbol(
                 " ".join([
                     self.image,
@@ -169,7 +231,7 @@ class Backend(object):
                 ])
             )
             print(textwrap.indent(
-                tabulate(t.applymap(
+                tabulate(table.applymap(
                     lambda x: (
                         '\n'.join(textwrap.wrap(x, 42))
                     ) if isinstance(x, str) else x
@@ -242,12 +304,11 @@ class Backend(object):
                     'rw'
                 )
         uid = os.getuid()
-        self.bindings = {
-            'gid': pwd.getpwuid(uid).pw_gid,
+        self.bindings.update({
             'tag': tag,
             'uid': uid,
             'volumes': self.volumes
-        }
+        })
 
     def _volumes_to_docker_mounts(self):
         return([
