@@ -76,27 +76,39 @@ class Singularity(Backend):
 
     def _try_to_stream(self, args, stream_command='run', **kwargs):
         self._bindings_as_option()
-        try:
-            if stream_command == 'run':
-                for line in Client.run(
-                    Client.instance(self.image),
-                    args=args,
-                    options=self.options,
-                    stream=True,
-                    return_result=True
-                ):
-                    yield line
-            elif stream_command == 'execute':
-                for line in Client.execute(
-                    self.image,
-                    command=args['command'].split(' '),
-                    options=self.options,
-                    stream=True,
-                    quiet=False
-                ):
-                    yield line
-        except CalledProcessError:  # pragma: no cover
-            return
+        if stream_command == 'run':
+            for line in Client.run(
+                Client.instance(self.image),
+                args=args,
+                options=self.options,
+                stream=True,
+                return_result=True,
+                **kwargs
+            ):
+                yield line
+        elif stream_command == 'execute':
+            for line in Client.execute(
+                self.image,
+                command=args['command'].split(' '),
+                options=self.options,
+                stream=True,
+                quiet=False,
+                **kwargs
+            ):
+                yield line
+        elif stream_command == 'enter':
+            enter_options = {}
+            if '-B' in self.options:
+                enter_options['bind'] = self.options[
+                    self.options.index('-B') + 1]
+                self.options.remove(enter_options['bind'])
+                self.options.remove('-B')
+            enter_options['singularity_options'] = self.options
+            Client.shell(
+                self.image,
+                **enter_options,
+                **kwargs
+            )
 
     def _read_crash(self, read_crash_command, **kwargs):
         return self._try_to_stream(
@@ -105,18 +117,26 @@ class Singularity(Backend):
             **kwargs
         )
 
-    def run(self, flags=[], **kwargs):
+    def run(self, flags=None, run_type='run', **kwargs):
+        # pylint: disable=expression-not-assigned
+        if flags is None:
+            flags = []
         self._load_logging()
-        [print(o, end='') for o in self._try_to_stream(
-            args=' '.join([
-                kwargs['bids_dir'],
-                kwargs['output_dir'],
-                kwargs['level_of_analysis'],
-                *flags
-            ]).strip(' ')
-        )]
+        if run_type == 'run':
+            [print(o, end='') for o in self._try_to_stream(
+                args=' '.join([
+                    kwargs['bids_dir'],
+                    kwargs['output_dir'],
+                    kwargs['level_of_analysis'],
+                    *flags
+                ]).strip(' ')
+            )]
+        else:
+            [print(o, end='') for o in self._try_to_stream(
+                args=' '.join(flags).strip(' '),
+                stream_command=run_type)]
 
-    def clarg(self, clcommand, flags=[], **kwargs):
+    def clarg(self, clcommand, flags=None, **kwargs):
         """
         Runs a commandline command
 
@@ -128,6 +148,9 @@ class Singularity(Backend):
 
         kwargs: dict
         """
+        # pylint: disable=expression-not-assigned
+        if flags is None:
+            flags = []
         self._load_logging()
         [print(o, end='') for o in self._try_to_stream(
             args=' '.join([
