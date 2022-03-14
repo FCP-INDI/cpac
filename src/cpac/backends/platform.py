@@ -350,7 +350,7 @@ class Backend:
             if ckey in crashfile:
                 self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'rw')
         with tempfile.TemporaryDirectory() as temp_dir:
-            self._bind_volume(temp_dir.name, '/out', 'rw')
+            self._bind_volume(temp_dir, '/out', 'rw')
         helper = cpac_read_crash.__file__
         self._bind_volume(helper, helper, 'ro')
 
