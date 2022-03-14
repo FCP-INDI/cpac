@@ -42,7 +42,7 @@ def test_utils_new_settings_template(
         with mock.patch.object(sys, 'argv', argv):
             run()
             template_path = os.path.join(wd, 'data_settings.yml')
-            assert(os.path.exists(template_path))
+            assert os.path.exists(template_path)
 
     args = set_commandline_args(platform, tag, argsep)
     argv = f'--working_dir {wd} utils data_config new_settings_template'

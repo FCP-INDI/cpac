@@ -43,11 +43,10 @@ def test_run_test_config(
     def run_test(argv):
         with mock.patch.object(sys, 'argv', argv):
             run()
-            assert(
-                any([date.today().isoformat() in fp for fp in os.listdir(wd)])
-            )
+            assert any(
+                date.today().isoformat() in fp for fp in os.listdir(wd))
 
-    wd = tmp_path
+    wd = tmp_path  # pylint: disable=invalid-name
     args = set_commandline_args(platform, tag, argsep)
     pipeline = '' if pipeline_file is None else ' '.join([
         ' --pipeline_file',

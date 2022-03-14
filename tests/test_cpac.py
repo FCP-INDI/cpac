@@ -39,9 +39,7 @@ def test_pull(argsep, capsys, platform=None, tag=None):
             run()
             captured = capsys.readouterr()
             checkstring = f':{tag}' if tag is not None else ':latest'
-            assert(
-                checkstring in captured.out + captured.err
-            )
+            assert checkstring in captured.out + captured.err
 
     args = set_commandline_args(platform, tag, argsep)
 

@@ -68,4 +68,4 @@ def SINGULARITY_OPTION():
 
 
 PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION()]
-TAGS = [None, 'latest', 'dev-v1.8']
+TAGS = [None, 'latest', 'nightly']
