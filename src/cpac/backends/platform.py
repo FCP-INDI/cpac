@@ -273,7 +273,8 @@ class Backend:
         binding_path_local = os.path.abspath(
             os.path.expanduser(binding_path_local)
         )
-        os.makedirs(binding_path_local, exist_ok=True)
+        if not os.path.exists(binding_path_local):
+            os.makedirs(binding_path_local)
         return(
             os.path.realpath(binding_path_local),
             os.path.abspath(binding_path_remote)
