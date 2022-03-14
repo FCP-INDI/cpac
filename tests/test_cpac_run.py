@@ -40,7 +40,7 @@ def test_run_help(argsep, capsys, helpflag, platform=None, tag=None):
 def test_run_test_config(
     argsep, pipeline_file, tmp_path, platform=None, tag=None
 ):
-    def run_test(argv):
+    def run_test(argv, wd):  # pylint: disable=invalid-name
         with mock.patch.object(sys, 'argv', argv):
             run()
             assert any(
@@ -57,12 +57,12 @@ def test_run_test_config(
         f's3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU {wd} '
         f'test_config --participant_ndx=2{pipeline}'
     )
-    if len(args):
+    if args:
         before, after = args_before_after(argv, args)
         # test with args before command
-        run_test(before)
+        run_test(before, wd)
         # test with args after command
-        run_test(after)
+        run_test(after, wd)
     else:
         # test without --platform and --tag args
-        run_test(f'cpac {argv}'.split(' '))
+        run_test(f'cpac {argv}'.split(' '), wd)

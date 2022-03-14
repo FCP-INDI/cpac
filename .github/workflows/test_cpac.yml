@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         platform: [docker, singularity]
-        tag: [latest, dev-v1.8]
+        tag: [latest, nightly]
         go: [1.14]
         python: [3.6, 3.7, 3.8]
         singularity: [3.6.4]

@@ -111,7 +111,7 @@ class Backend:
             crash_message += stderr.getvalue()
             stderr.read()  # clear stderr
             print(crash_message.strip())
-            if hasattr(self, 'container'):
+            if hasattr(self, 'container') and self.container is not None:
                 self.container.stop()
 
     def _bind_volume(self, local, remote, mode):

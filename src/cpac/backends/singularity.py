@@ -31,6 +31,7 @@ class Singularity(Backend):
         self._set_bindings(**kwargs)
 
     def _bindings_as_option(self):
+        # pylint: disable=consider-using-dict-items
         self.options += (
             ['-B', ','.join((chain.from_iterable([[
                 ':'.join([b for b in [
@@ -43,6 +44,16 @@ class Singularity(Backend):
                 ] if b is not None]) for binding in self.volumes[local]
             ] for local in self.volumes])))]
         )
+
+    def _bindings_from_option(self):
+        enter_options = {}
+        if '-B' in self.options:
+            enter_options['bind'] = self.options[
+                self.options.index('-B') + 1]
+            self.options.remove(enter_options['bind'])
+            self.options.remove('-B')
+        enter_options['singularity_options'] = self.options
+        return enter_options
 
     def pull(self, force=False, **kwargs):
         image = kwargs['image'] if kwargs.get(
@@ -111,29 +122,26 @@ class Singularity(Backend):
                 **kwargs
             ):
                 yield line
-        elif stream_command == 'execute':
-            for line in Client.execute(
-                self.image,
-                command=args['command'].split(' '),
-                options=self.options,
-                stream=not silent,
-                quiet=silent,
-                **kwargs
-            ):
-                yield line
-        elif stream_command == 'enter':
-            enter_options = {}
-            if '-B' in self.options:
-                enter_options['bind'] = self.options[
-                    self.options.index('-B') + 1]
-                self.options.remove(enter_options['bind'])
-                self.options.remove('-B')
-            enter_options['singularity_options'] = self.options
-            Client.shell(
-                self.image,
-                **enter_options,
-                **kwargs
-            )
+        else:
+            enter_options = self._bindings_from_option()
+            if stream_command == 'execute':
+                for line in Client.execute(
+                    self.image,
+                    command=args['command'].split(' '),
+                    options=self.options,
+                    stream=not silent,
+                    quiet=silent,
+                    **{kwarg: value for kwarg, value in kwargs.items() if
+                       kwarg in ['contain', 'environ', 'nv', 'sudo',
+                                 'return_result', 'writable']}
+                ):
+                    yield line
+            elif stream_command == 'enter':
+                Client.shell(
+                    self.image,
+                    **enter_options,
+                    **kwargs
+                )
 
     def _read_crash(self, read_crash_command, **kwargs):
         return self._try_to_stream(
