@@ -2,7 +2,6 @@ import os
 import tempfile
 import textwrap
 
-from abc import ABC, abstractmethod
 from collections import namedtuple
 from contextlib import redirect_stderr
 from io import StringIO
@@ -45,7 +44,7 @@ class PlatformMeta:
         return f'{self.symbol} {self.name}'
 
 
-class Backend(ABC):
+class Backend:
     def __init__(self, **kwargs):
         # start with default pipline, but prefer pipeline config over preconfig
         # over default
@@ -71,8 +70,22 @@ class Backend(ABC):
         self.platform = None
         self._run = None
 
-    @abstractmethod
     def read_crash(self, crashfile, flags=None, **kwargs):
+        """For C-PAC < 1.8.0, this method is used to decode a
+        crashfile into plain text. Since C-PAC 1.8.0,
+        crashfiles are stored as plain text.
+
+        Parameters
+        ----------
+        crashfile : str
+            Path to the crashfile to decode.
+
+        flags : list
+
+        Returns
+        -------
+        None
+        """
         if flags is None:
             flags = []
         os.chmod(cpac_read_crash.__file__, 0o775)
