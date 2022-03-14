@@ -121,8 +121,7 @@ class Backend(ABC):
         config_binding = None
         if isinstance(config, str):
             if os.path.exists(config):
-                path = os.path.dirname(config)
-                self._set_bindings({'custom_binding': [':'.join([path]*2)]})
+                self._set_bindings({'custom_binding': [':'.join([config]*2)]})
                 config = self.clarg(
                     clcommand='python -c "from CPAC.utils.configuration; '
                     'import Configuration; '
@@ -144,6 +143,20 @@ class Backend(ABC):
                 UserWarning
             )
         return config_binding
+
+    def clarg(self, clcommand, flags=[], **kwargs):
+        """
+        Runs a commandline command
+
+        Parameters
+        ----------
+        clcommand: str
+
+        flags: list
+
+        kwargs: dict
+        """
+        raise NotImplementedError()
 
     def collect_config_bindings(self, config, **kwargs):
         kwargs['output_dir'] = kwargs.get(
@@ -269,13 +282,12 @@ class Backend(ABC):
             *kwargs.get('extra_args', []), kwargs.get('crashfile', '')
         ]:
             if os.path.exists(kwarg):
-                d = kwarg if os.path.isdir(kwarg) else os.path.dirname(kwarg)
-                self._bind_volume(d, d, 'r')
+                self._bind_volume(kwarg, kwarg, 'r')
         if 'data_config_file' in kwargs and isinstance(
             kwargs['data_config_file'], str
         ) and os.path.exists(kwargs['data_config_file']):
-            dc_dir = os.path.dirname(kwargs['data_config_file'])
-            self._bind_volume(dc_dir, dc_dir, 'r')
+            self._bind_volume(kwargs['data_config_file'],
+                              kwargs['data_config_file'], 'r')
             locals_from_data_config = Locals_to_bind()
             locals_from_data_config.from_config_file(
                 kwargs['data_config_file']
@@ -323,12 +335,13 @@ class Backend(ABC):
         for ckey in ["/wd/", "/crash/", "/log"]:
             if ckey in crashfile:
                 self._bind_volume(crashfile.split(ckey)[0], '/outputs', 'rw')
-        self._bind_volume(tempfile.TemporaryDirectory().name, '/out', 'rw')
-        helper_dir = os.path.dirname(cpac_read_crash.__file__)
-        self._bind_volume(helper_dir, helper_dir, 'ro')
+        with tempfile.TemporaryDirectory() as temp_dir:
+            self._bind_volume(temp_dir.name, '/out', 'rw')
+        helper = cpac_read_crash.__file__
+        self._bind_volume(helper, helper, 'ro')
 
 
-class Result(object):
+class Result:
     mime = None
 
     def __init__(self, name, value):

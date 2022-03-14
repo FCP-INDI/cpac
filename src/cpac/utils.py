@@ -34,16 +34,14 @@ class Locals_to_bind():
         d: any
             object to search for local paths
         """
+        # pylint: disable=expression-not-assigned
         if isinstance(d, dict):
             [self._add_locals(d[k]) for k in d]
-        elif isinstance(d, list) or isinstance(d, tuple):
+        elif isinstance(d, (list, tuple)):
             [self._add_locals(i) for i in d]
         elif isinstance(d, str):
             if os.path.exists(d):
-                if os.path.isdir(d):
-                    self.locals.add(d)
-                else:
-                    self.locals.add(os.path.dirname(d))
+                self.locals.add(d)
         self._local_common_paths()
 
     def _local_common_paths(self):
