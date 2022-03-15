@@ -1,4 +1,6 @@
+"""Base classes for platform-specific implementations"""
 import os
+import pwd
 import tempfile
 import textwrap
 
@@ -69,6 +71,8 @@ class Backend:
         self.image = None
         self.platform = None
         self._run = None
+        self.uid = 0
+        self.username = 'root'
 
     def read_crash(self, crashfile, flags=None, **kwargs):
         """For C-PAC < 1.8.0, this method is used to decode a
@@ -253,6 +257,7 @@ class Backend:
             self._print_loading_with_symbol(
                 " ".join([
                     self.image,
+                    f"as {self.username} ({self.uid})",
                     "with these directory bindings:"
                 ])
             )
@@ -329,10 +334,13 @@ class Backend:
                     kwargs['config_bindings'][binding],
                     'rw'
                 )
-        uid = os.getuid()
+        self.uid = os.getuid()
+        pwuid = pwd.getpwuid(self.uid)
+        self.username = getattr(pwuid, 'pw_name',
+                                getattr(pwuid, 'pw_gecos', str(self.uid)))
         self.bindings.update({
             'tag': tag,
-            'uid': uid,
+            'uid': self.uid,
             'volumes': self.volumes
         })
 

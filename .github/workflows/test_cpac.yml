@@ -59,10 +59,7 @@ jobs:
         pip install -r requirements-dev.txt
         pip install coverage coveralls nipype
     - name: Install cpac
-      run: |
-        cd $GITHUB_WORKSPACE && pip install -e .
-        mkdir .cpac
-        chmod -R +rw .cpac
+      run: cd $GITHUB_WORKSPACE && pip install -e .
     - name: Test cpac, platform and tag specified
       run: |
         coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
