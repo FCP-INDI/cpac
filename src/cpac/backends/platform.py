@@ -15,7 +15,8 @@ import yaml
 from tabulate import tabulate
 
 from cpac.helpers import cpac_read_crash, get_extra_arg_value
-from cpac.utils import Locals_to_bind, PermissionMode
+from cpac.helpers.cpac_parse_resources import get_or_create_config
+from cpac.utils import LocalsToBind, PermissionMode
 from cpac import __version__ as cpac_version
 
 
@@ -65,6 +66,19 @@ class Backend:
                         f'pipeline_config_{pipeline_config}.yml'
                     ])
         self.volumes = {'/etc/passwd': [{'bind': '/etc/passwd', 'mode': 'ro'}]}
+        tracking_opt_out = '--tracking_opt-out'
+        if not(tracking_opt_out in kwargs or
+               tracking_opt_out in kwargs.get('extra_args', [])):
+            udir = os.path.expanduser('~')
+            if udir != '/':
+                tracking_path = get_or_create_config(udir)
+                self.volumes[tracking_path] = [{'bind': tracking_path,
+                                                'mode': 'rw'}]
+            else:
+                raise EnvironmentError('Unable to create tracking '
+                                       'configuration. Please run with '
+                                       '--tracking_opt-out and C-PAC >= '
+                                       '1.8.4')
         # initilizing these for overriding on load
         self.bindings = {}
         self.container = None
@@ -279,7 +293,7 @@ class Backend:
             os.path.expanduser(binding_path_local)
         )
         if not os.path.exists(binding_path_local):
-            os.makedirs(binding_path_local)
+            os.makedirs(binding_path_local, mode=777)
         return(
             os.path.realpath(binding_path_local),
             os.path.abspath(binding_path_remote)
@@ -307,7 +321,7 @@ class Backend:
         ) and os.path.exists(kwargs['data_config_file']):
             self._bind_volume(kwargs['data_config_file'],
                               kwargs['data_config_file'], 'r')
-            locals_from_data_config = Locals_to_bind()
+            locals_from_data_config = LocalsToBind()
             locals_from_data_config.from_config_file(
                 kwargs['data_config_file']
             )
@@ -316,9 +330,18 @@ class Backend:
         self._bind_volume(kwargs['output_dir'], kwargs['output_dir'], 'rw')
         self._bind_volume(kwargs['working_dir'], kwargs['working_dir'], 'rw')
         if kwargs.get('custom_binding'):
-            for d in kwargs['custom_binding']:
-                self._bind_volume(*d.split(':'), 'rw')
-        for d in ['bids_dir', 'output_dir']:
+            for d in kwargs['custom_binding']:  # pylint: disable=invalid-name
+                bind_parts = d.split(':')
+                if len(bind_parts) == 3:
+                    self._bind_volume(*bind_parts)
+                elif len(bind_parts) == 2:
+                    self._bind_volume(*bind_parts, 'rw')
+                elif len(bind_parts) == 1:
+                    self._bind_volume(bind_parts[0], bind_parts[0], 'rw')
+                else:
+                    raise SyntaxError("I don't know what to do with custom "
+                                      "binding {}".format(d))
+        for d in ['bids_dir', 'output_dir']:  # pylint: disable=invalid-name
             if d in kwargs and isinstance(kwargs[d], str) and os.path.exists(
                 kwargs[d]
             ):

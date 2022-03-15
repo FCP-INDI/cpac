@@ -7,7 +7,7 @@ from unittest import mock
 
 from cpac.backends import Backends
 from cpac.__main__ import run
-from CONSTANTS import set_commandline_args
+from .CONSTANTS import set_commandline_args
 
 
 def test_loading_message(platform, tag):

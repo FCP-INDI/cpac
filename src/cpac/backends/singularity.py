@@ -165,7 +165,7 @@ class Singularity(Backend):
                 ]).strip(' ')
             )]
         elif run_type == 'version':
-            self.get_version()
+            return self.get_version()
         else:
             [print(o, end='') for o in self._try_to_stream(
                 args=' '.join(flags).strip(' '),

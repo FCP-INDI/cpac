@@ -98,9 +98,9 @@ class Docker(Backend):
             kwargs.get('level_of_analysis'),
             *flags
         ] if (i is not None and len(i))]
-        self._execute(**kwargs)
+        return self._execute(**kwargs)
 
-    def clarg(self, clcommand, flags=[], **kwargs):
+    def clarg(self, clcommand, flags=None, **kwargs):
         """
         Runs a commandline command
 
@@ -108,10 +108,12 @@ class Docker(Backend):
         ----------
         clcommand: str
 
-        flags: list
+        flags: list or None
 
         kwargs: dict
         """
+        if flags is None:
+            flags = []
         kwargs['command'] = [i for i in [
             kwargs.get('bids_dir', kwargs.get('working_dir', '/tmp')),
             kwargs.get('output_dir', '/outputs'),
@@ -151,7 +153,7 @@ class Docker(Backend):
             self._run = DockerRun(self.container)
             self.container.stop()
         elif run_type == 'version':
-            self.get_version()
+            return self.get_version()
         elif run_type == 'exec':
             self.container = self.client.containers.create(
                 **shared_kwargs,

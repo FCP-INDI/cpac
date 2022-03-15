@@ -1,12 +1,14 @@
 import os
-import pytest
 import sys
 
 from datetime import date
 from unittest import mock
 
+import pytest
+
 from cpac.__main__ import run
-from CONSTANTS import args_before_after, set_commandline_args
+from cpac.utils import check_version_at_least
+from .CONSTANTS import args_before_after, set_commandline_args
 
 MINIMAL_CONFIG = os.path.join(
     os.path.dirname(__file__), 'test_data', 'minimal.min.yml'
@@ -57,6 +59,8 @@ def test_run_test_config(
         f's3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU {wd} '
         f'test_config --participant_ndx=2{pipeline}'
     )
+    if check_version_at_least('1.8.4', platform):
+        argv += ' --tracking_opt-out'
     if args:
         before, after = args_before_after(argv, args)
         # test with args before command

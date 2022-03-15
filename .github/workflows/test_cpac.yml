@@ -62,22 +62,22 @@ jobs:
       run: cd $GITHUB_WORKSPACE && pip install -e .
     - name: Test cpac, platform and tag specified
       run: |
-        coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
+        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
         coverage report -m
     - name: Test cpac, platform specified, tag unspecified
       if: ${{ matrix.tag == 'latest' }}
       run: |
-        coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} .
+        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --platform ${{ matrix.platform }} .
         coverage report -m
     - name: Test cpac, platform unspecified, tag specified
       if: ${{ matrix.platform == 'docker' }}
       run: |
-        coverage run --append -m pytest --doctest-modules --tag ${{ matrix.tag }} .
+        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --tag ${{ matrix.tag }} .
         coverage report -m
     - name: Test cpac, platform and tag unspecified
       if: ${{ matrix.platform == 'docker' }} && ${{ matrix.tag }} == 'latest'
       run: |
-        coverage run --append -m pytest --doctest-modules .
+        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules .
         coverage report -m
     - name: Report coverage
       uses: AndreMiras/coveralls-python-action@v20201129

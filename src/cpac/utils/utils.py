@@ -1,15 +1,15 @@
 import os
-import yaml
 
-from cpac import dist_name
 from itertools import permutations
 from warnings import warn
 
+import yaml
 
-class Locals_to_bind():
-    """
-    Class to collect local directories to bind to containers.
-    """
+from cpac import dist_name
+
+
+class LocalsToBind:
+    """Class to collect local directories to bind to containers."""
     def __init__(self):
         self.locals = set()
 
@@ -66,7 +66,7 @@ class Locals_to_bind():
         ])}
 
 
-class PermissionMode():
+class PermissionMode:
     """
     Class to overload comparison operators to compare file permissions levels.
 

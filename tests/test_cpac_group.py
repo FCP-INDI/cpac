@@ -1,10 +1,11 @@
-import pytest
 import sys
 
 from unittest import mock
 
+import pytest
+
 from cpac.__main__ import run
-from CONSTANTS import args_before_after, set_commandline_args
+from .CONSTANTS import args_before_after, set_commandline_args
 
 
 @pytest.mark.parametrize('argsep', [' ', '='])

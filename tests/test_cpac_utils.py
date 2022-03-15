@@ -1,11 +1,13 @@
 import os
-import pytest
 import sys
 
 from unittest import mock
 
+import pytest
+
 from cpac.__main__ import run
-from CONSTANTS import args_before_after, set_commandline_args
+from cpac.utils import check_version_at_least
+from .CONSTANTS import args_before_after, set_commandline_args
 
 
 @pytest.mark.parametrize('argsep', [' ', '='])
@@ -42,12 +44,13 @@ def test_utils_new_settings_template(
         with mock.patch.object(sys, 'argv', argv):
             run()
             template_path = os.path.join(wd, 'data_settings.yml')
-            print(template_path)
             assert os.path.exists(template_path)
 
     args = set_commandline_args(platform, tag, argsep)
     argv = f'--working_dir {wd} utils data_config new_settings_template'
-    if len(args):
+    if check_version_at_least('1.8.4', platform):
+        argv += ' --tracking_opt-out'
+    if args:
         before, after = args_before_after(argv, args)
         # test with args before command
         run_test(before)

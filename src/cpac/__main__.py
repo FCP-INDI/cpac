@@ -320,6 +320,8 @@ def main(args):
         )
 
     elif args.command in ['enter', 'version']:
+        print(arg_vars)
+        print(args)
         Backends(**arg_vars).run(
             run_type=args.command,
             flags=args.extra_args,
