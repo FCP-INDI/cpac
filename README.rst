@@ -32,7 +32,7 @@ Usage
     usage: cpac [-h] [--version] [-o OPT] [-B CUSTOM_BINDING]
                 [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
                 [--working_dir PATH] [-v] [-vv]
-                {run,group,utils,pull,upgrade,crash} ...
+                {enter,run,group,utils,version,pull,upgrade,crash} ...
     
     cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io> containerized images. 
     
@@ -58,7 +58,9 @@ Usage
     	cpac run --help
     
     positional arguments:
-      {run,group,utils,pull,upgrade,crash}
+      {enter,run,group,utils,version,pull,upgrade,crash}
+        enter               Enter a new C-PAC container via BASH
+        version             Print the version of C-PAC that cpac is using.
     
     optional arguments:
       -h, --help            show this help message and exit
