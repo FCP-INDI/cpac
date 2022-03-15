@@ -3,6 +3,9 @@
 
 `cpac_parse resources` is intended to be run outside a C-PAC container
 '''
+import os
+import configparser
+import uuid
 
 from rich.console import Console
 from rich.table import Table
@@ -43,6 +46,20 @@ def display(df):
         del tmp
 
     console.print(table)
+
+
+def get_or_create_config():
+    udir = os.path.expanduser('~')
+    tracking_path = os.path.join(udir, '.cpac')
+    if not os.path.exists(tracking_path):
+        parser = configparser.ConfigParser()
+        parser.read_dict(dict(user=dict(uid=uuid.uuid1().hex,
+                                        track=True)))
+        with open(tracking_path, 'w+') as fhandle:
+            parser.write(fhandle)
+    else:
+        parser = configparser.ConfigParser()
+        parser.read(tracking_path)
 
 
 def load_runtime_stats(callback):
