@@ -58,15 +58,14 @@ def get_or_create_config(udir):
     Sourced from https://github.com/FCP-INDI/C-PAC/blob/80424468c7f4e59c102f446b05d4154ec1cd4b2d/CPAC/utils/ga.py#L19-L30
     """  # noqa: E501  # pylint: disable=line-too-long
     tracking_path = os.path.join(udir, '.cpac')
-    if not os.path.exists(tracking_path):
-        cparser = configparser.ConfigParser()
+    cparser = configparser.ConfigParser()
+    if os.path.exists(tracking_path):
+        cparser.read(tracking_path)
+    if not cparser.has_section('user'):
         cparser.read_dict(dict(user=dict(uid=uuid.uuid1().hex,
                                          track=True)))
         with open(tracking_path, 'w+') as fhandle:
             cparser.write(fhandle)
-    else:
-        cparser = configparser.ConfigParser()
-        cparser.read(tracking_path)
     return tracking_path
 
 
