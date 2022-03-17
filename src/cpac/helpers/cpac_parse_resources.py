@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 '''cpac_parse_resources.py
 
-`cpac_parse resources` is intended to be run outside a C-PAC container
+`cpac_parse_resources` is intended to be run outside a C-PAC container.
 '''
-import os
 import configparser
+import os
 import uuid
 
 from rich.console import Console
@@ -86,6 +86,23 @@ def load_runtime_stats(callback):
     return pd.DataFrame.from_dict(pruned_logs)
 
 
+def main(args):
+    """Main function to parse and display resource usage
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+
+    Returns
+    -------
+    None
+    """
+    usage = load_runtime_stats(args.callback)
+    filtered_usage = query(usage, args.filter_field, args.filter_group,
+                           args.filter_count)
+    display(filtered_usage)
+
+
 def query(usage, f, g, c):
     order = True if g == 'lowest' else False
     usage.sort_values(by=field[f], ascending=order, inplace=True)
@@ -93,8 +110,17 @@ def query(usage, f, g, c):
     return usage[0:c]
 
 
-if __name__ == '__main__':
-    parser = ArgumentParser(__file__)
+def set_args(parser):
+    """Set up the command line arguments for the script
+
+    Parameters
+    ----------
+    parser : argparse.ArgumentParser
+
+    Returns
+    -------
+    parser : argparse.ArgumentParser
+    """
     parser.add_argument("callback",
                         help="callback.log file found in the 'log' "
                              "directory of the specified derivatives path")
@@ -105,10 +131,8 @@ if __name__ == '__main__':
                         choices=['lowest', 'highest'], default='lowest')
     parser.add_argument("--filter_count", "-n", action="store", type=int,
                         default=10)
+    return parser
 
-    res = parser.parse_args()
-    usage = load_runtime_stats(res.callback)
 
-    filtered_usage = query(usage, res.filter_field, res.filter_group,
-                           res.filter_count)
-    display(filtered_usage)
+if __name__ == '__main__':
+    main(set_args(ArgumentParser(__file__, add_help=True)).parse_args())

@@ -11,6 +11,7 @@ from itertools import chain
 
 from cpac import __version__
 from cpac.backends import Backends
+from cpac.helpers import cpac_parse_resources as parse_resources
 
 _logger = logging.getLogger(__name__)
 
@@ -212,6 +213,14 @@ def _parser():
 
     enter_parser = subparsers.add_parser(
         'enter', add_help=True, help='Enter a new C-PAC container via BASH.')
+
+    parse_resources.set_args(subparsers.add_parser(
+        'parse-resources', add_help=True,
+        help='\n'.join([parse_resources.__doc__.split(
+            parse_resources.__file__.split('/', maxsplit=-1)[-1],
+            maxsplit=1)[-1].strip().replace(
+                r'`cpac_parse_resources`', '"parse-resources"'),
+                'See "cpac parse-resources --help" for more information.'])))
 
     crash_parser = subparsers.add_parser(
         'crash', add_help=True,
