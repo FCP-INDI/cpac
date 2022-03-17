@@ -12,7 +12,7 @@ from .CONSTANTS import args_before_after, set_commandline_args
 
 @pytest.mark.parametrize('argsep', [' ', '='])
 @pytest.mark.parametrize('helpflag', ['--help', '-h'])
-def test_utils_help(argsep, capsys, helpflag, platform=None, tag=None):
+def test_utils_help(argsep, capsys, helpflag, platform, tag):
     def run_test(argv, platform):
         with mock.patch.object(sys, 'argv', argv):
             run()
@@ -35,10 +35,8 @@ def test_utils_help(argsep, capsys, helpflag, platform=None, tag=None):
 
 
 @pytest.mark.parametrize('argsep', [' ', '='])
-def test_utils_new_settings_template(
-    argsep, tmp_path, platform=None, tag=None
-):
-    wd = tmp_path
+def test_utils_new_settings_template(argsep, tmp_path, platform, tag):
+    wd = tmp_path  # pylint: disable=invalid-name
 
     def run_test(argv):
         with mock.patch.object(sys, 'argv', argv):

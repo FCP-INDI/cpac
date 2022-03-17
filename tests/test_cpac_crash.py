@@ -10,7 +10,7 @@ from .CONSTANTS import set_commandline_args
 
 
 @pytest.mark.parametrize('argsep', [' ', '='])
-def test_cpac_crash(argsep, capsys, platform=None, tag=None):
+def test_cpac_crash(argsep, capsys, platform, tag):
     args = set_commandline_args(platform, tag, argsep)
     crashfile = os.path.join(
         os.path.dirname(__file__), 'test_data', 'test_pickle.pklz'

@@ -269,10 +269,10 @@ class Backend:
         if not table.empty:
             table.columns = ['local', self.platform.name, 'mode']
             self._print_loading_with_symbol(
-                " ".join([
+                ' '.join([
                     self.image,
-                    f"as {self.username} ({self.uid})",
-                    "with these directory bindings:"
+                    f'as "{self.username} ({self.uid})"',
+                    'with these directory bindings:'
                 ])
             )
             print(textwrap.indent(

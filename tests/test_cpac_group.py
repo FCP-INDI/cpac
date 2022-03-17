@@ -9,7 +9,7 @@ from .CONSTANTS import args_before_after, set_commandline_args
 
 
 @pytest.mark.parametrize('argsep', [' ', '='])
-def test_utils_help(argsep, capsys, platform=None, tag=None):
+def test_utils_help(argsep, capsys, platform, tag):
     def run_test(argv, platform):
         with mock.patch.object(sys, 'argv', argv):
             run()

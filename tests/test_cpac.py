@@ -33,7 +33,7 @@ def test_loading_message(platform, tag):
 
 
 @pytest.mark.parametrize('argsep', [' ', '='])
-def test_pull(argsep, capsys, platform=None, tag=None):
+def test_pull(argsep, capsys, platform, tag):
     def run_test(argv):
         with mock.patch.object(sys, 'argv', argv):
             run()

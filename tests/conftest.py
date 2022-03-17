@@ -5,12 +5,29 @@
 Read more about conftest.py under:
 https://pytest.org/latest/plugins.html
 '''
+import logging
+import pytest  # pylint: disable=import-error
+
+LOGGER = logging.getLogger()
 
 
-# import pytest
+@pytest.fixture(autouse=True)
+def ensure_logging_framework_not_altered():
+    before_handlers = list(LOGGER.handlers)
+    yield
+    LOGGER.handlers = before_handlers
+
+
 def pytest_addoption(parser):
-    parser.addoption('--platform', action='store', nargs=1, default=[])
-    parser.addoption('--tag', action='store', nargs=1, default=[])
+    '''Add command line options for pytest.'''
+    def add_option(option):
+        '''Factory function to add option and fixture'''
+        parser.addoption(f'--{option}', action='store', nargs=1, default=[])
+        # pylint: disable=exec-used
+        exec(f'@pytest.fixture\ndef {option}(request):\n'
+             f'    return request.config.getoption("--{option}")')
+    for option in ['platform', 'tag']:
+        add_option(option)
 
 
 def pytest_generate_tests(metafunc):

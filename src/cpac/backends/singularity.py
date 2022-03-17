@@ -1,6 +1,7 @@
 import os
 
 from itertools import chain
+from spython.image import Image
 from spython.main import Client
 
 from cpac.backends.platform import Backend, PlatformMeta
@@ -55,6 +56,15 @@ class Singularity(Backend):
         enter_options['singularity_options'] = self.options
         return enter_options
 
+    def _pull(self, img, force, pull_folder):
+        '''Tries to pull image gracefully'''
+        try:
+            self.image = Client.pull(img, force=force, pull_folder=pull_folder)
+        except ValueError as value_error:
+            if 'closed file' in str(value_error):
+                # pylint: disable=protected-access
+                self.image = Image(Client._get_filename(img))
+
     def pull(self, force=False, **kwargs):
         image = kwargs['image'] if kwargs.get(
             'image'
@@ -64,20 +74,22 @@ class Singularity(Backend):
         if kwargs.get("working_dir") is not None:
             pwd = kwargs["working_dir"]
             os.chdir(pwd)
+        image_path = Client._get_filename(  # pylint: disable=protected-access
+            image if tag is None else ':'.join([image, tag]))
         if (
             not force and
-            image and isinstance(image, str) and os.path.exists(image)
+            image and isinstance(image, str) and os.path.exists(image_path)
         ):
-            self.image = image
+            self.image = image_path
         elif tag and isinstance(tag, str):  # pragma: no cover
-            self.image = Client.pull(
+            self._pull(
                 f"docker://{image}:{tag}",
                 force=force,
                 pull_folder=pwd
             )
         else:  # pragma: no cover
             try:
-                self.image = Client.pull(
+                self._pull(
                     "docker://fcpindi/c-pac:latest",
                     force=force,
                     pull_folder=pwd
@@ -112,20 +124,19 @@ class Singularity(Backend):
     def _try_to_stream(self, args, stream_command='run', silent=False,
                        **kwargs):
         self._bindings_as_option()
+        runtime = None
         if stream_command == 'run':
-            for line in Client.run(
+            runtime = Client.run(
                 Client.instance(self.image),
                 args=args,
                 options=self.options,
                 stream=not silent,
                 return_result=True,
-                **kwargs
-            ):
-                yield line
+                **kwargs)
         else:
             enter_options = self._bindings_from_option()
             if stream_command == 'execute':
-                for line in Client.execute(
+                runtime = Client.execute(
                     self.image,
                     command=args['command'].split(' '),
                     options=self.options,
@@ -133,15 +144,15 @@ class Singularity(Backend):
                     quiet=silent,
                     **{kwarg: value for kwarg, value in kwargs.items() if
                        kwarg in ['contain', 'environ', 'nv', 'sudo',
-                                 'return_result', 'writable']}
-                ):
-                    yield line
+                                 'return_result', 'writable']})
             elif stream_command == 'enter':
                 Client.shell(
                     self.image,
                     **enter_options,
-                    **kwargs
-                )
+                    **kwargs)
+        if runtime is not None:
+            for line in runtime:
+                yield line
 
     def _read_crash(self, read_crash_command, **kwargs):
         return self._try_to_stream(

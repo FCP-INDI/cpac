@@ -17,7 +17,7 @@ MINIMAL_CONFIG = os.path.join(
 
 @pytest.mark.parametrize('helpflag', ['--help', '-h'])
 @pytest.mark.parametrize('argsep', [' ', '='])
-def test_run_help(argsep, capsys, helpflag, platform=None, tag=None):
+def test_run_help(argsep, capsys, helpflag, platform, tag):
     def run_test(argv):
         with mock.patch.object(sys, 'argv', argv):
             run()
@@ -39,9 +39,7 @@ def test_run_help(argsep, capsys, helpflag, platform=None, tag=None):
 
 @pytest.mark.parametrize('argsep', [' ', '='])
 @pytest.mark.parametrize('pipeline_file', [None, MINIMAL_CONFIG])
-def test_run_test_config(
-    argsep, pipeline_file, tmp_path, platform=None, tag=None
-):
+def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
     def run_test(argv, wd):  # pylint: disable=invalid-name
         with mock.patch.object(sys, 'argv', argv):
             run()
