@@ -29,13 +29,13 @@ def get_extra_arg_value(extra_args, argument):
     ...     '--participant_ndx 3'], 'participant_ndx')
     '3'
     '''
-    # pattern = r'^\-*' + argument + r'([=\s]{1}.*)$'
-
     extra_args = list(chain.from_iterable([
-        re.split('[=\s]', arg) for arg in extra_args]))
+        re.split(r'[=\s]', arg) for arg in extra_args]))
 
     for index, item in enumerate(extra_args):
         if item.startswith('-') and item.lstrip('-') == argument:
             return extra_args[index + 1]
+    return None
+
 
 __all__ = ['get_extra_arg_value']
