@@ -146,14 +146,25 @@ def _parser():
 
     subparsers = parser.add_subparsers(dest='command')
 
-    enter_parser = subparsers.add_parser(
-        'enter', add_help=True, help='Enter a new C-PAC container via BASH')
-
     run_parser = subparsers.add_parser(
-        'run',
-        add_help=False,
+        'run', add_help=False,
+        help='Run C-PAC. See\n"cpac [--platform {docker,singularity}] '
+             '[--image IMAGE] [--tag TAG] run --help"\nfor more '
+             'information.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
+
+    utils_parser = subparsers.add_parser(
+        'utils', add_help=False,
+        help='Run C-PAC commandline utilities. See\n"cpac [--platform '
+             '{docker,singularity}] [--image IMAGE] [--tag TAG] utils '
+             '--help"\nfor more information.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
+    version_parser = subparsers.add_parser(
+        'version', add_help=True,
+        help='Print the version of C-PAC that cpac is using.')
 
     help_call = '--help' in sys.argv or '-h' in sys.argv
     # run_parser.add_argument('--address', action='store', type=address)
@@ -182,31 +193,29 @@ def _parser():
     )
 
     group_parser = subparsers.add_parser(
-        'group',
-        add_help=False,
+        'group', add_help=False,
+        help='Run a group level analysis in C-PAC. See\n"cpac [--platform '
+             '{docker,singularity}] [--image IMAGE] [--tag TAG] group '
+             '--help"\nfor more information.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-
-    utils_parser = subparsers.add_parser(
-        'utils',
-        add_help=False,
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
-
-    version_parser = subparsers.add_parser(
-        'version', add_help=True,
-        help='Print the version of C-PAC that cpac is using.')
 
     subparsers.add_parser(
-        'pull',
-        add_help=True,
+        'pull', add_help=True,
+        help='Upgrade your local C-PAC version to the latest version\n'
+             'by pulling from Docker Hub or other repository.\nUse with '
+             '"--image" and/or "--tag" to specify an image\nother than '
+             'the default "fcpindi/c-pac:latest" to pull.',
         aliases=['upgrade'],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
+    enter_parser = subparsers.add_parser(
+        'enter', add_help=True, help='Enter a new C-PAC container via BASH.')
+
     crash_parser = subparsers.add_parser(
-        'crash',
-        add_help=True,
+        'crash', add_help=True,
+        help='Convert a crash pickle to plain text (C-PAC < 1.8.0).',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
