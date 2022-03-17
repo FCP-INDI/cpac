@@ -104,7 +104,7 @@ def main(args):
 
 
 def query(usage, f, g, c):
-    order = True if g == 'lowest' else False
+    order = g == 'lowest'
     usage.sort_values(by=field[f], ascending=order, inplace=True)
     usage.reset_index(inplace=True, drop=True)
     return usage[0:c]
