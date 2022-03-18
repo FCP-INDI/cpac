@@ -106,7 +106,6 @@ class PermissionMode:
     defined_modes = {'rw', 'w', 'r', 'ro'}
 
     def __init__(self, fs_str):
-
         self.mode = fs_str.mode if isinstance(
             fs_str,
             PermissionMode
@@ -115,99 +114,56 @@ class PermissionMode:
         self._warn_if_undefined()
 
     def __repr__(self):
-        return(self.mode)
+        return self.mode
 
     def __eq__(self, other):
-        for permission in (self, other):
-            return self.mode == other.mode
+        return self.mode == other.mode
 
     def __gt__(self, other):
         for permission in (self, other):
-            if(permission._warn_if_undefined()):  # pragma: no cover
-                return(NotImplemented)
-
+            if permission._warn_if_undefined():
+                return NotImplemented
         if self.mode == 'rw':
             if other.mode in {'w', 'ro'}:
-                return(True)
+                return True
         elif self.mode == 'w' and other.mode == 'ro':
-            return(True)
-
-        return(False)
+            return True
+        return False
 
     def __ge__(self, other):
         for permission in (self, other):
-            if(permission._warn_if_undefined()):  # pragma: no cover
-                return(NotImplemented)
-
+            if permission._warn_if_undefined():
+                return NotImplemented
         if self.mode == other.mode or self > other:
-            return(True)
-
-        return(False)
+            return True
+        return False
 
     def __lt__(self, other):
         for permission in (self, other):
-            if(permission._warn_if_undefined()):  # pragma: no cover
-                return(NotImplemented)
-
+            if permission._warn_if_undefined():
+                return NotImplemented
         if self.mode == 'ro':
             if other.mode in {'w', 'rw'}:
-                return(True)
+                return True
         elif self.mode == 'ro' and other.mode == 'w':
-            return(True)
-
-        return(False)
+            return True
+        return False
 
     def __le__(self, other):
         for permission in (self, other):
-            if(permission._warn_if_undefined()):  # pragma: no cover
-                return(NotImplemented)
-
+            if permission._warn_if_undefined():
+                return NotImplemented
         if self.mode == other.mode or self < other:
-            return(True)
+            return True
+        return False
 
-        return(False)
-
-    def _warn_if_undefined(self):  # pragma: no cover
+    def _warn_if_undefined(self):
         if not self.defined:
-            warn(
-                f'\'{self.mode}\' is not a fully-configured permission '
-                f'level in {dist_name}. Configured permission levels are '
-                f'''{", ".join([
-                    f"'{mode}'" for mode in PermissionMode.defined_modes
-                ])}''',
-                UserWarning
-            )
-            return(True)
-        return(False)
-
-
-def ls_newest(directory, extensions):
-    """
-    Function to return the most-recently-modified of a given extension in a
-    given directory
-
-    Parameters
-    ----------
-    directory: str
-
-    extension: iterable
-
-    Returns
-    -------
-    full_path_to_file: str or None if none found
-    """
-    ls = [
-        os.path.join(
-            directory,
-            d
-        ) for d in os.listdir(
-            directory
-        ) if any([d.endswith(
-            extension.lstrip('.').lower()
-        ) for extension in extensions])
-    ]
-    ls.sort(key=lambda fp: os.stat(fp).st_mtime)
-    try:
-        return(ls[-1])
-    except IndexError:  # pragma: no cover
-        return(None)
+            warn(f'\'{self.mode}\' is not a fully-configured permission '
+                 f'level in {dist_name}. Configured permission levels are '
+                 f'''{", ".join([
+                     f"'{mode}'" for mode in PermissionMode.defined_modes
+                 ])}''',
+                 UserWarning)
+            return True
+        return False

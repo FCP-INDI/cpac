@@ -421,6 +421,9 @@ def run():
         if arg in options:
             reordered_args.append(args.pop(args.index(arg)))
             option_value_setting = True
+        elif any(arg.startswith(f'{option}=') for option in options):
+            reordered_args.append(args.pop(args.index(arg)))
+            option_value_setting = True
         elif option_value_setting:
             if arg.startswith('-'):
                 option_value_setting = False

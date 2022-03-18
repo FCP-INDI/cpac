@@ -22,10 +22,8 @@ def pytest_addoption(parser):
     '''Add command line options for pytest.'''
     def add_option(option):
         '''Factory function to add option and fixture'''
-        parser.addoption(f'--{option}', action='store', nargs=1, default=[])
-        # pylint: disable=exec-used
-        exec(f'@pytest.fixture\ndef {option}(request):\n'
-             f'    return request.config.getoption("--{option}")')
+        parser.addoption(f'--{option}', action='store', nargs=1,
+                         default=[None])
     for option in ['platform', 'tag']:
         add_option(option)
 
