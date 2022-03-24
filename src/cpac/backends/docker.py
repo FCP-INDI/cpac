@@ -141,6 +141,7 @@ class Docker(Backend):
             **self.docker_kwargs
         }
 
+        print(shared_kwargs['volumes'])
         if run_type == 'run':
             self.container = self.client.containers.run(
                 **shared_kwargs,

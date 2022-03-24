@@ -1,4 +1,6 @@
 """Base classes for platform-specific implementations"""
+from __future__ import annotations
+
 import os
 import pwd
 import tempfile
@@ -7,6 +9,7 @@ import textwrap
 from collections import namedtuple
 from contextlib import redirect_stderr
 from io import StringIO
+from typing import Iterator, overload
 from warnings import warn
 
 import pandas as pd
@@ -65,15 +68,14 @@ class Backend:
                         '/code/CPAC/resources/configs',
                         f'pipeline_config_{pipeline_config}.yml'
                     ])
-        self.volumes = {'/etc/passwd': [{'bind': '/etc/passwd', 'mode': 'ro'}]}
+        self.volumes = Volume('/etc/passwd', mode='ro')
         tracking_opt_out = '--tracking_opt-out'
         if not(tracking_opt_out in kwargs or
                tracking_opt_out in kwargs.get('extra_args', [])):
             udir = os.path.expanduser('~')
             if udir != '/':
                 tracking_path = get_or_create_config(udir)
-                self.volumes[tracking_path] = [{'bind': tracking_path,
-                                                'mode': 'rw'}]
+                self.volumes += Volume(tracking_path)
             else:
                 raise EnvironmentError('Unable to create tracking '
                                        'configuration. Please run with '
@@ -134,19 +136,7 @@ class Backend:
 
     def _bind_volume(self, local, remote, mode):
         local, remote = self._prep_binding(local, remote)
-        b = {'bind': remote,  # pylint: disable=invalid-name
-             'mode': PermissionMode(mode)}
-        if local in self.volumes:
-            if remote in [binding['bind'] for binding in self.volumes[local]]:
-                for i, binding in enumerate(self.volumes[local]):
-                    self.volumes[local][i] = {
-                        'bind': remote,
-                        'mode': max([binding['mode'], b['mode']])
-                    }
-            else:
-                self.volumes[local].append(b)
-        else:
-            self.volumes[local] = [b]
+        self.volumes += Volume(local, remote, mode)
 
     def _collect_config_binding(self, config, config_key):
         config_binding = None
@@ -262,10 +252,8 @@ class Backend:
         return version
 
     def _load_logging(self):
-        table = pd.DataFrame([
-            (i, j['bind'], j['mode']) for i in self.bindings['volumes'].keys(
-            ) for j in self.bindings['volumes'][i]
-        ])
+        table = pd.DataFrame([(volume.local, volume.bind, volume.mode) for
+                              volume in self.bindings['volumes']])
         if not table.empty:
             table.columns = ['local', self.platform.name, 'mode']
             self._print_loading_with_symbol(
@@ -306,6 +294,24 @@ class Backend:
             print(' '.join([self.platform.symbol, message]))
         except UnicodeEncodeError:
             print(message)
+
+    @overload
+    def __setattr__(self, name: str, value: Volume) -> None:
+        ...
+    @overload  # noqa: E301
+    def __setattr__(self, name: str, value: list) -> None:
+        ...
+    @overload  # noqa: E301
+    def __setattr__(self, name: str, value: Volumes) -> None:
+        ...
+    def __setattr__(self, name, value):  # noqa: E301
+        if name == 'volumes':
+            if isinstance(value, Volumes):
+                self.__dict__[name] = value
+            else:
+                self.__dict__[name] = Volumes(value)
+        else:
+            self.__dict__[name] = value
 
     def _set_bindings(self, **kwargs):
         tag = kwargs.get('tag', None)
@@ -368,13 +374,7 @@ class Backend:
         })
 
     def _volumes_to_docker_mounts(self):
-        return([
-            '{}:{}:{}'.format(
-                i,
-                j['bind'],
-                j['mode']
-            ) for i in self.volumes.keys() for j in self.volumes[i]
-        ])
+        return([str(volume) for volume in self.volumes])
 
     def _set_crashfile_binding(self, crashfile):
         for ckey in ["/wd/", "/crash/", "/log"]:
@@ -425,3 +425,143 @@ class FileResult(Result):
             'type': 'file',
             'mime': self.mime
         }
+
+
+class Volume:
+    '''Class to store bind volume information'''
+    @overload
+    def __init__(self, local: str, bind: str = None, mode: None = None
+                 ) -> None:
+        ...
+    @overload  # noqa: E301
+    def __init__(self, local: str, bind: str = None,
+                 mode: PermissionMode = None) -> None:
+        ...
+    def __init__(self, local, bind=None, mode=None):  # noqa: E301
+        self.local = local
+        self.bind = bind if bind is not None else local
+        self.mode = PermissionMode(
+            mode) if mode is not None else PermissionMode('rw')
+
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return f'{self.local}:{self.bind}:{self.mode}'
+
+
+class Volumes:
+    '''Class to store all bind volumes. Prevents duplicate mount points.'''
+    @overload
+    def __init__(self, volumes: list = None) -> None:
+        ...
+    @overload  # noqa: E301
+    def __init__(self, volumes: Volume = None) -> None:
+        ...
+    def __init__(self, volumes=None):  # noqa: E301
+        try:
+            if volumes is None:
+                self.volumes = Volumes()
+            elif isinstance(volumes, list):
+                self.volumes = {volume.local: volume for volume in [
+                                Volume(volume) for volume in volumes]}
+            elif isinstance(volumes, Volume):
+                self.volumes = {volumes.local: volumes}
+        except AttributeError as attribute_error:
+            raise TypeError('Volumes must be initialized with a Volume '
+                            'object, a list of Volume objects or None'
+                            ) from attribute_error
+
+    @overload
+    def __add__(self, other: list) -> Volumes:
+        ...
+    @overload  # noqa: E301
+    def __add__(self, other: Volume) -> Volumes:
+        ...
+    def __add__(self, other):  # noqa: E301
+        '''Add volume
+
+        Parameters
+        ----------
+        other : Volume
+            Volume to add
+
+        Returns
+        -------
+        Volumes
+        '''
+        new_volumes = Volumes(self.volumes.copy())
+        if isinstance(other, list):
+            for volume in other:
+                new_volumes += volume
+        elif isinstance(other, Volume):
+            new_volumes.volumes.update({other.bind: other})
+        return new_volumes
+
+    @overload
+    def __iadd__(self, other: list) -> Volumes:
+        ...
+    @overload  # noqa: E301
+    def __iadd__(self, other: Volume) -> Volumes:
+        ...
+    def __iadd__(self, other):  # noqa: E301
+        '''Add volume in place
+
+        Parameters
+        ----------
+        other : Volume
+            Volume to add
+
+        Returns
+        -------
+        Volumes
+        '''
+        if isinstance(other, list):
+            for volume in other:
+                self += volume
+        elif isinstance(other, Volume):
+            self.volumes.update({other.bind: other})
+        return self
+
+    def __isub__(self, bind: str) -> Volumes:
+        '''Remove volume in place
+
+        Parameters
+        ----------
+        bind : str
+            key of Volume to remove
+
+        Returns
+        -------
+        Volumes
+        '''
+        if bind in self.volumes:
+            del self.volumes[bind]
+        return self
+
+    def __iter__(self) -> Iterator[Volume]:
+        '''Iterator over volumes'''
+        return iter(self.volumes.values())
+
+    def __repr__(self) -> str:
+        return str(self)
+
+    def __str__(self) -> str:
+        return str(list(self.volumes.values()))
+
+    def __sub__(self, bind: str) -> Volumes:
+        '''Remove volume
+
+        Parameters
+        ----------
+        bind : str
+            key of Volume to remove
+
+        Returns
+        -------
+        Volumes
+        '''
+        new_volumes = Volumes(self.volumes.copy())
+        if bind in new_volumes.volumes:
+            del new_volumes.volumes[bind]
+        return new_volumes

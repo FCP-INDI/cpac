@@ -32,19 +32,10 @@ class Singularity(Backend):
         self._set_bindings(**kwargs)
 
     def _bindings_as_option(self):
-        # pylint: disable=consider-using-dict-items
         self.options += (
-            ['-B', ','.join((chain.from_iterable([[
-                ':'.join([b for b in [
-                    local,
-                    binding['bind'] if
-                    local != binding['bind'] or
-                    BINDING_MODES[str(binding['mode'])] != 'rw' else None,
-                    BINDING_MODES[str(binding['mode'])] if
-                    BINDING_MODES[str(binding['mode'])] != 'rw' else None
-                ] if b is not None]) for binding in self.volumes[local]
-            ] for local in self.volumes])))]
-        )
+            ['-B', ','.join([':'.join([
+                binding.local, binding.bind, binding.mode
+            ]) for binding in self.volumes])])
 
     def _bindings_from_option(self):
         enter_options = {}

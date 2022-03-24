@@ -212,7 +212,8 @@ def _parser():
     )
 
     enter_parser = subparsers.add_parser(
-        'enter', add_help=True, help='Enter a new C-PAC container via BASH.')
+        'enter', add_help=True, help='Enter a new C-PAC container via BASH.',
+        aliases=['bash', 'shell'])
 
     parse_resources.set_args(subparsers.add_parser(
         'parse-resources', add_help=True,
@@ -338,8 +339,6 @@ def main(args):
         )
 
     elif args.command in ['enter', 'version']:
-        print(arg_vars)
-        print(args)
         Backends(**arg_vars).run(
             run_type=args.command,
             flags=args.extra_args,
