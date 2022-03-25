@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import os
 
 from itertools import permutations
+from typing import Iterator, overload
 from warnings import warn
 
 import yaml
@@ -14,34 +17,37 @@ class LocalsToBind:
         self.locals = set()
 
     def __repr__(self):
-        return(str(self.locals))
+        return str(self)
+
+    def __str__(self):
+        return str(self.locals)
 
     def from_config_file(self, config_path):
         """
         Paramter
         --------
-        config_path: str
+        config_path : str
             path to data config file
         """
-        with open(config_path, 'r') as r:
-            config_dict = yaml.safe_load(r)
+        with open(config_path, 'r') as config_yml:
+            config_dict = yaml.safe_load(config_yml)
         self._add_locals(config_dict)
 
-    def _add_locals(self, d):
+    def _add_locals(self, local: str) -> None:
         """
         Parameter
         ---------
-        d: any
+        local : any
             object to search for local paths
         """
         # pylint: disable=expression-not-assigned
-        if isinstance(d, dict):
-            [self._add_locals(d[k]) for k in d]
-        elif isinstance(d, (list, tuple)):
-            [self._add_locals(i) for i in d]
-        elif isinstance(d, str):
-            if os.path.exists(d):
-                self.locals.add(d)
+        if isinstance(local, dict):
+            [self._add_locals(local[k]) for k in local]
+        elif isinstance(local, (list, tuple)):
+            [self._add_locals(i) for i in local]
+        elif isinstance(local, str):
+            if os.path.exists(local):
+                self.locals.add(local)
         self._local_common_paths()
 
     def _local_common_paths(self):
@@ -167,3 +173,153 @@ class PermissionMode:
                  UserWarning)
             return True
         return False
+
+
+class Volume:
+    '''Class to store bind volume information'''
+    @overload
+    def __init__(self, local: str, bind: str = None, mode: None = None
+                 ) -> None:
+        ...
+    @overload  # noqa: E301
+    def __init__(self, local: str, bind: str = None,
+                 mode: PermissionMode = None) -> None:
+        ...
+    def __init__(self, local, bind=None, mode=None):  # noqa: E301
+        self.local = local
+        self.bind = bind if bind is not None else local
+        if isinstance(mode, PermissionMode):
+            self.mode = mode
+        elif mode is not None:
+            self.mode = PermissionMode(mode)
+        else:
+            self.mode = PermissionMode('rw')
+
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return f'{self.local}:{self.bind}:{self.mode}'
+
+
+class Volumes:
+    '''Class to store all bind volumes. Prevents duplicate mount points.'''
+    @overload
+    def __init__(self, volumes: list = None) -> None:
+        ...
+    @overload  # noqa: E301
+    def __init__(self, volumes: Volume = None) -> None:
+        ...
+    def __init__(self, volumes=None):  # noqa: E301
+        try:
+            if volumes is None:
+                self.volumes = {}
+            elif isinstance(volumes, list):
+                self.volumes = {volume.local: volume for volume in [
+                                Volume(volume) for volume in volumes]}
+            elif isinstance(volumes, Volume):
+                self.volumes = {volumes.local: volumes}
+        except AttributeError as attribute_error:
+            raise TypeError('Volumes must be initialized with a Volume '
+                            'object, a list of Volume objects or None'
+                            ) from attribute_error
+
+    @overload
+    def __add__(self, other: list) -> Volumes:
+        ...
+    @overload  # noqa: E301
+    def __add__(self, other: Volume) -> Volumes:
+        ...
+    @overload  # noqa: E301
+    def __add__(self, other: Volumes) -> Volumes:
+        ...
+    def __add__(self, other):  # noqa: E301
+        '''Add volume
+
+        Parameters
+        ----------
+        other : Volume, list, or Volumes
+            Volume(s) to add
+
+        Returns
+        -------
+        Volumes
+        '''
+        new_volumes = Volumes(self.volumes.copy())
+        if isinstance(other, (list, Volumes)):
+            for volume in other:
+                new_volumes += volume
+        elif isinstance(other, Volume):
+            new_volumes.volumes.update({other.bind: other})
+        return new_volumes
+
+    @overload
+    def __iadd__(self, other: list) -> Volumes:
+        ...
+    @overload  # noqa: E301
+    def __iadd__(self, other: Volume) -> Volumes:
+        ...
+    @overload  # noqa: E301
+    def __iadd__(self, other: Volumes) -> Volumes:
+        ...
+    def __iadd__(self, other):  # noqa: E301
+        '''Add volume in place
+
+        Parameters
+        ----------
+        other : Volume, list, or Volumes
+            Volume(s) to add
+
+        Returns
+        -------
+        Volumes
+        '''
+        if isinstance(other, (list, Volumes)):
+            for volume in other:
+                self += volume
+        elif isinstance(other, Volume):
+            self.volumes.update({other.bind: other})
+        return self
+
+    def __isub__(self, bind: str) -> Volumes:
+        '''Remove volume in place
+
+        Parameters
+        ----------
+        bind : str
+            key of Volume to remove
+
+        Returns
+        -------
+        Volumes
+        '''
+        if bind in self.volumes:
+            del self.volumes[bind]
+        return self
+
+    def __iter__(self) -> Iterator[Volume]:
+        '''Iterator over volumes'''
+        return iter(self.volumes.values())
+
+    def __repr__(self) -> str:
+        return str(self)
+
+    def __str__(self) -> str:
+        return str(list(self.volumes.values()))
+
+    def __sub__(self, bind: str) -> Volumes:
+        '''Remove volume
+
+        Parameters
+        ----------
+        bind : str
+            key of Volume to remove
+
+        Returns
+        -------
+        Volumes
+        '''
+        new_volumes = Volumes(self.volumes.copy())
+        if bind in new_volumes.volumes:
+            del new_volumes.volumes[bind]
+        return new_volumes

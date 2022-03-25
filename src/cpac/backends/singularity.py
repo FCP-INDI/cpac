@@ -12,6 +12,7 @@ BINDING_MODES = {'ro': 'ro', 'w': 'rw', 'rw': 'rw'}
 class Singularity(Backend):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.container = None
         self.platform = PlatformMeta('Singularity', 'Ⓢ')
         self.platform.version = Client.version().split(' ')[-1]
         self._print_loading_with_symbol(self.platform.name)
@@ -34,7 +35,7 @@ class Singularity(Backend):
     def _bindings_as_option(self):
         self.options += (
             ['-B', ','.join([':'.join([
-                binding.local, binding.bind, binding.mode
+                binding.local, binding.bind, str(binding.mode)
             ]) for binding in self.volumes])])
 
     def _bindings_from_option(self):
@@ -115,9 +116,8 @@ class Singularity(Backend):
     def _try_to_stream(self, args, stream_command='run', silent=False,
                        **kwargs):
         self._bindings_as_option()
-        runtime = None
         if stream_command == 'run':
-            runtime = Client.run(
+            self.container = Client.run(
                 Client.instance(self.image),
                 args=args,
                 options=self.options,
@@ -127,7 +127,7 @@ class Singularity(Backend):
         else:
             enter_options = self._bindings_from_option()
             if stream_command == 'execute':
-                runtime = Client.execute(
+                self.container = Client.execute(
                     self.image,
                     command=args['command'].split(' '),
                     options=self.options,
@@ -141,9 +141,10 @@ class Singularity(Backend):
                     self.image,
                     **enter_options,
                     **kwargs)
-        if runtime is not None:
-            for line in runtime:
+        if self.container is not None:
+            for line in self.container:
                 yield line
+            self.container.close()
 
     def _read_crash(self, read_crash_command, **kwargs):
         return self._try_to_stream(

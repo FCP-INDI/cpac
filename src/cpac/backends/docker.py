@@ -10,6 +10,7 @@ from cpac.backends.platform import Backend, PlatformMeta
 class Docker(Backend):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.container = None
         self.platform = PlatformMeta('Docker', '🐳')
         self._print_loading_with_symbol(self.platform.name)
         self.client = docker.from_env()
@@ -125,60 +126,67 @@ class Docker(Backend):
         self._execute(**kwargs)
 
     def _execute(self, command, run_type='run', **kwargs):
+        container_return = None
         try:
-            self.client.images.get(self.image)
-        except docker.errors.ImageNotFound:  # pragma: no cover
-            self.pull(**kwargs)
+            try:
+                self.client.images.get(self.image)
+            except docker.errors.ImageNotFound:  # pragma: no cover
+                self.pull(**kwargs)
 
-        if run_type != 'version':
-            self._load_logging()
+            if run_type != 'version':
+                self._load_logging()
 
-        shared_kwargs = {
-            'image': self.image,
-            'user': str(self.bindings['uid']),
-            'volumes': self._volumes_to_docker_mounts(),
-            'working_dir': kwargs.get('working_dir', '/tmp'),
-            **self.docker_kwargs
-        }
+            shared_kwargs = {
+                'image': self.image,
+                'user': str(self.bindings['uid']),
+                **self._volumes_to_docker_mounts(),
+                'working_dir': kwargs.get('working_dir', os.getcwd()),
+                **self.docker_kwargs
+            }
 
-        print(shared_kwargs['volumes'])
-        if run_type == 'run':
-            self.container = self.client.containers.run(
-                **shared_kwargs,
-                command=command,
-                detach=True,
-                stderr=True,
-                stdout=True,
-                remove=True
-            )
-            self._run = DockerRun(self.container)
-            self.container.stop()
-        elif run_type == 'version':
-            return self.get_version()
-        elif run_type == 'exec':
-            self.container = self.client.containers.create(
-                **shared_kwargs,
-                auto_remove=True,
-                entrypoint='/bin/bash',
-                stdin_open=True
-            )
-            self.container.start()
-            return(self.container.exec_run(
-                cmd=command,
-                stdout=True,
-                stderr=True,
-                stream=True
-            )[1])
-        elif run_type == 'enter':
-            self.container = self.client.containers.create(
-                **shared_kwargs,
-                auto_remove=True,
-                entrypoint='/bin/bash',
-                stdin_open=True,
-                tty=True,
-                detach=False
-            )
-            dockerpty.start(self.client.api, self.container.id)
+            if run_type == 'run':
+                self.container = self.client.containers.run(
+                    **shared_kwargs,
+                    command=command,
+                    detach=True,
+                    stderr=True,
+                    stdout=True,
+                    remove=True
+                )
+                self._run = DockerRun(self.container)
+                self.container.stop()
+            elif run_type == 'version':
+                return self.get_version()
+            elif run_type == 'exec':
+                self.container = self.client.containers.create(
+                    **shared_kwargs,
+                    auto_remove=True,
+                    entrypoint='/bin/bash',
+                    stdin_open=True
+                )
+                self.container.start()
+                container_return = self.container.exec_run(
+                    cmd=command,
+                    stdout=True,
+                    stderr=True,
+                    stream=True
+                )[1]
+            elif run_type == 'enter':
+                self.container = self.client.containers.create(
+                    **shared_kwargs,
+                    auto_remove=True,
+                    entrypoint='/bin/bash',
+                    stdin_open=True,
+                    tty=True,
+                    detach=False
+                )
+                dockerpty.start(self.client.api, self.container.id)
+        finally:
+            try:
+                self.container.stop()
+            except AttributeError:
+                pass
+        return container_return
 
     def get_response(self, command, **kwargs):
         """Method to return the response of running a command in the
