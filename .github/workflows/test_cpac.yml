@@ -19,11 +19,11 @@ jobs:
 
     strategy:
       matrix:
-        platform: [docker]  # TODO: Fix CI for singularity
+        platform: [docker]
         tag: [latest, nightly]
         go: [1.14]
         python: [3.7, 3.8, 3.9, "3.10"]
-        # singularity: [3.6.4]
+        singularity: [3.6.4]
 
     steps:
     - uses: actions/checkout@v2
@@ -39,7 +39,7 @@ jobs:
       run: python -m pip install --upgrade pip setuptools wheel
     - name: Set up Singularity
       if: ${{ matrix.platform == 'singularity' }}
-      uses: eWaterCycle/setup-singularity@v5
+      uses: eWaterCycle/setup-singularity@v7
       with:
         singularity-version: ${{ matrix.singularity }}
     - name: Prepare Singularity cache and tmp directories
