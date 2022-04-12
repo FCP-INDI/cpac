@@ -371,6 +371,9 @@ def main(args):
             **arg_vars
         )
 
+    elif args.command == 'parse-resources':
+        parse_resources.main(args)
+
 
 def run():
     '''Function to try Docker first and fall back on Singularity if
