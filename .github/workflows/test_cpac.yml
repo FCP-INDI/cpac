@@ -47,8 +47,7 @@ jobs:
       run: mkdir -p ${SINGULARITY_CACHEDIR} && mkdir -p ${SINGULARITY_TMPDIR}
     - name: Install dependencies
       run: |
-        sudo apt-get install libarchive-dev \
-                             libffi-dev \
+        sudo apt-get install libffi-dev \
                              flawfinder \
                              libgpgme11-dev \
                              libseccomp-dev \
