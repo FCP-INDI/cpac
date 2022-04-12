@@ -1,6 +1,6 @@
 '''Constants for tests'''
 # pylint: disable=invalid-name
-TAGS = [None, 'latest', 'nightly'
+TAGS = [None, 'latest', 'nightly']
 
 
 def args_before_after(argv, args):

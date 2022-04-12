@@ -331,7 +331,7 @@ class Backend:
         )
         if not os.path.exists(volume.local):
             try:
-                os.makedirs(volume.local, mode=777)
+                os.makedirs(volume.local, exist_ok=True)
             except PermissionError as perm:
                 if second_try:
                     raise perm

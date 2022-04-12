@@ -188,6 +188,8 @@ class Volume:
     def __init__(self, local, bind=None, mode=None):  # noqa: E301
         self.local = local
         self.bind = bind if bind is not None else local
+        if self.bind is not None and not self.bind.startswith('/'):
+            self.bind = os.path.abspath(self.bind)
         if isinstance(mode, PermissionMode):
             self.mode = mode
         elif mode is not None:

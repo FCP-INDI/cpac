@@ -10,10 +10,7 @@ TODOs = {'persisting_containers': 'Some Docker containers unexpectedly '
                                   'persists, run\n    '
                                   r'2. `docker attach <container_name>`'
                                   '\n    '
-                                  r'3. `exit`',
-         'permission_denied': 'Pytest is getting "permission denied" errors '
-                              'writing to tmp directories, but running '
-                              'outside of Pytest is working locally'}
+                                  r'3. `exit`'}
 
 
 def get_extra_arg_value(extra_args, argument):

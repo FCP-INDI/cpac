@@ -7,7 +7,6 @@ from unittest import mock
 import pytest
 
 from cpac.__main__ import run
-from cpac.helpers import TODOs
 from cpac.utils import check_version_at_least
 from .CONSTANTS import args_before_after, set_commandline_args
 
@@ -38,7 +37,6 @@ def test_run_help(argsep, capsys, helpflag, platform, tag):
         run_test(f'cpac {argv}'.split(' '))
 
 
-@pytest.mark.skip(reason=TODOs['permission_denied'])
 @pytest.mark.parametrize('argsep', [' ', '='])
 @pytest.mark.parametrize('pipeline_file', [None, MINIMAL_CONFIG])
 def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):

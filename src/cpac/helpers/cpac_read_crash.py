@@ -7,7 +7,6 @@ The current run environment does not include the package `nipype`.
 
 import os
 import re
-
 from sys import argv
 
 path_regex = re.compile(
