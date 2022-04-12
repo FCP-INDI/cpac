@@ -1,4 +1,5 @@
 """Base classes for platform-specific implementations"""
+import atexit
 import os
 import pwd
 import tempfile
@@ -13,6 +14,7 @@ from warnings import warn
 import pandas as pd
 import yaml
 
+from docker import errors as docker_errors
 from tabulate import tabulate
 
 from cpac.helpers import cpac_read_crash, get_extra_arg_value
@@ -88,6 +90,10 @@ class Backend:
         self.uid = 0
         self.username = 'root'
         self.working_dir = kwargs.get('working_dir', os.getcwd())
+        atexit.register(self._cleanup)
+
+    def __del__(self):
+        self._cleanup()
 
     def read_crash(self, crashfile, flags=None, **kwargs):
         """For C-PAC < 1.8.0, this method is used to decode a
@@ -130,8 +136,6 @@ class Backend:
             crash_message += stderr.getvalue()
             stderr.read()  # clear stderr
             print(crash_message.strip())
-            if hasattr(self, 'container') and self.container is not None:
-                self.container.stop()
 
     def _bind_volume(self, volume: Volume) -> None:
         """Binds a volume to the container.
@@ -185,7 +189,33 @@ class Backend:
         """
         raise NotImplementedError()
 
+    def _cleanup(self):
+        if hasattr(self, 'container') and hasattr(self.container, 'stop'):
+            try:
+                self.container.stop()
+            except (docker_errors.APIError, docker_errors.NotFound):
+                pass
+
     def collect_config_bindings(self, config, **kwargs):
+        """Function to collect bindings for a given configuration.
+
+        Parameters
+        ----------
+        config : str or dict
+            Configuration to collect bindings for.
+
+        kwargs : dict
+            Extra arguments from the commandline.
+
+        kwargs['output_dir'] : str
+            Output directory for the run.
+
+        kwargs['working_dir'] : str
+            Working directory for the run.
+
+        Returns
+        -------
+        """
         kwargs['output_dir'] = kwargs.get(
             'output_dir',
             os.getcwd()
@@ -223,7 +253,6 @@ class Backend:
                 path = os.path.join(cwd, c_b[1])
                 config_bindings += Volume(path)
         kwargs['config_bindings'] = config_bindings
-        print(kwargs['config_bindings'])
         return kwargs
 
     def get_response(self, command, **kwargs):

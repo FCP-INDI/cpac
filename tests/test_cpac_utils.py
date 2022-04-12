@@ -7,7 +7,7 @@ import pytest
 
 from cpac.__main__ import run
 from cpac.utils import check_version_at_least
-from .CONSTANTS import args_before_after, set_commandline_args
+from .CONSTANTS import args_before_after, set_commandline_args, TODOs
 
 
 @pytest.mark.parametrize('argsep', [' ', '='])
@@ -34,8 +34,10 @@ def test_utils_help(argsep, capsys, helpflag, platform, tag):
         run_test(f'cpac {argv}'.split(' '), platform)
 
 
+@pytest.mark.skip(reason=TODOs['permission_denied'])
 @pytest.mark.parametrize('argsep', [' ', '='])
 def test_utils_new_settings_template(argsep, tmp_path, platform, tag):
+    """Test 'utils data_config new_settings_template' command"""
     wd = tmp_path  # pylint: disable=invalid-name
 
     def run_test(argv):
