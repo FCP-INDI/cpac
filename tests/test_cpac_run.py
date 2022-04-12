@@ -19,6 +19,7 @@ MINIMAL_CONFIG = os.path.join(
 @pytest.mark.parametrize('argsep', [' ', '='])
 def test_run_help(argsep, capsys, helpflag, platform, tag):
     def run_test(argv):
+        argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, 'argv', argv):
             run()
             captured = capsys.readouterr()
@@ -42,6 +43,7 @@ def test_run_help(argsep, capsys, helpflag, platform, tag):
 def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
     """Test 'test_config' run command"""
     def run_test(argv, wd):  # pylint: disable=invalid-name
+        argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, 'argv', argv):
             run()
             assert any(

@@ -40,11 +40,13 @@ def test_loading_message(platform, tag):
 def test_pull(argsep, capsys, platform, tag):
     """Test pull command"""
     def run_test(argv):
+        argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, 'argv', argv):
             run()
             captured = capsys.readouterr()
             checkstring = f':{tag}' if tag is not None else ':latest'
-            assert checkstring in captured.out + captured.err
+            outstring = captured.out + captured.err
+            assert checkstring in outstring or 'cached' in outstring
 
     args = set_commandline_args(platform, tag, argsep)
 

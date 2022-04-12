@@ -16,9 +16,9 @@ def test_cpac_crash(argsep, capsys, platform, tag):
         os.path.dirname(__file__), 'test_data', 'test_pickle.pklz'
     )
     argv = ['cpac', 'crash', crashfile]
-    argv = ' '.join([
+    argv = [arg for arg in ' '.join([
         w for w in ['cpac', args, 'crash', crashfile] if len(w)
-    ]).split(' ')
+    ]).split(' ') if arg]
     with mock.patch.object(sys, 'argv', argv):
         run()
         captured = capsys.readouterr()

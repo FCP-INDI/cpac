@@ -14,6 +14,7 @@ from .CONSTANTS import args_before_after, set_commandline_args
 @pytest.mark.parametrize('helpflag', ['--help', '-h'])
 def test_utils_help(argsep, capsys, helpflag, platform, tag):
     def run_test(argv, platform):
+        argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, 'argv', argv):
             run()
             captured = capsys.readouterr()
@@ -40,6 +41,7 @@ def test_utils_new_settings_template(argsep, tmp_path, platform, tag):
     wd = tmp_path  # pylint: disable=invalid-name
 
     def run_test(argv):
+        argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, 'argv', argv):
             run()
             template_path = os.path.join(wd, 'data_settings.yml')
