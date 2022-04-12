@@ -10,6 +10,7 @@ Changelog
 * 🐛 Fixes issue where custom pipeline configurations were not binding to temporary container prior to checking for bind paths
 * ✅ Updates for tests that were failing
 * 📝 Add known issues to usage string
+* ⬆ Require Python ≥ 3.7 (for typing annotations)
 
 `Version 0.4.0: Goodbye Singularity Hub <https://github.com/FCP-INDI/cpac/releases/tag/v0.4.0>`_
 ================================================================================================
