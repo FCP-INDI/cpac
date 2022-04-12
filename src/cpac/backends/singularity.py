@@ -144,7 +144,10 @@ class Singularity(Backend):
         if self.container is not None:
             for line in self.container:
                 yield line
-            self.container.close()
+            if hasattr(self.container, 'close') and callable(
+                self.container.close
+            ):
+                self.container.close()
 
     def _read_crash(self, read_crash_command, **kwargs):
         return self._try_to_stream(
