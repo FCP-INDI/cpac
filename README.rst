@@ -32,7 +32,7 @@ Usage
     usage: cpac [-h] [--version] [-o OPT] [-B CUSTOM_BINDING]
                 [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
                 [--working_dir PATH] [-v] [-vv]
-                {run,utils,version,group,pull,upgrade,enter,parse-resources,crash}
+                {run,utils,version,group,pull,upgrade,enter,bash,shell,parse-resources,parse_resources,crash}
                 ...
     
     cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io> containerized images. 
@@ -58,8 +58,16 @@ Usage
     
     	cpac run --help
     
+    Known issues:
+    - Some Docker containers unexpectedly persist after cpac finishes. To clear them, run
+        1. `docker ps` to list the containers
+      For each C-PAC conatainer that persists, run
+        2. `docker attach <container_name>`
+        3. `exit`
+    - https://github.com/FCP-INDI/cpac/issues
+    
     positional arguments:
-      {run,utils,version,group,pull,upgrade,enter,parse-resources,crash}
+      {run,utils,version,group,pull,upgrade,enter,bash,shell,parse-resources,parse_resources,crash}
         run                 Run C-PAC. See
                             "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] run --help"
                             for more information.
@@ -74,8 +82,10 @@ Usage
                             by pulling from Docker Hub or other repository.
                             Use with "--image" and/or "--tag" to specify an image
                             other than the default "fcpindi/c-pac:latest" to pull.
-        enter               Enter a new C-PAC container via BASH.
-        parse-resources     When provided with a `callback.log` file, this utility can sort through
+        enter (bash, shell)
+                            Enter a new C-PAC container via BASH.
+        parse-resources (parse_resources)
+                            When provided with a `callback.log` file, this utility can sort through
                             the memory `runtime` usage, `estimate`, and associated `efficiency`, to
                             identify the `n` tasks with the `highest` or `lowest` of each of these
                             categories.
