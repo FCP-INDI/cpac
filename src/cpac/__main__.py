@@ -216,7 +216,7 @@ def _parser():
         aliases=['bash', 'shell'])
 
     parse_resources.set_args(subparsers.add_parser(
-        'parse-resources', add_help=True,
+        'parse-resources', add_help=True, aliases=['parse_resources'],
         help='\n'.join([parse_resources.__doc__.split(
             parse_resources.__file__.split('/', maxsplit=-1)[-1],
             maxsplit=1)[-1].strip().replace(
