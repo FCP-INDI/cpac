@@ -1,11 +1,6 @@
 '''Constants for tests'''
 # pylint: disable=invalid-name
-TAGS = [None, 'latest', 'nightly']
-TODOs = {'persisting_containers': 'Some containers unexpectedly persist after '
-                                  'a test', 
-         'permission_denied': 'Pytest is getting "permission denied" errors '
-                              'writing to tmp directories, but running '
-                              'outside of Pytest is working for @shnizzedy'}
+TAGS = [None, 'latest', 'nightly'
 
 
 def args_before_after(argv, args):

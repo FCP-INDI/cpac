@@ -2,6 +2,19 @@
 import re
 from itertools import chain
 
+TODOs = {'persisting_containers': 'Some Docker containers unexpectedly '
+                                  'persist after cpac finishes. To clear '
+                                  'them, run\n    '
+                                  r'1. `docker ps` to list the containers'
+                                  '\n  For each C-PAC conatainer that '
+                                  'persists, run\n    '
+                                  r'2. `docker attach <container_name>`'
+                                  '\n    '
+                                  r'3. `exit`',
+         'permission_denied': 'Pytest is getting "permission denied" errors '
+                              'writing to tmp directories, but running '
+                              'outside of Pytest is working locally'}
+
 
 def get_extra_arg_value(extra_args, argument):
     '''Function to parse passed-through arguments and get their values
@@ -38,4 +51,4 @@ def get_extra_arg_value(extra_args, argument):
     return None
 
 
-__all__ = ['get_extra_arg_value']
+__all__ = ['get_extra_arg_value', 'TODOs']

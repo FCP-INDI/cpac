@@ -7,8 +7,9 @@ from unittest import mock
 import pytest
 
 from cpac.__main__ import run
+from cpac.helpers import TODOs
 from cpac.utils import check_version_at_least
-from .CONSTANTS import args_before_after, set_commandline_args, TODOs
+from .CONSTANTS import args_before_after, set_commandline_args
 
 MINIMAL_CONFIG = os.path.join(
     os.path.dirname(__file__), 'test_data', 'minimal.min.yml'

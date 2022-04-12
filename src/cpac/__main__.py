@@ -11,7 +11,7 @@ from itertools import chain
 
 from cpac import __version__
 from cpac.backends import Backends
-from cpac.helpers import cpac_parse_resources as parse_resources
+from cpac.helpers import cpac_parse_resources as parse_resources, TODOs
 
 _logger = logging.getLogger(__name__)
 
@@ -61,7 +61,10 @@ def _parser():
                     '--data_config_file /configs/data_config.yml \\\n\t\t'
                     '--save_working_dir\n\n'
                     'Each command can take "--help" to provide additonal '
-                    'usage information, e.g.,\n\n\tcpac run --help',
+                    'usage information, e.g.,\n\n\tcpac run --help\n\n'
+                    'Known issues:\n' +
+                    '\n'.join([f'- {todo}' for todo in TODOs.values()]) +
+                    '\n- https://github.com/FCP-INDI/cpac/issues',
         conflict_handler='resolve',
         formatter_class=argparse.RawTextHelpFormatter
     )
