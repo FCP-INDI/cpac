@@ -1,6 +1,10 @@
 =========
 Changelog
 =========
+Unreleased
+==========
+* 
+
 `Version 0.5.0: Parse Resources <https://github.com/FCP-INDI/cpac/releases/tag/v0.5.0>`_
 ================================================================================================
 * 🧮 Evaluates memory usage for specific nodes from ``callback.log`` files
