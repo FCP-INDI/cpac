@@ -3,7 +3,14 @@ Changelog
 =========
 `Unreleased`
 ================================================================================================
-* 🧮 Evaluates memory usage for specific nodes from `callback.log` files
+* 🧮 Evaluates memory usage for specific nodes from ``callback.log`` files
+* ✨ Adds ``enter`` command to enter a container's ``BASH``
+* ✨ Adds ``version`` command to give version of in-container C-PAC
+* 🐛 Fixes issue where ``--version`` command was not working
+* 🐛 Fixes issue where custom pipeline configurations were not binding to temporary container prior to checking for bind paths
+* ✅ Updates for tests that were failing
+* 📝 Add known issues to usage string
+* ⬆ Require Python ≥ 3.7 (for typing annotations)
 
 `Version 0.4.0: Goodbye Singularity Hub <https://github.com/FCP-INDI/cpac/releases/tag/v0.4.0>`_
 ================================================================================================

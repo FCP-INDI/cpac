@@ -1,17 +1,20 @@
 import os
-import pytest
 import sys
 
 from unittest import mock
 
+import pytest
+
 from cpac.__main__ import run
-from CONSTANTS import args_before_after, set_commandline_args
+from cpac.utils import check_version_at_least
+from .CONSTANTS import args_before_after, set_commandline_args
 
 
 @pytest.mark.parametrize('argsep', [' ', '='])
 @pytest.mark.parametrize('helpflag', ['--help', '-h'])
-def test_utils_help(argsep, capsys, helpflag, platform=None, tag=None):
+def test_utils_help(argsep, capsys, helpflag, platform, tag):
     def run_test(argv, platform):
+        argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, 'argv', argv):
             run()
             captured = capsys.readouterr()
@@ -33,20 +36,22 @@ def test_utils_help(argsep, capsys, helpflag, platform=None, tag=None):
 
 
 @pytest.mark.parametrize('argsep', [' ', '='])
-def test_utils_new_settings_template(
-    argsep, tmp_path, platform=None, tag=None
-):
-    wd = tmp_path
+def test_utils_new_settings_template(argsep, tmp_path, platform, tag):
+    """Test 'utils data_config new_settings_template' command"""
+    wd = tmp_path  # pylint: disable=invalid-name
 
     def run_test(argv):
+        argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, 'argv', argv):
             run()
             template_path = os.path.join(wd, 'data_settings.yml')
-            assert(os.path.exists(template_path))
+            assert os.path.exists(template_path)
 
     args = set_commandline_args(platform, tag, argsep)
     argv = f'--working_dir {wd} utils data_config new_settings_template'
-    if len(args):
+    if check_version_at_least('1.8.4', platform):
+        argv += ' --tracking_opt-out'
+    if args:
         before, after = args_before_after(argv, args)
         # test with args before command
         run_test(before)

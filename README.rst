@@ -14,12 +14,12 @@ C-PAC Python Package is a lightweight Python package that handles interfacing a 
 Dependencies
 ============
 
-* `Python <https://www.python.org>`_ ≥3.6
+* `Python <https://www.python.org>`_ ≥3.7
 * `pip <https://pip.pypa.io>`_
 * At least one of:
 
   * `Docker <https://www.docker.com>`_
-  * `Singularity <https://sylabs.io/singularity>`_ ≥2.5&≤3.0
+  * `Singularity <https://sylabs.io/singularity>`_ ≥2.5
 
 Usage
 =====
@@ -32,7 +32,8 @@ Usage
     usage: cpac [-h] [--version] [-o OPT] [-B CUSTOM_BINDING]
                 [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
                 [--working_dir PATH] [-v] [-vv]
-                {run,group,utils,pull,upgrade,crash} ...
+                {run,utils,version,group,pull,upgrade,enter,bash,shell,parse-resources,parse_resources,crash}
+                ...
     
     cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io> containerized images. 
     
@@ -57,8 +58,40 @@ Usage
     
     	cpac run --help
     
+    Known issues:
+    - Some Docker containers unexpectedly persist after cpac finishes. To clear them, run
+        1. `docker ps` to list the containers
+      For each C-PAC conatainer that persists, run
+        2. `docker attach <container_name>`
+        3. `exit`
+    - https://github.com/FCP-INDI/cpac/issues
+    
     positional arguments:
-      {run,group,utils,pull,upgrade,crash}
+      {run,utils,version,group,pull,upgrade,enter,bash,shell,parse-resources,parse_resources,crash}
+        run                 Run C-PAC. See
+                            "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] run --help"
+                            for more information.
+        utils               Run C-PAC commandline utilities. See
+                            "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] utils --help"
+                            for more information.
+        version             Print the version of C-PAC that cpac is using.
+        group               Run a group level analysis in C-PAC. See
+                            "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] group --help"
+                            for more information.
+        pull (upgrade)      Upgrade your local C-PAC version to the latest version
+                            by pulling from Docker Hub or other repository.
+                            Use with "--image" and/or "--tag" to specify an image
+                            other than the default "fcpindi/c-pac:latest" to pull.
+        enter (bash, shell)
+                            Enter a new C-PAC container via BASH.
+        parse-resources (parse_resources)
+                            When provided with a `callback.log` file, this utility can sort through
+                            the memory `runtime` usage, `estimate`, and associated `efficiency`, to
+                            identify the `n` tasks with the `highest` or `lowest` of each of these
+                            categories.
+                            "parse-resources" is intended to be run outside a C-PAC container.
+                            See "cpac parse-resources --help" for more information.
+        crash               Convert a crash pickle to plain text (C-PAC < 1.8.0).
     
     optional arguments:
       -h, --help            show this help message and exit

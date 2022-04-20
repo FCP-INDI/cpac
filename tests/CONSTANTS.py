@@ -1,6 +1,6 @@
-import os
-
-from cpac.utils import ls_newest
+'''Constants for tests'''
+# pylint: disable=invalid-name
+TAGS = [None, 'latest', 'nightly']
 
 
 def args_before_after(argv, args):
@@ -22,6 +22,8 @@ def args_before_after(argv, args):
     after : list
         f'cpac {argv} {args}'.split(' ')
     '''
+    argv = single_space(argv).strip()
+    args = single_space(args).strip()
     if argv.startswith('cpac'):
         argv = argv.lstrip('cpac').strip()
     if args is not None and len(args):
@@ -49,23 +51,23 @@ def set_commandline_args(platform, tag, sep=' '):
     '''
     args = ''
     if platform is not None:
-        if platform.lower() == 'docker':
-            args = args + PLATFORM_ARGS[0]
-        elif platform.lower() == 'singularity':
-            args = args + PLATFORM_ARGS[1]
-        if sep != ' ':
-            args = args.replace(' ', sep)
+        args += f' --platform{sep}{platform.lower()} '
     if tag and tag is not None:
-        args = args + f' --tag{sep}{tag}'
+        args = args + f' --tag{sep}{tag} '
     return args
 
 
-def SINGULARITY_OPTION():
-    singularity_option = ls_newest(os.getcwd(), ['sif', 'simg'])
-    return(f'--image {singularity_option}' if (
-        singularity_option is not None
-    ) else '--platform singularity')
+def single_space(string):
+    '''Function to remove spaces from a string
 
+    Parameters
+    ----------
+    string : str
 
-PLATFORM_ARGS = ['--platform docker', SINGULARITY_OPTION()]
-TAGS = [None, 'latest', 'dev-v1.8']
+    Returns
+    -------
+    string : str
+    '''
+    while '  ' in string:
+        string = string.replace('  ', ' ')
+    return string
