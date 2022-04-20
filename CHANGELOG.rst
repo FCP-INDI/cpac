@@ -1,6 +1,19 @@
 =========
 Changelog
 =========
+`Version 0.5.0: Parse Resources <https://github.com/FCP-INDI/cpac/releases/tag/v0.5.0>`_
+================================================================================================
+* 🧮 Evaluates memory usage for specific nodes from ``callback.log`` files
+* ✨ Adds ``enter`` command to enter a container's ``BASH``
+* ✨ Adds ``version`` command to give version of in-container C-PAC
+* ✨ Adds ``parse-resources`` command to parse resources from ``callback.log``
+* 🐛 Fixes issue where ``--version`` command was not working
+* 🐛 Fixes issue where custom pipeline configurations were not binding to temporary container prior to checking for bind paths
+* ✅ Updates for tests that were failing
+* 📝 Add known issues to usage string
+* ⬆ Require Python ≥ 3.7 (for typing annotations)
+* 📝 Documents support for Singularity 3
+
 `Version 0.4.0: Goodbye Singularity Hub <https://github.com/FCP-INDI/cpac/releases/tag/v0.4.0>`_
 ================================================================================================
 * 👽 Drop call to now-deprecated Singularity Hub

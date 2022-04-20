@@ -19,10 +19,10 @@ jobs:
 
     strategy:
       matrix:
-        platform: [docker, singularity]
-        tag: [latest, dev-v1.8]
+        platform: [docker]
+        tag: [latest, nightly]
         go: [1.14]
-        python: [3.6, 3.7, 3.8]
+        python: [3.7, 3.8, 3.9, "3.10"]
         singularity: [3.6.4]
 
     steps:
@@ -39,7 +39,7 @@ jobs:
       run: python -m pip install --upgrade pip setuptools wheel
     - name: Set up Singularity
       if: ${{ matrix.platform == 'singularity' }}
-      uses: eWaterCycle/setup-singularity@v5
+      uses: eWaterCycle/setup-singularity@v7
       with:
         singularity-version: ${{ matrix.singularity }}
     - name: Prepare Singularity cache and tmp directories
@@ -47,14 +47,13 @@ jobs:
       run: mkdir -p ${SINGULARITY_CACHEDIR} && mkdir -p ${SINGULARITY_TMPDIR}
     - name: Install dependencies
       run: |
-        sudo apt-get install libarchive-dev \
-        libffi-dev \
-        flawfinder \
-        libgpgme11-dev \
-        libseccomp-dev \
-        squashfs-tools \
-        libssl1.1 libssl-dev \
-        libuuid1 uuid-dev
+        sudo apt-get install libffi-dev \
+                             flawfinder \
+                             libgpgme11-dev \
+                             libseccomp-dev \
+                             squashfs-tools \
+                             libssl1.1 libssl-dev \
+                             libuuid1 uuid-dev
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
         pip install coverage coveralls nipype
@@ -62,22 +61,22 @@ jobs:
       run: cd $GITHUB_WORKSPACE && pip install -e .
     - name: Test cpac, platform and tag specified
       run: |
-        coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
+        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
         coverage report -m
     - name: Test cpac, platform specified, tag unspecified
       if: ${{ matrix.tag == 'latest' }}
       run: |
-        coverage run --append -m pytest --doctest-modules --platform ${{ matrix.platform }} .
+        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --platform ${{ matrix.platform }} .
         coverage report -m
     - name: Test cpac, platform unspecified, tag specified
       if: ${{ matrix.platform == 'docker' }}
       run: |
-        coverage run --append -m pytest --doctest-modules --tag ${{ matrix.tag }} .
+        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --tag ${{ matrix.tag }} .
         coverage report -m
     - name: Test cpac, platform and tag unspecified
       if: ${{ matrix.platform == 'docker' }} && ${{ matrix.tag }} == 'latest'
       run: |
-        coverage run --append -m pytest --doctest-modules .
+        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules .
         coverage report -m
     - name: Report coverage
       uses: AndreMiras/coveralls-python-action@v20201129
@@ -102,6 +101,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Install cpac
       run: cd $GITHUB_WORKSPACE && pip install .
     - name: Configure Git credentials

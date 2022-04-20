@@ -11,6 +11,7 @@ from itertools import chain
 
 from cpac import __version__
 from cpac.backends import Backends
+from cpac.helpers import cpac_parse_resources as parse_resources, TODOs
 
 _logger = logging.getLogger(__name__)
 
@@ -60,7 +61,10 @@ def _parser():
                     '--data_config_file /configs/data_config.yml \\\n\t\t'
                     '--save_working_dir\n\n'
                     'Each command can take "--help" to provide additonal '
-                    'usage information, e.g.,\n\n\tcpac run --help',
+                    'usage information, e.g.,\n\n\tcpac run --help\n\n'
+                    'Known issues:\n' +
+                    '\n'.join([f'- {todo}' for todo in TODOs.values()]) +
+                    '\n- https://github.com/FCP-INDI/cpac/issues',
         conflict_handler='resolve',
         formatter_class=argparse.RawTextHelpFormatter
     )
@@ -68,7 +72,10 @@ def _parser():
     parser.add_argument(
         '--version',
         action='version',
-        version='cpac {ver}'.format(ver=__version__)
+        version='cpac (convenience wrapper) version {ver}\nFor C-PAC version, '
+                'run `cpac version` with any cpac options (e.g., '
+                '`--platform`, `--image`, `--tag`) that you would use '
+                'while running'.format(ver=__version__)
     )
 
     parser.add_argument(
@@ -144,13 +151,26 @@ def _parser():
     subparsers = parser.add_subparsers(dest='command')
 
     run_parser = subparsers.add_parser(
-        'run',
-        add_help=False,
+        'run', add_help=False,
+        help='Run C-PAC. See\n"cpac [--platform {docker,singularity}] '
+             '[--image IMAGE] [--tag TAG] run --help"\nfor more '
+             'information.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
+    utils_parser = subparsers.add_parser(
+        'utils', add_help=False,
+        help='Run C-PAC commandline utilities. See\n"cpac [--platform '
+             '{docker,singularity}] [--image IMAGE] [--tag TAG] utils '
+             '--help"\nfor more information.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
+    version_parser = subparsers.add_parser(
+        'version', add_help=True,
+        help='Print the version of C-PAC that cpac is using.')
+
     help_call = '--help' in sys.argv or '-h' in sys.argv
-    run_parser.register('action', 'extend', ExtendAction)
     # run_parser.add_argument('--address', action='store', type=address)
 
     if not help_call:
@@ -177,38 +197,50 @@ def _parser():
     )
 
     group_parser = subparsers.add_parser(
-        'group',
-        add_help=False,
+        'group', add_help=False,
+        help='Run a group level analysis in C-PAC. See\n"cpac [--platform '
+             '{docker,singularity}] [--image IMAGE] [--tag TAG] group '
+             '--help"\nfor more information.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    group_parser.register('action', 'extend', ExtendAction)
-
-    utils_parser = subparsers.add_parser(
-        'utils',
-        add_help=False,
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
-    utils_parser.register('action', 'extend', ExtendAction)
 
     subparsers.add_parser(
-        'pull',
-        add_help=True,
+        'pull', add_help=True,
+        help='Upgrade your local C-PAC version to the latest version\n'
+             'by pulling from Docker Hub or other repository.\nUse with '
+             '"--image" and/or "--tag" to specify an image\nother than '
+             'the default "fcpindi/c-pac:latest" to pull.',
         aliases=['upgrade'],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
+    enter_parser = subparsers.add_parser(
+        'enter', add_help=True, help='Enter a new C-PAC container via BASH.',
+        aliases=['bash', 'shell'])
+
+    parse_resources.set_args(subparsers.add_parser(
+        'parse-resources', add_help=True, aliases=['parse_resources'],
+        help='\n'.join([parse_resources.__doc__.split(
+            parse_resources.__file__.split('/', maxsplit=-1)[-1],
+            maxsplit=1)[-1].strip().replace(
+                r'`cpac_parse_resources`', '"parse-resources"'),
+                'See "cpac parse-resources --help" for more information.'])))
+
     crash_parser = subparsers.add_parser(
-        'crash',
-        add_help=True,
+        'crash', add_help=True,
+        help='Convert a crash pickle to plain text (C-PAC < 1.8.0).',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    crash_parser.register('action', 'extend', ExtendAction)
 
     crash_parser.add_argument(
         'crashfile',
         help='path to crashfile, to read a crashfile from C-PAC < 1.8.0.\n'
              'Crashfiles in C-PAC >= 1.8.0 are plain text files.'
     )
+
+    for subparser in [crash_parser, enter_parser, group_parser, run_parser,
+                      utils_parser, version_parser]:
+        subparser.register('action', 'extend', ExtendAction)
 
     return parser
 
@@ -309,13 +341,20 @@ def main(args):
             **arg_vars
         )
 
-    if args.command in ['pull', 'upgrade']:
+    elif args.command in ['enter', 'version']:
+        Backends(**arg_vars).run(
+            run_type=args.command,
+            flags=args.extra_args,
+            **arg_vars
+        )
+
+    elif args.command in ['pull', 'upgrade']:
         Backends(**arg_vars).pull(
             force=True,
             **arg_vars
         )
 
-    if args.command in clargs:
+    elif args.command in clargs:
         # utils doesn't have '-h' flag for help
         if args.command == 'utils' and '-h' in arg_vars.get('extra_args', []):
             arg_vars['extra_args'] = [
@@ -329,11 +368,14 @@ def main(args):
             **arg_vars
         )
 
-    if args.command == 'crash':
+    elif args.command == 'crash':
         Backends(**arg_vars).read_crash(
             flags=args.extra_args,
             **arg_vars
         )
+
+    elif args.command == 'parse-resources':
+        parse_resources.main(args)
 
 
 def run():
@@ -353,11 +395,15 @@ def run():
     Consumes commandline arguments. Run `cpac --help` for usage string.
     '''
     args = sys.argv[1:]
-
     # reorder args
     command = None
     command_index = 0
     parser = _parser()
+    if args and (
+        args[0] == '--version' or args[0] == '--help' or args[0 == '-h']
+    ):
+        parse_args(args)
+    # pylint: disable=protected-access
     commands = list([cmd for cmd in parser._get_positional_actions(
     ) if cmd.dest == 'command'][0].choices)
     options = set(chain.from_iterable([
@@ -378,6 +424,9 @@ def run():
         if i == command_index:
             option_value_setting = False
         if arg in options:
+            reordered_args.append(args.pop(args.index(arg)))
+            option_value_setting = True
+        elif any(arg.startswith(f'{option}=') for option in options):
             reordered_args.append(args.pop(args.index(arg)))
             option_value_setting = True
         elif option_value_setting:
