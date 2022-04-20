@@ -1,7 +1,8 @@
-========================================================================================
-C-PAC Python Package |build-status| |github-version| |upload| |pypi-version| |coverage|
-========================================================================================
+====================
+C-PAC Python Package
+====================
 
+|build-status| |github-version| |upload| |pypi-version| |coverage|
 
 A Python package that wraps `C-PAC <http://fcp-indi.github.io>`_, enabling users to install cpac with `pip <https://pip.pypa.io>`_ and run from the command line.
 
