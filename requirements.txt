@@ -3,6 +3,7 @@ dockerpty
 docker-pycreds
 pandas >= 0.23.4
 pyyaml
+semver
 setuptools
 spython >= 0.0.81
 tabulate >= 0.8.6
