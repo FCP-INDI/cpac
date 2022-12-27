@@ -241,7 +241,7 @@ class Backend:
                         kwargs[c_b[2]] = inner_binding
                 try:
                     os.makedirs(inner_binding, exist_ok=True)
-                except PermissionError:
+                except (OSError, PermissionError):
                     outer_binding = os.path.join(kwargs.get(
                         'output_dir',
                         os.path.join(cwd, 'outputs')
@@ -337,7 +337,7 @@ class Backend:
         if not os.path.exists(volume.local):
             try:
                 os.makedirs(volume.local, exist_ok=True)
-            except PermissionError as perm:
+            except (OSError, PermissionError) as perm:
                 if second_try:
                     raise perm
                 new_local = os.path.join(self.working_dir,
@@ -430,12 +430,13 @@ class Backend:
         return {'volumes': [str(volume) for volume in self.volumes]}
 
     def _set_crashfile_binding(self, crashfile):
+        cwd = os.getcwd()
         for ckey in ["/wd/", "/crash/", "/log"]:
             if ckey in crashfile:
                 self._bind_volume(Volume(
-                    crashfile.split(ckey)[0], '/outputs', 'rw'))
+                    crashfile.split(ckey)[0], f'{cwd}/outputs', 'rw'))
         with tempfile.TemporaryDirectory() as temp_dir:
-            self._bind_volume(Volume(temp_dir, '/out', 'rw'))
+            self._bind_volume(Volume(temp_dir, f'{cwd}/out', 'rw'))
         helper = cpac_read_crash.__file__
         self._bind_volume(Volume(helper, mode='ro'))
 

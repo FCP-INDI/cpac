@@ -123,8 +123,9 @@ class Docker(Backend):
         if flags is None:
             flags = []
         kwargs['command'] = [i for i in [
-            kwargs.get('bids_dir', kwargs.get('working_dir', '/tmp')),
-            kwargs.get('output_dir', '/outputs'),
+            kwargs.get('bids_dir', kwargs.get('working_dir',
+                                              f'{os.getcwd()}/tmp')),
+            kwargs.get('output_dir', f'{os.getcwd()}/outputs'),
             'cli',
             '--',
             clcommand,
@@ -210,14 +211,22 @@ class DockerRun:
     def __init__(self, container):
         # pylint: disable=expression-not-assigned
         self.container = container
-        [print(
-            l.decode('utf-8'), end=''
-        ) for l in self.container.attach(  # noqa E741
+        # breakpoint()
+        # [print(
+        #     l.decode('utf-8'), end=''
+        # ) for l in self.container.attach(  # noqa E741
+        #     logs=True,
+        #     stderr=True,
+        #     stdout=True,
+        #     stream=True
+        # )]
+        log = self.container.attach(
             logs=True,
             stderr=True,
             stdout=True,
             stream=True
-        )]
+        )
+        print([l for l in log])
 
     @property
     def status(self):
