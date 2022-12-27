@@ -54,7 +54,8 @@ class Backend:
     def __init__(self, **kwargs):
         # start with default pipline, but prefer pipeline config over preconfig
         # over default
-        self.pipeline_config = '/cpac_resources/default_pipeline.yml'
+        self.pipeline_config = ('/code/CPAC/resources/configs/'
+                                'pipeline_config_default.yml')
         if 'extra_args' in kwargs and isinstance(kwargs['extra_args'], list):
             pipeline_config = get_extra_arg_value(
                 kwargs['extra_args'], 'pipeline_file')
@@ -254,6 +255,10 @@ class Backend:
                 config_bindings += Volume(path)
         kwargs['config_bindings'] = config_bindings
         return kwargs
+
+    def _deprecated_default(self):
+        # default pipeline config moved in C-PAC 1.8.5. It was here before:
+        self.pipeline_config = '/cpac_resources/default_pipeline.yml'
 
     def get_response(self, command, **kwargs):
         """Method to return the response of running a command in the

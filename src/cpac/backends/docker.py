@@ -2,7 +2,7 @@ import os
 
 import docker
 import dockerpty
-from docker.errors import ImageNotFound
+from docker.errors import ImageNotFound, NotFound
 
 from cpac.backends.platform import Backend, PlatformMeta
 
@@ -68,10 +68,17 @@ class Docker(Backend):
                     self.pull(**kwargs)
                     container = self.client.containers.create(
                         **container_kwargs)
-                stream = container.get_archive(path=self.pipeline_config)[0]
-                self.config = b''.join([
+                try:
+                    stream = container.get_archive(path=self.pipeline_config
+                                                   )[0]
+                except NotFound:
+                    self._deprecated_default()
+                    stream = container.get_archive(path=self.pipeline_config
+                                                   )[0]
+
+                self.config = b''.join(
                     l for l in stream  # noqa E741
-                ]).split(b'\x000000000')[-1].replace(b'\x00', b'').decode()
+                ).split(b'\x000000000')[-1].replace(b'\x00', b'').decode()
                 container.remove()
             else:
                 self.config = self.pipeline_config

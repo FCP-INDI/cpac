@@ -21,11 +21,19 @@ class Singularity(Backend):
             "container_options"
         ])) if bool(kwargs.get("container_options")) else []
         if isinstance(self.pipeline_config, str):
-            self.config = Client.execute(
-                image=self.image,
-                command=f'cat {self.pipeline_config}',
-                return_result=False
-            )
+            try:
+                self.config = Client.execute(
+                    image=self.image,
+                    command=f'cat {self.pipeline_config}',
+                    return_result=False
+                )
+            except Exception:  # TODO: find specific exception
+                self._deprecated_default()
+                self.config = Client.execute(
+                    image=self.image,
+                    command=f'cat {self.pipeline_config}',
+                    return_result=False
+                )
         else:
             self.config = self.pipeline_config
         kwargs = self.collect_config_bindings(self.config, **kwargs)
