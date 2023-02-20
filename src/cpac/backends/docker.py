@@ -1,11 +1,15 @@
 import os
 
+from cpac.utils.osutils import IS_PLATFORM_WINDOWS
+from cpac.utils.utils import windows_path_to_docker
+
 import docker
-import dockerpty
 from docker.errors import ImageNotFound
 
 from cpac.backends.platform import Backend, PlatformMeta
 
+if not IS_PLATFORM_WINDOWS:
+    import dockerpty
 
 class Docker(Backend):
     def __init__(self, **kwargs):
@@ -57,8 +61,8 @@ class Docker(Backend):
             if isinstance(self.pipeline_config, str):
                 container_kwargs = {'image': self.image}
                 if os.path.exists(self.pipeline_config):
-                    container_kwargs['volumes'] = {self.pipeline_config: {
-                        'bind': self.pipeline_config,
+                    container_kwargs['volumes'] = {windows_path_to_docker(self.pipeline_config): {
+                        'bind': windows_path_to_docker(self.pipeline_config),
                         'mode': 'ro',
                     }}
                 try:
@@ -68,7 +72,7 @@ class Docker(Backend):
                     self.pull(**kwargs)
                     container = self.client.containers.create(
                         **container_kwargs)
-                stream = container.get_archive(path=self.pipeline_config)[0]
+                stream = container.get_archive(path=windows_path_to_docker(self.pipeline_config))[0]
                 self.config = b''.join([
                     l for l in stream  # noqa E741
                 ]).split(b'\x000000000')[-1].replace(b'\x00', b'').decode()
@@ -143,6 +147,13 @@ class Docker(Backend):
             **self.docker_kwargs
         }
 
+        if IS_PLATFORM_WINDOWS:
+            shared_kwargs['working_dir'] = windows_path_to_docker(shared_kwargs['working_dir'])
+
+            for i in range(len(command)):
+                if len(command[i]) > 1 and command[i][1] == ':':
+                    command[i] = windows_path_to_docker(command[i])
+
         if run_type == 'run':
             self.container = self.client.containers.run(
                 **shared_kwargs,
@@ -170,15 +181,18 @@ class Docker(Backend):
                 stream=True
             )[1]
         elif run_type == 'enter':
-            self.container = self.client.containers.create(
-                **shared_kwargs,
-                auto_remove=True,
-                entrypoint='/bin/bash',
-                stdin_open=True,
-                tty=True,
-                detach=False
-            )
-            dockerpty.start(self.client.api, self.container.id)
+            if IS_PLATFORM_WINDOWS:
+                raise NotImplementedError()
+            else:
+                self.container = self.client.containers.create(
+                    **shared_kwargs,
+                    auto_remove=True,
+                    entrypoint='/bin/bash',
+                    stdin_open=True,
+                    tty=True,
+                    detach=False
+                )
+                dockerpty.start(self.client.api, self.container.id)
         return container_return
 
     def get_response(self, command, **kwargs):
