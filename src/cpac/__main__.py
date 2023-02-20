@@ -11,6 +11,7 @@ from itertools import chain
 
 from cpac import __version__
 from cpac.backends import Backends
+from cpac.utils.osutils import IS_PLATFORM_WINDOWS
 from cpac.helpers import cpac_parse_resources as parse_resources, TODOs
 
 _logger = logging.getLogger(__name__)
@@ -220,11 +221,12 @@ def _parser():
 
     parse_resources.set_args(subparsers.add_parser(
         'parse-resources', add_help=True, aliases=['parse_resources'],
-        help='\n'.join([parse_resources.__doc__.split(
-            parse_resources.__file__.split('/', maxsplit=-1)[-1],
-            maxsplit=1)[-1].strip().replace(
-                r'`cpac_parse_resources`', '"parse-resources"'),
-                'See "cpac parse-resources --help" for more information.'])))
+        help=parse_resources.__doc__
+             .replace('cpac_parse_resources.py', '')
+             .strip()
+             .replace(r'`cpac_parse_resources`', '"parse-resources"') +
+             '\nSee "cpac parse-resources --help" for more information.'
+    ))
 
     crash_parser = subparsers.add_parser(
         'crash', add_help=True,
@@ -438,16 +440,19 @@ def run():
     # parse args
     parsed = parse_args(args)
     if not parsed.platform and "--platform" not in args:
-        if parsed.image and os.path.exists(parsed.image):
+        if not IS_PLATFORM_WINDOWS and parsed.image and os.path.exists(parsed.image):
             parsed.platform = 'singularity'
         else:
             parsed.platform = 'docker'
         try:
             main(parsed)
         # fall back on Singularity if Docker not found
-        except (DockerException, NotFound):  # pragma: no cover
-            parsed.platform = 'singularity'
-            main(parsed)
+        except (DockerException, NotFound) as exc:  # pragma: no cover
+            if IS_PLATFORM_WINDOWS:
+                raise exc
+            else:
+                parsed.platform = 'singularity'
+                main(parsed)
     else:
         main(parsed)
 

@@ -1,7 +1,10 @@
 """Base classes for platform-specific implementations"""
+from cpac.utils.osutils import IS_PLATFORM_WINDOWS
+
 import atexit
 import os
-import pwd
+if not IS_PLATFORM_WINDOWS:
+    import pwd
 import tempfile
 import textwrap
 
@@ -411,10 +414,15 @@ class Backend:
         if kwargs.get('config_bindings'):
             for binding in kwargs['config_bindings']:
                 self._bind_volume(binding)
-        self.uid = os.getuid()
-        pwuid = pwd.getpwuid(self.uid)
-        self.username = getattr(pwuid, 'pw_name',
-                                getattr(pwuid, 'pw_gecos', str(self.uid)))
+
+        if IS_PLATFORM_WINDOWS:
+            self.username = os.getlogin()
+            self.uid = hash(self.username) % 100  # TODO: Is there something we have to keep in mind here?
+        else:
+            self.uid = os.getuid()
+            pwuid = pwd.getpwuid(self.uid)
+            self.username = getattr(pwuid, 'pw_name',
+                                    getattr(pwuid, 'pw_gecos', str(self.uid)))
         self.bindings.update({
             'tag': tag,
             'uid': self.uid,

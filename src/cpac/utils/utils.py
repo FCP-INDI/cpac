@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import os
 
+import pathlib as pl
+from os import PathLike
+from typing import Union
+
 from itertools import permutations
 from typing import Iterator, overload
 from warnings import warn
@@ -9,6 +13,7 @@ from warnings import warn
 import yaml
 
 from cpac import dist_name
+from cpac.utils.osutils import IS_PLATFORM_WINDOWS
 
 
 class LocalsToBind:
@@ -175,6 +180,18 @@ class PermissionMode:
         return False
 
 
+def windows_path_to_docker(path: Union[str, PathLike]):
+    if isinstance(path, str) and ':' not in path:
+        return path
+
+    win_path = pl.Path(path)
+    if win_path.is_absolute():
+        win_drive = win_path.drive
+        win_dir = win_path.relative_to(win_drive).as_posix()
+        return f'/{win_drive[0].lower()}{win_dir}'
+    return win_path.as_posix()
+
+
 class Volume:
     '''Class to store bind volume information'''
     @overload
@@ -201,6 +218,8 @@ class Volume:
         return str(self)
 
     def __str__(self):
+        if IS_PLATFORM_WINDOWS:
+            return f'{windows_path_to_docker(self.local)}:{windows_path_to_docker(self.bind)}:{self.mode}'
         return f'{self.local}:{self.bind}:{self.mode}'
 
 
