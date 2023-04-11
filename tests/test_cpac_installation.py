@@ -45,13 +45,19 @@ class Requirement():
     def __init__(self, requirement):
         if isinstance(requirement, PathDistribution):
             self.package = requirement.name
-            self.version = requirement.version
+            self.version = {'==': requirement.version}
         else:
             package = str(requirement).rstrip().split(' ')
-            self.package = package[0]
-            self.version = {
-                "==": package[1]} if len(package) == 2 else {
-                package[i]: package[i+1] for i in range(len(package)) if i % 2}
+            versions = len(package)
+            try:
+                if len(package):
+                    self.package = package[0]
+                    self.version = {
+                        "==": package[1]} if versions == 2 else {
+                        package[i]: package[i + 1] for i in range(versions) if
+                        ((i % 2) and (i + 1 < versions))}
+            except IndexError as index_error:
+                raise IndexError(f'{package}') from index_error
 
     def __repr__(self):
         return ' '.join([
