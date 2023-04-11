@@ -38,6 +38,21 @@ class CpacVersion:
                 f'{self.platform.name} version {self.platform.version}')
 
 
+class _MockBinding:
+    """Class to hold a ``.bind`` property with the value ``None``"""
+    def __init__(self):
+        self.bind = None
+
+    def __bool__(self):
+        return False
+
+    def __repr__(self):
+        return 'cpac.backends.platform._MockBinding()'
+
+    def __str__(self):
+        return 'None'
+
+
 class PlatformMeta:
     """Class to hold platform metadata"""
     # pylint: disable=too-few-public-methods
@@ -52,9 +67,7 @@ class PlatformMeta:
 
 class Backend:
     def __init__(self, **kwargs):
-        # start with default pipline, but prefer pipeline config over preconfig
-        # over default
-        self.pipeline_config = '/cpac_resources/default_pipeline.yml'
+        self.pipeline_config = None
         if 'extra_args' in kwargs and isinstance(kwargs['extra_args'], list):
             pipeline_config = get_extra_arg_value(
                 kwargs['extra_args'], 'pipeline_file')
@@ -148,7 +161,7 @@ class Backend:
         self.volumes += self._prep_binding(volume)
 
     def _collect_config_binding(self, config, config_key):
-        config_binding = None
+        config_binding = _MockBinding()
         if isinstance(config, str):
             if os.path.exists(config):
                 self._set_bindings(custom_binding=Volume(config, mode='r'))
@@ -158,24 +171,26 @@ class Backend:
                     f'yaml.dump(Configuration({config}).dict())"'
                 )
             config = yaml.safe_load(config)
-        pipeline_setup = config.get('pipeline_setup', {})
-        minimal = pipeline_setup.get('FROM', False)
-        if isinstance(pipeline_setup, dict):
-            config_binding = Volume(pipeline_setup.get(config_key, {}).get(
-                'path'))
-        else:
-            minimal = True
-        if minimal:
-            warn(
-                'This run is using a minimal pipeline configuration. If this '
-                'configuration imports a configuration that requires paths to '
-                'be bound from your real environment to your container, you '
-                'need to bind those paths manually with the `-B` flag.',
-                UserWarning
-            )
+        if config:
+            pipeline_setup = config.get('pipeline_setup', {})
+            minimal = pipeline_setup.get('FROM', False)
+            if isinstance(pipeline_setup, dict):
+                config_binding = Volume(pipeline_setup.get(config_key, {}).get(
+                    'path'))
+            else:
+                minimal = True
+            if minimal:
+                warn(
+                    'This run is using a minimal pipeline configuration. If '
+                    'this configuration imports a configuration that '
+                    'requires paths to be bound from your real environment '
+                    'to your container, you need to bind those paths '
+                    'manually with the `-B` flag.',
+                    UserWarning
+                )
         return config_binding
 
-    def clarg(self, clcommand, flags=[], **kwargs):
+    def clarg(self, clcommand, flags=None, **kwargs):
         """
         Runs a commandline command
 
@@ -183,7 +198,7 @@ class Backend:
         ----------
         clcommand: str
 
-        flags: list
+        flags: list, optional
 
         kwargs: dict
         """
@@ -240,7 +255,7 @@ class Backend:
                         kwargs[c_b[2]] = inner_binding
                 try:
                     os.makedirs(inner_binding, exist_ok=True)
-                except PermissionError:
+                except (PermissionError, OSError):
                     outer_binding = os.path.join(kwargs.get(
                         'output_dir',
                         os.path.join(cwd, 'outputs')
@@ -332,7 +347,7 @@ class Backend:
         if not os.path.exists(volume.local):
             try:
                 os.makedirs(volume.local, exist_ok=True)
-            except PermissionError as perm:
+            except (PermissionError, OSError) as perm:
                 if second_try:
                     raise perm
                 new_local = os.path.join(self.working_dir,
