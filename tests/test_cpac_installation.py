@@ -1,8 +1,10 @@
 """Test if cpac is installed as expected"""
 try:
-    from importlib.metadata import distributions, PathDistribution
+    from importlib.metadata import distribution, distributions, \
+        PackageNotFoundError, PathDistribution
 except ModuleNotFoundError:
-    from importlib_metadata import distributions, PathDistribution
+    from importlib_metadata import distribution, distributions, \
+        PackageNotFoundError, PathDistribution
 try:
     import tomllib
 except ModuleNotFoundError:
@@ -26,10 +28,16 @@ def test_requirements():
                 req, requirements[config_file]), (
                 f'package {req} is in requirements.txt '
                 f'but not in {config_file}')
+            failure_message = (f'package {req} is in requirements.txt '
+                               'but not installed')
+            try:
+                failure_message += ' '.join([
+                    ';', str(req.package),
+                    str(distribution(req.package).version), 'installed'])
+            except PackageNotFoundError:
+                pass
             assert package_in_list(
-                req, requirements_list(distributions())), (
-                f'package {req} is in requirements.txt '
-                'but not installed')
+                req, requirements_list(distributions())), failure_message
 
 
 def test_version():
