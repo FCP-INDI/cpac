@@ -25,7 +25,7 @@ version = "0.6.0"
 urls = {Homepage = "https://github.com/FCP-INDI/cpac"}
 requires-python = ">=3.7"
 dependencies = [
-    "docker",
+    "docker >= 4.2.1",
     "dockerpty",
     "docker-pycreds",
     "pandas >= 0.23.4",
