@@ -1,56 +1,63 @@
 """Test if cpac is installed as expected"""
-from pkg_resources import working_set
-from setuptools.config import read_configuration
+try:
+    from importlib.metadata import distributions, PathDistribution
+except ModuleNotFoundError:
+    from importlib_metadata import distributions, PathDistribution
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 
 def test_requirements():
-    requirements = {
-        'setup.cfg': requirements_list(read_configuration(
-                'setup.cfg'
-            )['options']['install_requires']
-        )
-    }
-    with open('requirements.txt', 'r') as req:
+    """Test that requirements are listed in config and in requirements.txt
+    and that they are all installed."""
+    config_file = 'pyproject.toml'
+    with open(config_file, 'rb') as _pyproject:
+        requirements = {
+            config_file: requirements_list(
+                tomllib.load(_pyproject)['project']['dependencies'])}
+    with open('requirements.txt', 'r', encoding='utf-8') as req:
         requirements['requirements.txt'] = requirements_list(
-            req.readlines()
-        )
+            req.readlines())
     for req in requirements['requirements.txt']:
         if req.package.lower() != 'setuptools':
             assert package_in_list(
-                req, requirements['setup.cfg']
-            ), (
+                req, requirements[config_file]), (
                 f'package {req} is in requirements.txt '
-                'but not in setup.cfg'
-            )
+                f'but not in {config_file}')
             assert package_in_list(
-                req, requirements_list(working_set)
-            ), (
+                req, requirements_list(distributions())), (
                 f'package {req} is in requirements.txt '
-                'but not installed'
-            )
+                'but not installed')
 
 
 def test_version():
-    from cpac import __version__
+    """Check that version is set"""
+    from cpac import __version__  # pylint: disable=import-outside-toplevel
     assert __version__ != 'undefined', f'version is {__version__}'
 
 
 class Requirement():
+    """Parse various types of requirements into a type with a
+    'package' attribute and a 'version' attribute"""
+    # pylint: disable=too-few-public-methods
     def __init__(self, requirement):
-        package = str(requirement).rstrip().split(' ')
-        self.package = package[0]
-        self.version = {
-            "==": package[1]
-        } if len(package) == 2 else {
-            package[i]: package[i+1] for i in range(len(package)) if i % 2
-        }
+        if isinstance(requirement, PathDistribution):
+            self.package = requirement.name
+            self.version = requirement.version
+        else:
+            package = str(requirement).rstrip().split(' ')
+            self.package = package[0]
+            self.version = {
+                "==": package[1]} if len(package) == 2 else {
+                package[i]: package[i+1] for i in range(len(package)) if i % 2}
 
     def __repr__(self):
         return ' '.join([
             f'{self.package}',
             ', '.join([
-                f'{key} {self.version[key]}' for key in self.version
-            ])
+                f'{key} {self.version[key]}' for key in self.version])
         ]).strip()
 
 
@@ -71,9 +78,7 @@ def package_in_list(package, version_list):
     """
     return(
         package.package.lower() in [
-            p.package.lower() for p in version_list
-        ]
-    )
+            p.package.lower() for p in version_list])
 
 
 def requirements_list(requirements):

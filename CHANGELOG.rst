@@ -5,6 +5,7 @@ Changelog
 ===============
 * Handles relocation of default pipeline in C-PAC 1.8.5
 * Fixes a bug preventing default bindings in Mac OS ≥ 10.15
+* Replaces ``setup.cfg`` with ``pyproject.toml``
 
 `Version 0.5.0: Parse Resources <https://github.com/FCP-INDI/cpac/releases/tag/v0.5.0>`_
 ================================================================================================

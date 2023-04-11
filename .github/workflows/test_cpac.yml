@@ -22,7 +22,7 @@ jobs:
         platform: [docker]
         tag: [latest, nightly]
         go: [1.14]
-        python: [3.7, 3.8, 3.9, "3.10"]
+        python: [3.7, 3.8, 3.9, "3.10", 3.11]
         singularity: [3.6.4]
 
     steps:
