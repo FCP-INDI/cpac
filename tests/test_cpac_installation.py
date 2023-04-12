@@ -86,9 +86,13 @@ class Requirement():
     # pylint: disable=too-few-public-methods
     def __init__(self, requirement):
         if isinstance(requirement, PathDistribution):
-            self.package = requirement.name
             self.operator = '=='
-            self.version = _version(requirement.version)
+            try:
+                self.package = requirement.name
+                self.version = _version(requirement.version)
+            except AttributeError:
+                self.package = requirement.metadata.get('Name')
+                self.version = _version(requirement.metadata.get('Version'))
         else:
             package = str(requirement).rstrip().split(' ')
             versions = len(package)
