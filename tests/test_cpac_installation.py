@@ -48,8 +48,24 @@ def test_requirements():
                     str(distribution(req.package).version), 'installed'])
             except PackageNotFoundError:
                 pass
-            assert package_in_list(
-                req, requirements_list(distributions())), failure_message
+            try:
+                assert package_in_list(
+                    req, requirements_list(distributions())), failure_message
+            except AssertionError as assertion_error:
+                installed = requirements_list(distributions())
+                docker_installed = installed[
+                    [_p.package.lower() for _p in installed].index('docker')]
+                docker_required = requirements['requirements.txt'][
+                    [_p.package.lower() for _p in
+                     requirements['requirements.txt']].index('docker')]
+                print(docker_installed)
+                print(docker_installed.package)
+                print(docker_installed.operator)
+                print(docker_installed.version)
+                print(docker_required.package)
+                print(docker_required.operator)
+                print(docker_required.version)
+                raise assertion_error
 
 
 def test_version():
