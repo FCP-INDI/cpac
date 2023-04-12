@@ -53,6 +53,8 @@ def test_requirements():
                     req, requirements_list(distributions())), failure_message
             except AssertionError as assertion_error:
                 installed = requirements_list(distributions())
+                print(installed)
+                print(requirements['requirements.txt'])
                 docker_installed = installed[
                     [_p.package.lower() for _p in installed].index('docker')]
                 docker_required = requirements['requirements.txt'][
