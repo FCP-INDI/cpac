@@ -49,7 +49,8 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
             assert any(
                 date.today().isoformat() in fp for fp in os.listdir(wd)
             ), ' not in \n'.join([
-                date.today().isoformat(), str(os.listdir(wd))])
+                date.today().isoformat(), str(os.listdir(wd))]
+            ) + f'for {" ".join(argv)}'
 
     wd = tmp_path  # pylint: disable=invalid-name
     args = set_commandline_args(platform, tag, argsep)
