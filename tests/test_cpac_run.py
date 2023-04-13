@@ -47,9 +47,10 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
         argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, 'argv', argv):
             run()
+            possibilities = _where_to_find_runlogs(wd)
             assert any(
                 date.today().isoformat() in fp for fp in
-                _where_to_find_runlogs(wd))
+                possibilities), f'expected log not found in {possibilities}'
 
     wd = tmp_path  # pylint: disable=invalid-name
     args = set_commandline_args(platform, tag, argsep)
@@ -81,7 +82,7 @@ def _where_to_find_runlogs(_wd) -> list:
 
     Returns
     -------
-    possibilities : list of str or Path
+    possibilities : list of str
     """
     possibilities = []
     _wd = Path(_wd)
@@ -89,11 +90,11 @@ def _where_to_find_runlogs(_wd) -> list:
         # C-PAC < 1.8.5
         for filename in _wd.iterdir():
             if (_wd / filename).is_file():
-                possibilities.append(filename)
+                possibilities.append(str(filename))
         # C-PAC ≥ 1.8.5
         for subses_dir in _wd.glob("pipeline_*/sub-*_ses-*"):
             if subses_dir.is_dir():
                 for filename in subses_dir.iterdir():
                     if (subses_dir / filename).is_file():
-                        possibilities.append(filename)
+                        possibilities.append(str(filename))
     return possibilities
