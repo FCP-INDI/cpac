@@ -44,6 +44,7 @@ def test_run_help(argsep, capsys, helpflag, platform, tag):
 def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
     """Test 'test_config' run command"""
     def run_test(argv, wd):  # pylint: disable=invalid-name
+        os.chdir(wd)
         argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, 'argv', argv):
             run()
