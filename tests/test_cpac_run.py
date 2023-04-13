@@ -52,6 +52,7 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
             assert any(
                 date.today().isoformat() in fp for fp in
                 possibilities), (
+                f'wd: {wd}\n'
                 f'expected log not found in {possibilities}\n'
                 f'{return_directory_contents(Path(wd))}')
 
