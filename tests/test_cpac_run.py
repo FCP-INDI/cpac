@@ -43,6 +43,7 @@ def test_run_help(argsep, capsys, helpflag, platform, tag):
 def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
     """Test 'test_config' run command"""
     def run_test(argv, wd):  # pylint: disable=invalid-name
+        os.chdir(wd)
         argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, 'argv', argv):
             run()
@@ -50,7 +51,7 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
                 date.today().isoformat() in fp for fp in os.listdir(wd)
             ), ' not in \n'.join([
                 date.today().isoformat(), str(os.listdir(wd))]
-            ) + f'for {" ".join(argv)}'
+            ) + f' for {" ".join(argv)}'
 
     wd = tmp_path  # pylint: disable=invalid-name
     args = set_commandline_args(platform, tag, argsep)
