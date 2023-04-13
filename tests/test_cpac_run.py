@@ -50,7 +50,9 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
             possibilities = _where_to_find_runlogs(wd)
             assert any(
                 date.today().isoformat() in fp for fp in
-                possibilities), f'expected log not found in {possibilities}'
+                possibilities), (
+                f'expected log not found in {possibilities}\n'
+                f'{return_directory_contents(Path(wd))}')
 
     wd = tmp_path  # pylint: disable=invalid-name
     args = set_commandline_args(platform, tag, argsep)
@@ -98,3 +100,14 @@ def _where_to_find_runlogs(_wd) -> list:
                     if (subses_dir / filename).is_file():
                         possibilities.append(str(filename))
     return possibilities
+
+
+def return_directory_contents(path, so_far=None):
+    if so_far is None:
+        so_far = ''
+    for item in path.iterdir():
+        if item.is_dir():
+            so_far += f'\n{return_directory_contents(item)}'
+        else:
+            so_far += f'\n{item}'
+    return so_far
