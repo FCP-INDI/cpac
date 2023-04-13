@@ -96,7 +96,7 @@ def _where_to_find_runlogs(_wd) -> list:
             if (_wd / filename).is_file():
                 possibilities.append(str(filename))
         # C-PAC ≥ 1.8.5
-        for subses_dir in _wd.glob("pipeline_*/sub-*_ses-*"):
+        for subses_dir in _wd.glob("log/pipeline_*/sub-*_ses-*"):
             if subses_dir.is_dir():
                 for filename in subses_dir.iterdir():
                     if (subses_dir / filename).is_file():
