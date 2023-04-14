@@ -53,9 +53,7 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
                 date.today().isoformat() in fp for fp in
                 possibilities), (
                 f'wd: {wd}\n'
-                f'expected log not found in {possibilities}\n'
-                f'{return_directory_contents(Path(wd))}')
-
+                f'expected log not found in {possibilities}\n')
     wd = tmp_path  # pylint: disable=invalid-name
     args = set_commandline_args(platform, tag, argsep)
     pipeline = '' if pipeline_file is None else ' '.join([
@@ -75,6 +73,7 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
     else:
         # test without --platform and --tag args
         run_test(f'cpac {argv}'.split(' '), wd)
+
 
 def _where_to_find_runlogs(_wd) -> list:
     """The location of run logs changed in 1.8.5.
@@ -102,14 +101,3 @@ def _where_to_find_runlogs(_wd) -> list:
                     if (subses_dir / filename).is_file():
                         possibilities.append(str(filename))
     return possibilities
-
-
-def return_directory_contents(path, so_far=None):
-    if so_far is None:
-        so_far = ''
-    for item in path.iterdir():
-        if item.is_dir():
-            so_far += f'\n{return_directory_contents(item)}'
-        else:
-            so_far += f'\n{item}'
-    return so_far
