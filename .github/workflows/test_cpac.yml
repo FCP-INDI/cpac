@@ -104,7 +104,10 @@ jobs:
       with:
         fetch-depth: 0
     - name: Install cpac
-      run: cd $GITHUB_WORKSPACE && pip install .
+      run: |
+        export DEB_PYTHON_INSTALL_LAYOUT=deb_system
+        cd $GITHUB_WORKSPACE
+        pip install .
     - name: Configure Git credentials
       uses: oleksiyrudenko/gha-git-credentials@v2.1
       with:
