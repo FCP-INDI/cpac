@@ -94,7 +94,7 @@ Usage
                             See "cpac parse-resources --help" for more information.
         crash               Convert a crash pickle to plain text (C-PAC < 1.8.0).
     
-    optional arguments:
+    options:
       -h, --help            show this help message and exit
       --version             show program's version number and exit
       -o OPT, --container_option OPT

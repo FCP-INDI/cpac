@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-from pkg_resources import get_distribution, DistributionNotFound
-
 try:
-    dist_name = __name__
-    __version__ = get_distribution(dist_name).version
-except DistributionNotFound:
+    from importlib.metadata import distribution, PackageNotFoundError
+except ModuleNotFoundError:
+    from importlib_metadata import distribution, PackageNotFoundError
+
+DIST_NAME = __name__
+try:
+    __version__ = distribution(DIST_NAME).version
+except (AttributeError, NameError, PackageNotFoundError):
     __version__ = 'unknown'
 finally:
-    del get_distribution, DistributionNotFound
+    del distribution, PackageNotFoundError
