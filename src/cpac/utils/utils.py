@@ -8,7 +8,7 @@ from warnings import warn
 
 import yaml
 
-from cpac import dist_name
+from cpac import DIST_NAME
 
 
 class LocalsToBind:
@@ -166,7 +166,7 @@ class PermissionMode:
     def _warn_if_undefined(self):
         if not self.defined:
             warn(f'\'{self.mode}\' is not a fully-configured permission '
-                 f'level in {dist_name}. Configured permission levels are '
+                 f'level in {DIST_NAME}. Configured permission levels are '
                  f'''{", ".join([
                      f"'{mode}'" for mode in PermissionMode.defined_modes
                  ])}''',

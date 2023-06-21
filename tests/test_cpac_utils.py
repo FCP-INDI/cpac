@@ -6,7 +6,6 @@ from unittest import mock
 import pytest
 
 from cpac.__main__ import run
-from cpac.utils import check_version_at_least
 from .CONSTANTS import args_before_after, set_commandline_args
 
 
@@ -49,8 +48,6 @@ def test_utils_new_settings_template(argsep, tmp_path, platform, tag):
 
     args = set_commandline_args(platform, tag, argsep)
     argv = f'--working_dir {wd} utils data_config new_settings_template'
-    if check_version_at_least('1.8.4', platform):
-        argv += ' --tracking_opt-out'
     if args:
         before, after = args_before_after(argv, args)
         # test with args before command

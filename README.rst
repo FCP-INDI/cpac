@@ -1,7 +1,8 @@
-========================================================================================
-C-PAC Python Package |build-status| |github-version| |upload| |pypi-version| |coverage|
-========================================================================================
+====================
+C-PAC Python Package
+====================
 
+|build-status| |github-version| |upload| |pypi-version| |coverage|
 
 A Python package that wraps `C-PAC <http://fcp-indi.github.io>`_, enabling users to install cpac with `pip <https://pip.pypa.io>`_ and run from the command line.
 
@@ -93,7 +94,7 @@ Usage
                             See "cpac parse-resources --help" for more information.
         crash               Convert a crash pickle to plain text (C-PAC < 1.8.0).
     
-    optional arguments:
+    options:
       -h, --help            show this help message and exit
       --version             show program's version number and exit
       -o OPT, --container_option OPT
