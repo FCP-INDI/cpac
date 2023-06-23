@@ -28,7 +28,6 @@ dependencies = [
     "docker >= 4.2.1",
     "dockerpty",
     "docker-pycreds",
-    'importlib; python_version >= "3.8"',
     'importlib_metadata; python_version < "3.8"',
     "pandas >= 0.23.4",
     "spython >= 0.0.81",
