@@ -1,5 +1,6 @@
 '''Constants for tests'''
 # pylint: disable=invalid-name
+FIXTURENAMES = ['image', 'platform', 'tag']
 TAGS = [None, 'latest', 'nightly']
 
 
