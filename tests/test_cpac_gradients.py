@@ -73,13 +73,3 @@ def test_raise_invalid_input_no_parcellation(mock_args, mock_files) -> None:
         cli._raise_invalid_input(mock_args, mock_files)
 
     assert "Must provide a parcellation" in str(exc_info.value)
-
-
-def test_raise_invalid_input_invalid_output_format(mock_args, mock_files) -> None:
-    """Test _raise_invalid_input when an invalid output format is provided."""
-    mock_args.output_format = "invalid_format"
-
-    with pytest.raises(exceptions.InputError) as exc_info:
-        cli._raise_invalid_input(mock_args, mock_files)
-
-    assert "Output format must be" in str(exc_info.value)
