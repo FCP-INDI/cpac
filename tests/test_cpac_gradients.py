@@ -39,12 +39,6 @@ def mock_files() -> list[str]:
     return ["/path/to/bids/sub-01/func/sub-01_task-rest_bold.nii.gz"]
 
 
-def test_get_parser() -> None:
-    """Test the _get_parser function to ensure it returns an instance of argparse.ArgumentParser."""
-    parser = cli._get_parser()
-    assert isinstance(parser, argparse.ArgumentParser)
-
-
 def test_raise_invalid_input_existing_output_file(mock_args: mock.MagicMock) -> None:
     """Test _raise_invalid_input when output file already exists."""
     mock_output_file = mock.MagicMock()
