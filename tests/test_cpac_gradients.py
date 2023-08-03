@@ -45,7 +45,7 @@ def test_get_parser() -> None:
     assert isinstance(parser, argparse.ArgumentParser)
 
 
-def test_raise_invalid_input_existing_output_file(mock_args) -> None:
+def test_raise_invalid_input_existing_output_file(mock_args: mock.MagicMock) -> None:
     """Test _raise_invalid_input when output file already exists."""
     mock_output_file = mock.MagicMock()
     mock_output_file.exists.return_value = True
@@ -57,7 +57,7 @@ def test_raise_invalid_input_existing_output_file(mock_args) -> None:
     assert "Output file already exists" in str(exc_info.value)
 
 
-def test_raise_invalid_input_no_input_files(mock_args) -> None:
+def test_raise_invalid_input_no_input_files(mock_args: mock.MagicMock) -> None:
     """Test _raise_invalid_input when no input files are provided."""
     with pytest.raises(exceptions.InputError) as exc_info:
         cli._raise_invalid_input(mock_args, [])
@@ -65,7 +65,9 @@ def test_raise_invalid_input_no_input_files(mock_args) -> None:
     assert "No input files found" in str(exc_info.value)
 
 
-def test_raise_invalid_input_no_parcellation(mock_args, mock_files) -> None:
+def test_raise_invalid_input_no_parcellation(
+    mock_args: mock.MagicMock, mock_files: list[str]
+) -> None:
     """Test _raise_invalid_input when no parcellation is provided."""
     mock_args.parcellation = None
 
