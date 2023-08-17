@@ -29,7 +29,7 @@ def test_utils_help(argsep, capsys, helpflag, platform, tag):
         run_test(before, platform)
         # test with args after command
         run_test(after, platform)
-    else:
+    elif tag=='latest':
         # test without --platform and --tag args
         run_test(f'cpac {argv}'.split(' '), platform)
 
@@ -54,6 +54,6 @@ def test_utils_new_settings_template(argsep, tmp_path, platform, tag):
         run_test(before)
         # test with args after command
         run_test(after)
-    else:
+    elif tag=='latest':
         # test without --platform and --tag args
         run_test(f'cpac {argv}'.split(' '))

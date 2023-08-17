@@ -34,7 +34,7 @@ def test_run_help(argsep, capsys, helpflag, platform, tag):
         run_test(before)
         # test with args after command
         run_test(after)
-    else:
+    elif tag=='latest':
         # test without --platform and --tag args
         run_test(f'cpac {argv}'.split(' '))
 
@@ -70,7 +70,7 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
         run_test(before, wd)
         # test with args after command
         run_test(after, wd)
-    else:
+    elif tag=='latest':
         # test without --platform and --tag args
         run_test(f'cpac {argv}'.split(' '), wd)
 
