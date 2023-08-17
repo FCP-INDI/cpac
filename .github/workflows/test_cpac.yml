@@ -18,6 +18,7 @@ jobs:
       SINGULARITY_TMPDIR: $GITHUB_WORKSPACE/.singularity/tmp
 
     strategy:
+      max-parallel: 1
       matrix:
         platform: [docker]
         tag: [latest, nightly]
