@@ -18,7 +18,7 @@ jobs:
       SINGULARITY_TMPDIR: $GITHUB_WORKSPACE/.singularity/tmp
 
     strategy:
-      max-parallel: 2
+      max-parallel: 1  # This'll slow it down but increase stability
       matrix:
         platform: [docker]
         tag: [latest, nightly]
@@ -27,6 +27,13 @@ jobs:
         singularity: [3.6.4]
 
     steps:
+    - name: Maximize space
+      uses: easimon/maximize-build-space@v8
+      with:
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+        remove-docker-images: 'true'  # This'll slow it down but increase stability
     - uses: actions/checkout@v3
     - name: Set up Go
       uses: actions/setup-go@v4
