@@ -44,7 +44,7 @@ def test_pull(argsep, capsys, platform, tag):
         with mock.patch.object(sys, 'argv', argv):
             run()
             captured = capsys.readouterr()
-            checkstring = f':{tag}' if tag is not None else ':latest'
+            checkstring = f'{tag}' if tag is not None else 'latest'
             outstring = captured.out + captured.err
             assert checkstring in outstring or 'cached' in outstring
 
