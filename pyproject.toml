@@ -23,7 +23,7 @@ classifiers = [
 ]
 version = "1.8.5"
 urls = {Homepage = "https://github.com/FCP-INDI/cpac"}
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 dependencies = [
     "docker >= 4.2.1",
     "dockerpty",
