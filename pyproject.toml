@@ -21,7 +21,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
-version = "0.6.0"
+version = "1.8.5"
 urls = {Homepage = "https://github.com/FCP-INDI/cpac"}
 requires-python = ">=3.7"
 dependencies = [
