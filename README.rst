@@ -6,7 +6,6 @@ C-PAC Python Package
 
 A Python package that wraps `C-PAC <http://fcp-indi.github.io>`_, enabling users to install cpac with `pip <https://pip.pypa.io>`_ and run from the command line.
 
-
 Description
 ===========
 
