@@ -1,5 +1,7 @@
 '''Constants for tests'''
 # pylint: disable=invalid-name
+from typing import Optional
+
 FIXTURENAMES = ['image', 'platform', 'tag']
 TAGS = [None, 'latest', 'nightly']
 
@@ -36,21 +38,28 @@ def args_before_after(argv, args):
     return before, after
 
 
-def set_commandline_args(platform, tag, sep=' '):
+def set_commandline_args(image: Optional[str] = None,
+                         platform: Optional[str] = None,
+                         tag: Optional[str] = None, sep: Optional[str] = ' '
+                         ) -> str:
     '''Function to turn pytest commandline options into mock
     cpac commandline option strings
 
     Parameters
     ----------
-    platform : string
+    image : str, optional
 
-    tag : string
+    platform : str, optional
+
+    tag : str, optional
 
     Returns
     -------
-    args : string
+    args : str
     '''
     args = ''
+    if image is not None:
+        args += f' --image{sep}{image} '
     if platform is not None:
         args += f' --platform{sep}{platform.lower()} '
     if tag and tag is not None:

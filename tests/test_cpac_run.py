@@ -1,12 +1,11 @@
+"""Test running C-PAC with cpac"""
+# pylint: disable=too-many-arguments
 import os
 import sys
-
 from datetime import date
 from pathlib import Path
 from unittest import mock
-
 import pytest
-
 from cpac.__main__ import run
 from cpac.utils import check_version_at_least
 from .CONSTANTS import args_before_after, set_commandline_args
@@ -18,7 +17,7 @@ MINIMAL_CONFIG = os.path.join(
 
 @pytest.mark.parametrize('helpflag', ['--help', '-h'])
 @pytest.mark.parametrize('argsep', [' ', '='])
-def test_run_help(argsep, capsys, helpflag, platform, tag):
+def test_run_help(argsep, capsys, helpflag, image, platform, tag):
     def run_test(argv):
         argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, 'argv', argv):
@@ -26,9 +25,9 @@ def test_run_help(argsep, capsys, helpflag, platform, tag):
             captured = capsys.readouterr()
             assert 'participant' in captured.out + captured.err
 
-    args = set_commandline_args(platform, tag, argsep)
+    args = set_commandline_args(image, platform, tag, argsep)
     argv = f'run {helpflag}'
-    if len(args):
+    if args:
         before, after = args_before_after(argv, args)
         # test with args before command
         run_test(before)
@@ -41,7 +40,7 @@ def test_run_help(argsep, capsys, helpflag, platform, tag):
 
 @pytest.mark.parametrize('argsep', [' ', '='])
 @pytest.mark.parametrize('pipeline_file', [None, MINIMAL_CONFIG])
-def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
+def test_run_test_config(argsep, pipeline_file, tmp_path, image, platform, tag):
     """Test 'test_config' run command"""
     def run_test(argv, wd):  # pylint: disable=invalid-name
         os.chdir(wd)
@@ -55,7 +54,7 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
                 f'wd: {wd}\n'
                 f'expected log not found in {possibilities}\n')
     wd = tmp_path  # pylint: disable=invalid-name
-    args = set_commandline_args(platform, tag, argsep)
+    args = set_commandline_args(image, platform, tag, argsep)
     pipeline = '' if pipeline_file is None else ' '.join([
         ' --pipeline_file', pipeline_file])
     argv = (

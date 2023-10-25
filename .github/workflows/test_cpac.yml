@@ -69,7 +69,7 @@ jobs:
       run: cd $GITHUB_WORKSPACE && pip install -e .
     - name: Test cpac, platform and tag specified
       run: |
-        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
+        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --image ghcr.io/fcp-indi/c-pac --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
         coverage report -m
     - name: Test cpac, platform specified, tag unspecified
       if: ${{ matrix.tag == 'latest' }}

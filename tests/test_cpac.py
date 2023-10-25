@@ -37,7 +37,7 @@ def test_loading_message(platform, tag):
 
 
 @pytest.mark.parametrize('argsep', [' ', '='])
-def test_pull(argsep, capsys, platform, tag):
+def test_pull(argsep, capsys, image, platform, tag):
     """Test pull command"""
     def run_test(argv):
         argv = [arg for arg in argv if arg]
@@ -48,7 +48,7 @@ def test_pull(argsep, capsys, platform, tag):
             outstring = captured.out + captured.err
             assert checkstring in outstring or 'cached' in outstring
 
-    args = set_commandline_args(platform, tag, argsep)
+    args = set_commandline_args(image, platform, tag, argsep)
 
     # test args before command
     run_test(f'cpac {args} pull'.split(' '))
