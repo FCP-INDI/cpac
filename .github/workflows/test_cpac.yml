@@ -20,7 +20,7 @@ jobs:
     strategy:
       max-parallel: 1  # This'll slow it down but increase stability
       matrix:
-        platform: [docker]
+        platform: [singularity]
         tag: [latest, nightly]
         go: [1.14]
         python: [3.9, "3.10", 3.11]
