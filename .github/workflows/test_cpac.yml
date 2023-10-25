@@ -30,10 +30,11 @@ jobs:
     - name: Maximize space
       uses: easimon/maximize-build-space@v8
       with:
-        remove-dotnet: 'true'
         remove-android: 'true'
+        remove-codeql: 'true'
+        remove-docker-images: 'true'
+        remove-dotnet: 'true'
         remove-haskell: 'true'
-        remove-docker-images: 'false'
     - uses: actions/checkout@v3
     - name: Set up Go
       uses: actions/setup-go@v4
