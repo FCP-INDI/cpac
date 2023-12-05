@@ -44,3 +44,11 @@ repos:
   - id: check-yaml
   - id: check-json
   - id: check-toml
+
+- repo: local
+  hooks:
+  - id: yaml-file-extension
+    name: Prefer .yaml over .yml.
+    entry: YAML files must have .yaml extension.
+    language: fail
+    files: .yml$
