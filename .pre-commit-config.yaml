@@ -51,4 +51,4 @@ repos:
     name: Prefer .yaml over .yml.
     entry: YAML files must have .yaml extension.
     language: fail
-    files: .yml$
+    files: \.yml$
