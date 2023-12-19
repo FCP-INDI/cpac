@@ -1,25 +1,24 @@
 import sys
-
 from unittest import mock
 
+from cpac.__main__ import run
 import pytest
 
-from cpac.__main__ import run
 from .CONSTANTS import args_before_after, set_commandline_args
 
 
-@pytest.mark.parametrize('argsep', [' ', '='])
+@pytest.mark.parametrize("argsep", [" ", "="])
 def test_utils_help(argsep, capsys, platform, tag):
     def run_test(argv, platform):
         argv = [arg for arg in argv if arg]
-        with mock.patch.object(sys, 'argv', argv):
+        with mock.patch.object(sys, "argv", argv):
             run()
             captured = capsys.readouterr()
             if platform is not None:
                 assert platform.title() in captured.out
-            assert 'COMMAND' in captured.out
+            assert "COMMAND" in captured.out
 
-    argv = 'group --help'
+    argv = "group --help"
     args = set_commandline_args(platform, tag, argsep)
     if len(args):
         before, after = args_before_after(argv, args)
@@ -29,4 +28,4 @@ def test_utils_help(argsep, capsys, platform, tag):
         run_test(after, platform)
     else:
         # test without --platform and --tag args
-        run_test(f'cpac {argv}'.split(' '), platform)
+        run_test(f"cpac {argv}".split(" "), platform)

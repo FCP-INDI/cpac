@@ -1,33 +1,30 @@
-import os
-import sys
-
 from datetime import date
+import os
 from pathlib import Path
+import sys
 from unittest import mock
-
-import pytest
 
 from cpac.__main__ import run
 from cpac.utils import check_version_at_least
+import pytest
+
 from .CONSTANTS import args_before_after, set_commandline_args
 
-MINIMAL_CONFIG = os.path.join(
-    os.path.dirname(__file__), 'test_data', 'minimal.min.yml'
-)
+MINIMAL_CONFIG = os.path.join(os.path.dirname(__file__), "test_data", "minimal.min.yml")
 
 
-@pytest.mark.parametrize('helpflag', ['--help', '-h'])
-@pytest.mark.parametrize('argsep', [' ', '='])
+@pytest.mark.parametrize("helpflag", ["--help", "-h"])
+@pytest.mark.parametrize("argsep", [" ", "="])
 def test_run_help(argsep, capsys, helpflag, platform, tag):
     def run_test(argv):
         argv = [arg for arg in argv if arg]
-        with mock.patch.object(sys, 'argv', argv):
+        with mock.patch.object(sys, "argv", argv):
             run()
             captured = capsys.readouterr()
-            assert 'participant' in captured.out + captured.err
+            assert "participant" in captured.out + captured.err
 
     args = set_commandline_args(platform, tag, argsep)
-    argv = f'run {helpflag}'
+    argv = f"run {helpflag}"
     if len(args):
         before, after = args_before_after(argv, args)
         # test with args before command
@@ -36,34 +33,36 @@ def test_run_help(argsep, capsys, helpflag, platform, tag):
         run_test(after)
     else:
         # test without --platform and --tag args
-        run_test(f'cpac {argv}'.split(' '))
+        run_test(f"cpac {argv}".split(" "))
 
 
-@pytest.mark.parametrize('argsep', [' ', '='])
-@pytest.mark.parametrize('pipeline_file', [None, MINIMAL_CONFIG])
+@pytest.mark.parametrize("argsep", [" ", "="])
+@pytest.mark.parametrize("pipeline_file", [None, MINIMAL_CONFIG])
 def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
-    """Test 'test_config' run command"""
+    """Test 'test_config' run command."""
+
     def run_test(argv, wd):  # pylint: disable=invalid-name
         os.chdir(wd)
         argv = [arg for arg in argv if arg]
-        with mock.patch.object(sys, 'argv', argv):
+        with mock.patch.object(sys, "argv", argv):
             run()
             possibilities = _where_to_find_runlogs(wd)
-            assert any(
-                date.today().isoformat() in fp for fp in
-                possibilities), (
-                f'wd: {wd}\n'
-                f'expected log not found in {possibilities}\n')
+            assert any(date.today().isoformat() in fp for fp in possibilities), (
+                f"wd: {wd}\n" f"expected log not found in {possibilities}\n"
+            )
+
     wd = tmp_path  # pylint: disable=invalid-name
     args = set_commandline_args(platform, tag, argsep)
-    pipeline = '' if pipeline_file is None else ' '.join([
-        ' --pipeline_file', pipeline_file])
+    pipeline = (
+        "" if pipeline_file is None else " ".join([" --pipeline_file", pipeline_file])
+    )
     argv = (
-        'run '
-        f's3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU {wd} '
-        f'test_config --participant_ndx=2{pipeline}')
-    if check_version_at_least('1.8.4', platform):
-        argv += ' --tracking_opt-out'
+        "run "
+        f"s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU {wd} "
+        f"test_config --participant_ndx=2{pipeline}"
+    )
+    if check_version_at_least("1.8.4", platform):
+        argv += " --tracking_opt-out"
     if args:
         before, after = args_before_after(argv, args)
         # test with args before command
@@ -72,12 +71,12 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
         run_test(after, wd)
     else:
         # test without --platform and --tag args
-        run_test(f'cpac {argv}'.split(' '), wd)
+        run_test(f"cpac {argv}".split(" "), wd)
 
 
 def _where_to_find_runlogs(_wd) -> list:
-    """The location of run logs changed in 1.8.5.
-    This function will list all the files in both the old and new locations.
+    """
+    List all the files in both the old and new locations of run logs changed in 1.8.5.
 
     Parameters
     ----------

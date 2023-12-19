@@ -5,12 +5,16 @@ repos:
   rev: v0.1.8
   hooks:
   - id: ruff
+    # args: [--ignore-noqa]
   - id: ruff-format
 
 - repo: https://github.com/pre-commit/mirrors-mypy
   rev: v1.4.1
   hooks:
   - id: mypy
+    additional_dependencies:
+    - types-tabulate
+    - types-PyYAML
     args: [--ignore-missing-imports]
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
   rev: v2.11.0
@@ -25,6 +29,13 @@ repos:
     - --autofix
     - --indent=2
     - --no-sort
+
+- repo: https://github.com/python-poetry/poetry
+  rev: 1.5.1
+  hooks:
+  - id: poetry-check
+  - id: poetry-lock
+    args: [--no-update]
 
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.1.0
@@ -44,11 +55,3 @@ repos:
   - id: check-yaml
   - id: check-json
   - id: check-toml
-
-- repo: local
-  hooks:
-  - id: yaml-file-extension
-    name: Prefer .yaml over .yml.
-    entry: YAML files must have .yaml extension.
-    language: fail
-    files: \.yml$
