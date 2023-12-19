@@ -1,11 +1,15 @@
 =========
 Changelog
 =========
-`Version 0.6.0: Support for C-PAC v1.8.5 <https://github.com/FCP-INDI/cpac/releases/tag/v0.6.0>`_
-===============
+
+`Version 1.8.5: Support for C-PAC v1.8.5 <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.5>`_
+=====================================================================================================
+
+* Changes versioning scheme to match supported C-PAC version
 * Handles relocation of default pipeline in C-PAC 1.8.5
 * Fixes a bug preventing default bindings in Mac OS ≥ 10.15
 * Replaces ``setup.cfg`` with ``pyproject.toml``
+* Replaces ``setuptools`` with ``poetry``
 
 `Version 0.5.0: Parse Resources <https://github.com/FCP-INDI/cpac/releases/tag/v0.5.0>`_
 ========================================================================================
