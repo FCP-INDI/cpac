@@ -3,24 +3,13 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.aliases]
-build = "bdist_wheel"
-release = "build upload"
+build = "poetry build"
+release = "poetry publish"
 test = "pytest"
 
 [tool.devpi.upload]
 no-vcs = "1"
 formats = "bdist_wheel"
-
-[tool.distutils.test]
-addopts = "--verbose -s"
-extras = true
-
-[tool.distutils.bdist_wheel]
-universal = 1
-
-[tool.distutils.build_sphinx]
-source-dir = "docs"
-build-dir = "docs/_build"
 
 [tool.poetry]
 name = "cpac"
