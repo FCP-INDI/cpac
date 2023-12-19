@@ -86,6 +86,8 @@ Usage
         enter (bash, shell)
                             Enter a new C-PAC container via BASH.
         parse-resources (parse_resources)
+                            .
+                            
                             When provided with a `callback.log` file, this utility can sort through
                             the memory `runtime` usage, `estimate`, and associated `efficiency`, to
                             identify the `n` tasks with the `highest` or `lowest` of each of these
