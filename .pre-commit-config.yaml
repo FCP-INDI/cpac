@@ -8,7 +8,7 @@ repos:
   - id: ruff-format
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.7.1
+  rev: v1.4.1
   hooks:
   - id: mypy
     args: [--ignore-missing-imports]
@@ -27,7 +27,7 @@ repos:
     - --no-sort
 
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.5.0
+  rev: v4.1.0
   hooks:
   - id: check-case-conflict
   - id: end-of-file-fixer

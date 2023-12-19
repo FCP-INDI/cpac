@@ -2,6 +2,15 @@
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.aliases]
+build = "bdist_wheel"
+release = "build upload"
+test = "pytest"
+
+[tool.devpi.upload]
+no-vcs = "1"
+formats = "bdist_wheel"
+
 [tool.distutils.test]
 addopts = "--verbose -s"
 extras = true
@@ -19,13 +28,13 @@ description = "C-PAC Python Package"
 authors = ["C-PAC developers <cpac@cnl.childmind.org>"]
 license = "MIT"
 classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
-    "Natural Language :: English",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-    "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Bio-Informatics"
 ]
 documentation = "https://fcp-indi.github.io/docs/latest/user/cpac"
 readme = "README.rst"
@@ -37,7 +46,7 @@ python = ">=3.7"
 docker = ">=4.2.1"
 dockerpty = "*"
 docker-pycreds = "*"
-importlib_metadata = { version = "*", markers = "python_version < '3.8'" }
+importlib_metadata = {version = "*", markers = "python_version < '3.8'"}
 pandas = ">=0.23.4"
 spython = ">=0.0.81"
 pyyaml = "*"
@@ -46,15 +55,14 @@ semver = "*"
 tabulate = ">=0.8.6"
 tornado = "*"
 websocket-client = "*"
-
-alabaster = { version = "*", optional = true }
-coveralls = { version = "*", optional = true }
-imagesize = { version = "*", optional = true }
-pytest = { version = "*", optional = true }
-pytest-cov = { version = "*", optional = true }
-pytest-remotedata = { version = ">=0.3.2", optional = true }
-pytest-runner = { version = "*", optional = true }
-sphinx =  { version = "*", optional = true }
+alabaster = {version = "*", optional = true}
+coveralls = {version = "*", optional = true}
+imagesize = {version = "*", optional = true}
+pytest = {version = "*", optional = true}
+pytest-cov = {version = "*", optional = true}
+pytest-remotedata = {version = ">=0.3.2", optional = true}
+pytest-runner = {version = "*", optional = true}
+sphinx = {version = "*", optional = true}
 
 [tool.poetry.extras]
 dev = ["coveralls", "pytest", "pytest-remotedata", "pytest-runner", "sphinx"]
@@ -69,25 +77,50 @@ addopts = "-s"
 # -s
 # --verbose
 norecursedirs = [
-    "dist",
-    "build",
-    ".tox",
+  "dist",
+  "build",
+  ".tox"
 ]
 testpaths = ["tests"]
 
-[tool.aliases]
-build = "bdist_wheel"
-release = "build upload"
-test = "pytest"
+[tool.ruff]
+extend-exclude = ["dev/docker_data/get-pip_23.0.1.py"]
+extend-select = ["A", "C4", "D", "G", "I", "ICN", "NPY", "PL", "RET", "RSE", "RUF", "Q", "T20", "W"]
+target-version = "py37"
 
-[tool.devpi.upload]
-no-vcs = "1"
-formats = "bdist_wheel"
+[tool.ruff.lint.per-file-ignores]
+"CPAC/func_preproc/func_preproc.py" = ["E402"]
 
-[tool.flake8]
-exclude = """
-.tox
-build
-dist
-.eggs
-docs/conf.py"""
+[tool.ruff.lint.flake8-import-conventions.extend-aliases]
+"CPAC.pipeline.cpac_group_runner" = "cgr"
+"nibabel" = "nib"
+"nipype.interfaces.io" = "nio"
+"networkx" = "nx"
+"pkg_resources" = "p"
+"CPAC.pipeline.nipype_pipeline_engine" = "pe"
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+force-sort-within-sections = true
+known-first-party = ["CPAC"]
+no-lines-before = ["collab", "other-first-party", "local-folder"]
+order-by-type = true
+section-order = ["future", "standard-library", "third-party", "collab", "other-first-party", "first-party", "local-folder"]
+
+[tool.ruff.lint.isort.sections]
+"collab" = ["nibabel", "nilearn", "nipype", "PyBASC", "pybids", "scipy", "spython"]
+"other-first-party" = ["flowdump", "indi_aws", "indi_schedulers", "PyPEER"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+ignore-decorators = ["CPAC.utils.docs.docstring_parameter"]
+
+[tool.ruff.lint.pylint]
+max-args = 10
+max-branches = 50
+max-returns = 12
+max-statements = 100
+
+[tool.ruff.lint.pyupgrade]
+# Until variants Python ≥ 3.10
+keep-runtime-typing = true
