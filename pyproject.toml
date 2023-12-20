@@ -31,20 +31,23 @@ repository = "https://github.com/FCP-INDI/cpac"
 version = "1.8.5.dev1"
 
 [tool.poetry.dependencies]
-python = ">=3.7"
+python = ">=3.8"
 docker = ">=4.2.1"
 dockerpty = "*"
 docker-pycreds = "*"
 importlib_metadata = {version = "*", markers = "python_version < '3.8'"}
 pandas = ">=0.23.4"
-spython = ">=0.0.81"
+poetry = "*"
 pyyaml = "*"
 rich = "*"
 semver = "*"
+spython = ">=0.0.81"
 tabulate = ">=0.8.6"
+toml = {version = "*", markers = "python_version < '3.11'"}
 tornado = "*"
 websocket-client = "*"
 alabaster = {version = "*", optional = true}
+ba_timeseries_gradients = {git = "https://github.com/cmi-dair/ba-timeseries-gradients.git", optional = true, markers = "python_version >= '3.11' and python_version < '3.12'"}
 coveralls = {version = "*", optional = true}
 imagesize = {version = "*", optional = true}
 pytest = {version = "*", optional = true}
@@ -55,6 +58,7 @@ sphinx = {version = "*", optional = true}
 
 [tool.poetry.extras]
 dev = ["coveralls", "pytest", "pytest-remotedata", "pytest-runner", "sphinx"]
+gradients = ["ba_timeseries_gradients"]
 testing = ["alabaster", "imagesize", "pytest", "pytest-cov", "pytest-runner", "sphinx"]
 
 [tool.poetry.scripts]
@@ -75,7 +79,7 @@ testpaths = ["tests"]
 [tool.ruff]
 extend-exclude = ["docs/conf.py"]
 extend-select = ["A", "C4", "D", "G", "I", "ICN", "NPY", "PL", "RET", "RSE", "RUF", "Q", "W"]
-target-version = "py37"
+target-version = "py38"
 
 [tool.ruff.lint.per-file-ignores]
 "CPAC/func_preproc/func_preproc.py" = ["E402"]

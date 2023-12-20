@@ -2,12 +2,18 @@ from __future__ import annotations
 
 from itertools import permutations
 import os
+from pathlib import Path
 from typing import ClassVar, Iterator, Optional, Set, Union
 from warnings import warn
 
 import yaml
 
 from cpac import DIST_NAME
+
+
+def get_project_root() -> Path:
+    """Get project root directory."""
+    return Path(__file__).parents[3]
 
 
 class LocalsToBind:

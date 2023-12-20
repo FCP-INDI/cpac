@@ -3,7 +3,7 @@
 try:
     from importlib.metadata import PackageNotFoundError, distribution
 except ModuleNotFoundError:
-    from importlib_metadata import PackageNotFoundError, distribution
+    from importlib_metadata import PackageNotFoundError, distribution  # type: ignore
 
 DIST_NAME = __name__
 try:

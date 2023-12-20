@@ -11,6 +11,8 @@ Changelog
 * Replaces ``setup.cfg`` with ``pyproject.toml``
 * Replaces ``setuptools`` with ``poetry``
 * Adds pre-commit hooks for linting and formatting
+* Require Python ≥ 3.8
+* Wrap ``cmi-dair/ba_timeseries_gradients`` as ``gradients`` command
 
 `Version 0.5.0: Parse Resources <https://github.com/FCP-INDI/cpac/releases/tag/v0.5.0>`_
 ========================================================================================

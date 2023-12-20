@@ -13,6 +13,7 @@ from docker.errors import DockerException, NotFound
 from cpac import __version__
 from cpac.backends import Backends
 from cpac.helpers import TODOs, cpac_parse_resources as parse_resources
+from cpac.utils.bare_wrap import WRAPPED, add_bare_wrapper, call
 
 _logger = logging.getLogger(__name__)
 
@@ -193,6 +194,8 @@ def _parser():
         '--help"\nfor more information.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
+
+    add_bare_wrapper(subparsers, "gradients")
 
     subparsers.add_parser(
         "pull",
@@ -408,6 +411,9 @@ def run():
     if command is None:
         parser.print_help()
         parser.exit()
+    if command in WRAPPED:
+        # directly call external package and exit on completion or failure
+        call(command, args)
     reordered_args = []
     option_value_setting = False
     for i, arg in enumerate(args.copy()):
