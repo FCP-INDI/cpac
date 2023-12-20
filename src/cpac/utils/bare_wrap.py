@@ -36,14 +36,20 @@ class ScriptInfo(TypedDict):
     """Info needed for bare package wrapping."""
 
     command: str
+    """The command to run."""
     helpstring: Optional[str]
+    """The original usage string."""
+    positional_arguments: bool
+    """Whether the original command takes positional arguments."""
     url: str
+    """The URL to the wrapped package's documentation."""
 
 
 _SCRIPTS: Dict[str, ScriptInfo] = {
     "gradients": {
         "command": "ba_timeseries_gradients",
         "helpstring": None,
+        "positional_arguments": True,
         "url": "https://cmi-dair.github.io/ba-timeseries-gradients/ba_timeseries_gradients.html",
     }
 }
@@ -57,6 +63,7 @@ class WrappedBare:
     name: str
     command: str
     _helpstring: Optional[str]
+    positional_arguments: bool
     url: str
 
     @property
@@ -210,6 +217,7 @@ def get_wrapped(name: str) -> WrappedBare:
                 name,
                 _SCRIPTS[name]["command"],
                 _SCRIPTS[name]["helpstring"],
+                _SCRIPTS[name]["positional_arguments"],
                 _SCRIPTS[name]["url"],
             )
         else:

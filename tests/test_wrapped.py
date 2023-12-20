@@ -19,6 +19,17 @@ def _remove_whitespace(captured):
 
 
 @mark.parametrize("command", _SCRIPTS.keys())
+def test_call(capfd, command):
+    """Check that call is performed in bare-wrapped package."""
+    wrapped = get_wrapped(command)
+    call(["cpac", wrapped.name])
+    output = _join_captured(capfd.readouterr())
+    if wrapped.positional_arguments:
+        assert wrapped.command in output
+        assert "error" in output.lower() and "arguments" in output.lower()
+
+
+@mark.parametrize("command", _SCRIPTS.keys())
 def test_usage_string(capfd, command):
     """Check that usage string is passed through from wrapped package."""
     wrapped = get_wrapped(command)
