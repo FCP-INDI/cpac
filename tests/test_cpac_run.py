@@ -47,8 +47,10 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
         with mock.patch.object(sys, "argv", argv):
             run()
             possibilities = _where_to_find_runlogs(wd)
-            assert any(date.today().isoformat() in fp for fp in possibilities), (
-                f"wd: {wd}\n" f"expected log not found in {possibilities}\n"
+            datestamp = date.today().isoformat()
+            assert any(datestamp in fp for fp in possibilities), (
+                f"wd: {wd}\n"
+                f"expected log ({datestamp}) not found in {possibilities}\n"
             )
 
     wd = tmp_path  # pylint: disable=invalid-name
