@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Wrap another Python package without any modifications."""
-from argparse import REMAINDER, ArgumentParser, _SubParsersAction
+from argparse import _SubParsersAction, ArgumentParser, HelpFormatter, REMAINDER
 from dataclasses import dataclass
-from logging import ERROR, WARNING, log
+from logging import ERROR, log, WARNING
 from shutil import which
-from subprocess import CalledProcessError, call as sub_call
+from subprocess import call as sub_call, CalledProcessError
 from sys import exit as sys_exit, version_info
 from typing import Any, Literal, Optional, TypedDict
 
@@ -40,6 +40,16 @@ class ScriptInfo(TypedDict):
     url: str
 
 
+_SCRIPTS: Dict[str, ScriptInfo] = {
+    "gradients": {
+        "command": "ba_timeseries_gradients",
+        "helpstring": None,
+        "url": "https://cmi-dair.github.io/ba-timeseries-gradients/ba_timeseries_gradients.html",
+    }
+}
+"""Info needed for bare package wrapping."""
+
+
 @dataclass
 class WrappedBare:
     """Info needed for bare package wrapping."""
@@ -53,8 +63,16 @@ class WrappedBare:
     def helpstring(self):
         """Get the helpstring."""
         if self._helpstring is None:
-            return f"Extra script {self.command} not found. See {self.url} for more information, or run `pip install cpac[{self.name}]` to install it."
-        return self._helpstring
+            self._helpstring = f"Extra script {self.command} not found. See {self.url} for more information, or run `pip install cpac[{self.name}]` to install it."
+        return self._helpstring.replace(f"usage: {self.command}", f"cpac {self.name}")
+
+
+class WrappedHelpFormatter(HelpFormatter):
+    """HelpFormatter that wraps the usage string."""
+
+    def add_arguments(self, actions):
+        """Don't add arguments."""
+        pass
 
 
 def add_bare_wrapper(parser: _SubParsersAction, command: str) -> None:
@@ -71,7 +89,10 @@ def add_bare_wrapper(parser: _SubParsersAction, command: str) -> None:
     from cpac.__main__ import ExtendAction
 
     bare_parser: ArgumentParser = parser.add_parser(
-        command, usage=get_wrapped(command).helpstring
+        command,
+        formatter_class=WrappedHelpFormatter,
+        help=f"Run {get_wrapped(command).command}",
+        usage=get_wrapped(command).helpstring,
     )
     bare_parser.add_argument("args", nargs=REMAINDER)
     bare_parser.register("action", "extend", ExtendAction)
@@ -182,25 +203,14 @@ def get_wrapped(name: str) -> WrappedBare:
         The name of the script to run
     """
     if name not in WRAPPED:
-        scripts: Dict[str, ScriptInfo] = {
-            "gradients": {
-                "command": "ba_timeseries_gradients",
-                "helpstring": None,
-                "url": "https://cmi-dair.github.io/ba-timeseries-gradients/ba_timeseries_gradients.html",
-            }
-        }
         if gradients_parser is not None:
-            scripts["gradients"]["helpstring"] = (
-                gradients_parser()
-                .format_help()
-                .replace("usage: ba_timeseries_gradients", "cpac gradients")
-            )
-        if name in scripts:
+            _SCRIPTS["gradients"]["helpstring"] = gradients_parser().format_help()
+        if name in _SCRIPTS:
             WRAPPED[name] = WrappedBare(
                 name,
-                scripts[name]["command"],
-                scripts[name]["helpstring"],
-                scripts[name]["url"],
+                _SCRIPTS[name]["command"],
+                _SCRIPTS[name]["helpstring"],
+                _SCRIPTS[name]["url"],
             )
         else:
             raise KeyError(f"Package {name} not defined in scripts")

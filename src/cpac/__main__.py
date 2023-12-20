@@ -12,13 +12,16 @@ from docker.errors import DockerException, NotFound
 
 from cpac import __version__
 from cpac.backends import Backends
-from cpac.helpers import TODOs, cpac_parse_resources as parse_resources
-from cpac.utils.bare_wrap import WRAPPED, add_bare_wrapper, call
+from cpac.helpers import cpac_parse_resources as parse_resources, TODOs
+from cpac.utils.bare_wrap import add_bare_wrapper, call, WRAPPED
 
 _logger = logging.getLogger(__name__)
 
-# commandline arguments to pass into container after `--`:
-clargs = {"group", "utils"}
+
+_CLARGS: set = {"group", "utils"}
+"""commandline arguments to pass into container after `--`"""
+_HELP_CALL: bool = "--help" in sys.argv or "-h" in sys.argv
+"""whether the helpstring is being called"""
 
 
 class ExtendAction(argparse.Action):
@@ -172,10 +175,9 @@ def _parser():
         "version", add_help=True, help="Print the version of C-PAC that cpac is using."
     )
 
-    help_call = "--help" in sys.argv or "-h" in sys.argv
     # run_parser.add_argument('--address', action='store', type=address)
 
-    if not help_call:
+    if not _HELP_CALL:
         # These positional arguments are required unless we're just getting
         # the helpstring
         run_parser.add_argument("bids_dir")
@@ -354,7 +356,7 @@ def main(args):
     elif args.command in ["pull", "upgrade"]:
         Backends(**arg_vars).pull(force=True, **arg_vars)
 
-    elif args.command in clargs:
+    elif args.command in _CLARGS:
         # utils doesn't have '-h' flag for help
         if args.command == "utils" and "-h" in arg_vars.get("extra_args", []):
             arg_vars["extra_args"] = [
@@ -412,8 +414,9 @@ def run():
         parser.print_help()
         parser.exit()
     if command in WRAPPED:
-        # directly call external package and exit on completion or failure
-        call(command, args)
+        if not _HELP_CALL:
+            # directly call external package and exit on completion or failure
+            call(command, args)
     reordered_args = []
     option_value_setting = False
     for i, arg in enumerate(args.copy()):
