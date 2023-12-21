@@ -36,7 +36,10 @@ docker = ">=4.2.1"
 dockerpty = "*"
 docker-pycreds = "*"
 importlib_metadata = {version = "*", markers = "python_version < '3.8'"}
-pandas = ">=0.23.4"
+pandas = [
+  {version = ">=0.23.4"},
+  {version = "<2.1", markers = "extra == 'tsconcat'"}
+]
 poetry = "*"
 pyyaml = "*"
 rich = "*"
