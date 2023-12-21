@@ -33,7 +33,7 @@ Usage
     usage: cpac [-h] [--version] [-o OPT] [-B CUSTOM_BINDING]
                 [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
                 [--working_dir PATH] [-v] [-vv]
-                {run,utils,version,group,pull,upgrade,enter,bash,shell,parse-resources,parse_resources,crash}
+                {run,utils,version,group,gradients,pull,upgrade,enter,bash,shell,parse-resources,parse_resources,crash}
                 ...
     
     cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io> containerized images. 
@@ -68,7 +68,7 @@ Usage
     - https://github.com/FCP-INDI/cpac/issues
     
     positional arguments:
-      {run,utils,version,group,pull,upgrade,enter,bash,shell,parse-resources,parse_resources,crash}
+      {run,utils,version,group,gradients,pull,upgrade,enter,bash,shell,parse-resources,parse_resources,crash}
         run                 Run C-PAC. See
                             "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] run --help"
                             for more information.
@@ -79,6 +79,7 @@ Usage
         group               Run a group level analysis in C-PAC. See
                             "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] group --help"
                             for more information.
+        gradients           Run ba_timeseries_gradients
         pull (upgrade)      Upgrade your local C-PAC version to the latest version
                             by pulling from Docker Hub or other repository.
                             Use with "--image" and/or "--tag" to specify an image
