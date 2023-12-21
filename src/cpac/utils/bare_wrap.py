@@ -4,11 +4,11 @@
 from argparse import _SubParsersAction, ArgumentParser, HelpFormatter, REMAINDER
 from dataclasses import dataclass
 from importlib.metadata import requires
-from logging import ERROR, log, WARNING
+from logging import ERROR, log
 from shutil import which
 from subprocess import call as sub_call, CalledProcessError
 from sys import exit as sys_exit, version_info
-from typing import Any, Literal, Optional, TypedDict
+from typing import Optional, TypedDict
 
 if version_info.minor < 9:  # noqa: PLR2004
     from typing import Dict, List
@@ -161,54 +161,6 @@ def call(name: str, command: list) -> None:
 def check_for_package(package_name: str) -> bool:
     """Check if a package is installed."""
     return which(package_name) is not None
-
-
-def get_nested(
-    dct: dict, keys: list, error: Literal["raise", "warn", None] = "raise"
-) -> Any:
-    """Get a nested dictionary value.
-
-    Parameters
-    ----------
-    dct : dict
-        The dictionary to search
-
-    keys : Iterable
-        The keys to search for
-
-    error : Literal['raise', 'warn', None]
-        How to handle errors:
-        'raise' : raise an error
-        'warn' : log a warning and return None
-        None : return None without a warning
-
-    Returns
-    -------
-    Any
-        The value of the nested key or None
-
-    Examples
-    --------
-    >>> dct = {'a': {'b': {'c': 1}}}
-    >>> get_nested(dct, ['a', 'b', 'c'])
-    1
-    >>> get_nested(dct, ['a', 'b', 'd'])
-    Traceback (most recent call last):
-    ...
-    KeyError: 'd'
-    >>> get_nested(dct, ['a', 'b', 'd'], error=None) is None
-    True
-    """
-    key = keys.pop(0)
-    if key in dct:
-        if len(keys) == 0:
-            return dct[key]
-        return get_nested(dct[key], keys, error)
-    if error == "raise":
-        return dct[key]
-    if error == "warn":
-        log(WARNING, "Key %s not found in %s", key, dct)
-    return None
 
 
 def get_wrapped(name: str) -> WrappedBare:
