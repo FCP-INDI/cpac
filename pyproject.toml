@@ -54,11 +54,13 @@ pytest-cov = {version = "*", optional = true}
 pytest-remotedata = {version = ">=0.3.2", optional = true}
 pytest-runner = {version = "*", optional = true}
 sphinx = {version = "*", optional = true}
+tsconcat = {git = "https://github.com/cmi-dair/tsconcat.git", optional = true, markers = "python_version >= '3.11' and python_version < '4.0'"}
 
 [tool.poetry.extras]
 dev = ["coveralls", "pytest", "pytest-remotedata", "pytest-runner", "sphinx"]
 gradients = ["ba_timeseries_gradients"]
 testing = ["alabaster", "imagesize", "pytest", "pytest-cov", "pytest-runner", "sphinx"]
+tsconcat = ["tsconcat"]
 
 [tool.poetry.scripts]
 cpac = "cpac.__main__:run"
