@@ -63,7 +63,12 @@ if build_bidsapp_group_parser is not None:
         default=False,
     )
 
-_PARSERS = {"gradients": gradients_parser(), "tsconcat": tsconcat_parser}
+_PARSERS = {
+    "gradients": gradients_parser()
+    if gradients_parser is not None
+    else gradients_parser,
+    "tsconcat": tsconcat_parser,
+}
 """CLI parsers for wrapped packages"""
 WRAPPED = {}
 """memoization of wrapped packages"""
