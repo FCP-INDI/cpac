@@ -16,12 +16,8 @@ from cpac.helpers import cpac_parse_resources as parse_resources, TODOs
 from cpac.utils.bare_wrap import add_bare_wrapper, call, WRAPPED
 
 _logger = logging.getLogger(__name__)
-
-
 _CLARGS: set = {"group", "utils"}
 """commandline arguments to pass into container after `--`"""
-_HELP_CALL: bool = "--help" in sys.argv or "-h" in sys.argv
-"""whether the helpstring is being called"""
 
 
 class ExtendAction(argparse.Action):
@@ -35,6 +31,11 @@ def address(str_addy):
     addr, port = str_addy.split(":")
     port = int(port)
     return addr, port
+
+
+def help_call(argument_list: list) -> bool:
+    """Check if the helpstring is being called."""
+    return "--help" in argument_list or "-h" in argument_list
 
 
 def _parser():
@@ -177,7 +178,7 @@ def _parser():
 
     # run_parser.add_argument('--address', action='store', type=address)
 
-    if not _HELP_CALL:
+    if not help_call(sys.argv):
         # These positional arguments are required unless we're just getting
         # the helpstring
         run_parser.add_argument("bids_dir")
@@ -197,7 +198,8 @@ def _parser():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
-    add_bare_wrapper(subparsers, "gradients")
+    for bare_package in ["gradients"]:
+        add_bare_wrapper(subparsers, bare_package)
 
     subparsers.add_parser(
         "pull",
@@ -414,7 +416,7 @@ def run():
         parser.print_help()
         parser.exit()
     if command in WRAPPED:
-        if not _HELP_CALL:
+        if not help_call(args):
             # directly call external package and exit on completion or failure
             call(command, args)
     reordered_args = []
