@@ -1,11 +1,19 @@
 from .checks import check_version_at_least
-from .utils import get_project_root, LocalsToBind, PermissionMode, Volume, Volumes
+from .utils import (
+    INTERVAL_CHECKS,
+    LocalsToBind,
+    PermissionMode,
+    version_tuple,
+    Volume,
+    Volumes,
+)
 
 __all__ = [
     "check_version_at_least",
-    "get_project_root",
+    "INTERVAL_CHECKS",
     "LocalsToBind",
     "PermissionMode",
+    "version_tuple",
     "Volume",
     "Volumes",
 ]

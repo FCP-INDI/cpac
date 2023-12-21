@@ -3,6 +3,7 @@
 """Wrap another Python package without any modifications."""
 from argparse import _SubParsersAction, ArgumentParser, HelpFormatter, REMAINDER
 from dataclasses import dataclass
+from importlib.metadata import requires
 from logging import ERROR, log, WARNING
 from shutil import which
 from subprocess import call as sub_call, CalledProcessError
@@ -10,23 +11,19 @@ from sys import exit as sys_exit, version_info
 from typing import Any, Literal, Optional, TypedDict
 
 if version_info.minor < 9:  # noqa: PLR2004
-    from typing import Dict
+    from typing import Dict, List
 else:
     Dict = dict  # type: ignore
+    List = list  # type: ignore
 
-from packaging.markers import Marker
-
-try:
-    import tomllib
-except (ImportError, ModuleNotFoundError):
-    import toml
+from packaging.requirements import Requirement
 
 try:
     from ba_timeseries_gradients.parser import get_parser as gradients_parser
 except (ImportError, ModuleNotFoundError):
     gradients_parser = None
 
-from cpac.utils import get_project_root
+from cpac.utils import INTERVAL_CHECKS, version_tuple
 
 WRAPPED = {}
 """memoization of wrapped packages"""
@@ -41,6 +38,8 @@ class ScriptInfo(TypedDict):
     """The original usage string."""
     positional_arguments: bool
     """Whether the original command takes positional arguments."""
+    supported_python: str
+    """Constraints for supported Python versions in interval notation."""
     url: str
     """The URL to the wrapped package's documentation."""
 
@@ -50,6 +49,7 @@ _SCRIPTS: Dict[str, ScriptInfo] = {
         "command": "ba_timeseries_gradients",
         "helpstring": None,
         "positional_arguments": True,
+        "supported_python": "[3.11, 3.12)",
         "url": "https://cmi-dair.github.io/ba-timeseries-gradients/ba_timeseries_gradients.html",
     }
 }
@@ -61,17 +61,37 @@ class WrappedBare:
     """Info needed for bare package wrapping."""
 
     name: str
+    """The cpac command string."""
     command: str
+    """The wrapped command."""
     _helpstring: Optional[str]
+    """The original usage string."""
     positional_arguments: bool
+    """Whether the original command takes positional arguments."""
+    supported_python_range: str
+    """Constraints for supported Python versions in interval notation."""
     url: str
+    """The URL to the wrapped package's documentation."""
 
     @property
     def helpstring(self):
         """Get the helpstring."""
         if self._helpstring is None:
-            self._helpstring = f"Extra script {self.command} not found. See {self.url} for more information, or run `pip install cpac[{self.name}]` to install it."
+            if not self.supported_python:
+                self._helpstring = f"Extra command '{self.name}' not supported on Python {f'{version_info.major}.{version_info.minor}.{ version_info.micro}'}; supported Python versions range is {self.supported_python_range}.\n\nSee {self.url} for more information and system requirements."
+            else:
+                self._helpstring = f"Extra script {self.command} not found. See {self.url} for more information and system requirements, or run `pip install cpac[{self.name}]` to try to install it."
         return self._helpstring.replace(f"usage: {self.command}", f"cpac {self.name}")
+
+    @property
+    def supported_python(self):
+        """Whether the wrapped package supports the current Python version."""
+        py_min, py_max = [_.strip() for _ in self.supported_python_range.split(",")]
+        return getattr(version_info, INTERVAL_CHECKS[py_min[0]])(
+            version_tuple(py_min[1:])
+        ) and getattr(version_info, INTERVAL_CHECKS[py_max[-1]])(
+            version_tuple(py_max[:-1])
+        )
 
 
 class WrappedHelpFormatter(HelpFormatter):
@@ -116,25 +136,20 @@ def call(name: str, command: list) -> None:
     command : list
         The command to run
     """
-    if version_info.minor < 11:  # noqa: PLR2004
-        pyproject = toml.load(get_project_root() / "pyproject.toml")
-    else:
-        with open(get_project_root() / "pyproject.toml", "rb") as _f:
-            pyproject = tomllib.load(_f)
     script = get_wrapped(name)
+    cpac_requires = requires("cpac") or []
+    _requirements: List[Requirement] = [Requirement(req) for req in cpac_requires]
+    requirements: Dict[str, Requirement] = {req.name: req for req in _requirements}
+    del _requirements
     try:
-        package_info = get_nested(
-            pyproject, ["tool", "poetry", "dependencies", script.command]
-        )
+        package_info = requirements[script.command]
     except KeyError as ke:
         raise KeyError(f"Package {name} not defined in dependencies") from ke
-    marker = Marker(package_info["marker"]) if "marker" in package_info else None
-    if marker and marker.evaluate() is False:
+    marker = getattr(package_info, "marker", None)
+    if marker and marker.evaluate({"extra": name}) is False:
         raise EnvironmentError(
             f"Current environment does not meet requirements ({marker}) for package {name}"
         )
-    if not check_for_package(script.command):
-        sub_call(["poetry", "install", "--extras", name], cwd=get_project_root())
     try:
         sub_call([script.command, *command])
     except CalledProcessError as cpe:
@@ -218,6 +233,7 @@ def get_wrapped(name: str) -> WrappedBare:
                 _SCRIPTS[name]["command"],
                 _SCRIPTS[name]["helpstring"],
                 _SCRIPTS[name]["positional_arguments"],
+                _SCRIPTS[name]["supported_python"],
                 _SCRIPTS[name]["url"],
             )
         else:

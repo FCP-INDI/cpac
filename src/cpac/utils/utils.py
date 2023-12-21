@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from itertools import permutations
 import os
-from pathlib import Path
 from typing import ClassVar, Iterator, Optional, Set, Union
 from warnings import warn
 
@@ -10,10 +9,7 @@ import yaml
 
 from cpac import DIST_NAME
 
-
-def get_project_root() -> Path:
-    """Get project root directory."""
-    return Path(__file__).parents[3]
+INTERVAL_CHECKS = {"[": "__ge__", "]": "__le__", "(": "__gt__", ")": "__lt__"}
 
 
 class LocalsToBind:
@@ -192,6 +188,11 @@ class PermissionMode:
             )
             return True
         return False
+
+
+def version_tuple(version: str) -> tuple:
+    """Convert version string to tuple."""
+    return tuple(int(v) for v in version.split("."))
 
 
 class Volume:
