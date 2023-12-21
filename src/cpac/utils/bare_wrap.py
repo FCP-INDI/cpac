@@ -186,7 +186,7 @@ def add_bare_wrapper(parser: _SubParsersAction, command: str) -> None:
     bare_parser: ArgumentParser = parser.add_parser(
         command,
         formatter_class=WrappedHelpFormatter,
-        help=f"Run {get_wrapped(command).package}",
+        help=f"Run {get_wrapped(command).command}",
         usage=get_wrapped(command).helpstring,
     )
     bare_parser.add_argument("args", nargs=REMAINDER)
