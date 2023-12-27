@@ -31,20 +31,25 @@ repository = "https://github.com/FCP-INDI/cpac"
 version = "1.8.5.dev1"
 
 [tool.poetry.dependencies]
-python = ">=3.7"
+python = ">=3.8"
 docker = ">=4.2.1"
 dockerpty = "*"
 docker-pycreds = "*"
 importlib_metadata = {version = "*", markers = "python_version < '3.8'"}
-pandas = ">=0.23.4"
-spython = ">=0.0.81"
+pandas = [
+  {version = ">=0.23.4"},
+  {version = "<2.1", markers = "extra == 'tsconcat'"}
+]
+poetry = "*"
 pyyaml = "*"
 rich = "*"
 semver = "*"
+spython = ">=0.0.81"
 tabulate = ">=0.8.6"
 tornado = "*"
 websocket-client = "*"
 alabaster = {version = "*", optional = true}
+ba_timeseries_gradients = {git = "https://github.com/cmi-dair/ba-timeseries-gradients.git", optional = true, markers = "python_version >= '3.11' and python_version < '3.12'"}
 coveralls = {version = "*", optional = true}
 imagesize = {version = "*", optional = true}
 pytest = {version = "*", optional = true}
@@ -52,10 +57,13 @@ pytest-cov = {version = "*", optional = true}
 pytest-remotedata = {version = ">=0.3.2", optional = true}
 pytest-runner = {version = "*", optional = true}
 sphinx = {version = "*", optional = true}
+tsconcat = {git = "https://github.com/cmi-dair/tsconcat.git", optional = true, markers = "python_version >= '3.11' and python_version < '4.0'"}
 
 [tool.poetry.extras]
 dev = ["coveralls", "pytest", "pytest-remotedata", "pytest-runner", "sphinx"]
+gradients = ["ba_timeseries_gradients"]
 testing = ["alabaster", "imagesize", "pytest", "pytest-cov", "pytest-runner", "sphinx"]
+tsconcat = ["tsconcat"]
 
 [tool.poetry.scripts]
 cpac = "cpac.__main__:run"
@@ -75,34 +83,22 @@ testpaths = ["tests"]
 [tool.ruff]
 extend-exclude = ["docs/conf.py"]
 extend-select = ["A", "C4", "D", "G", "I", "ICN", "NPY", "PL", "RET", "RSE", "RUF", "Q", "W"]
-target-version = "py37"
-
-[tool.ruff.lint.per-file-ignores]
-"CPAC/func_preproc/func_preproc.py" = ["E402"]
-
-[tool.ruff.lint.flake8-import-conventions.extend-aliases]
-"CPAC.pipeline.cpac_group_runner" = "cgr"
-"nibabel" = "nib"
-"nipype.interfaces.io" = "nio"
-"networkx" = "nx"
-"pkg_resources" = "p"
-"CPAC.pipeline.nipype_pipeline_engine" = "pe"
+target-version = "py38"
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
 force-sort-within-sections = true
-known-first-party = ["CPAC"]
+known-first-party = ["cpac"]
 no-lines-before = ["collab", "other-first-party", "local-folder"]
-order-by-type = true
+order-by-type = false
 section-order = ["future", "standard-library", "third-party", "collab", "other-first-party", "first-party", "local-folder"]
 
 [tool.ruff.lint.isort.sections]
-"collab" = ["nibabel", "nilearn", "nipype", "PyBASC", "pybids", "scipy", "spython"]
-"other-first-party" = ["flowdump", "indi_aws", "indi_schedulers", "PyPEER"]
+"collab" = ["nipype", "spython"]
+"other-first-party" = ["ba_timeseries_gradients"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
-ignore-decorators = ["CPAC.utils.docs.docstring_parameter"]
 
 [tool.ruff.lint.pylint]
 max-args = 10

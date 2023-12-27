@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Init file for cpac."""
 try:
-    from importlib.metadata import PackageNotFoundError, distribution
+    from importlib.metadata import distribution, PackageNotFoundError
 except ModuleNotFoundError:
-    from importlib_metadata import PackageNotFoundError, distribution
+    from importlib_metadata import distribution, PackageNotFoundError  # type: ignore
 
 DIST_NAME = __name__
 try:
