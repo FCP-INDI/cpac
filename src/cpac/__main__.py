@@ -198,7 +198,7 @@ def _parser():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
-    for bare_package in ["gradients"]:
+    for bare_package in ["gradients", "tsconcat"]:
         add_bare_wrapper(subparsers, bare_package)
 
     subparsers.add_parser(

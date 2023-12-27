@@ -36,7 +36,10 @@ docker = ">=4.2.1"
 dockerpty = "*"
 docker-pycreds = "*"
 importlib_metadata = {version = "*", markers = "python_version < '3.8'"}
-pandas = ">=0.23.4"
+pandas = [
+  {version = ">=0.23.4"},
+  {version = "<2.1", markers = "extra == 'tsconcat'"}
+]
 poetry = "*"
 pyyaml = "*"
 rich = "*"
@@ -54,11 +57,13 @@ pytest-cov = {version = "*", optional = true}
 pytest-remotedata = {version = ">=0.3.2", optional = true}
 pytest-runner = {version = "*", optional = true}
 sphinx = {version = "*", optional = true}
+tsconcat = {git = "https://github.com/cmi-dair/tsconcat.git", optional = true, markers = "python_version >= '3.11' and python_version < '4.0'"}
 
 [tool.poetry.extras]
 dev = ["coveralls", "pytest", "pytest-remotedata", "pytest-runner", "sphinx"]
 gradients = ["ba_timeseries_gradients"]
 testing = ["alabaster", "imagesize", "pytest", "pytest-cov", "pytest-runner", "sphinx"]
+tsconcat = ["tsconcat"]
 
 [tool.poetry.scripts]
 cpac = "cpac.__main__:run"
