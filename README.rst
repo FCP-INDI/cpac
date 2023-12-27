@@ -10,7 +10,11 @@ A Python package that wraps `C-PAC <http://fcp-indi.github.io>`_, enabling users
 Description
 ===========
 
-C-PAC Python Package is a lightweight Python package that handles interfacing a user's machine and a C-PAC container through a command line interface.
+cpac Python Package is a lightweight Python package that handles interfacing a user's machine and a C-PAC container through a command line interface.
+
+.. admonition:: Note about cpac versioning
+
+    This package's versioning scheme changed in version 1.8.5 to match C-PAC's versioning. From cpac v1.8.5 forward, the version of cpac indicates the newest supported version of C-PAC.
 
 Dependencies
 ============
