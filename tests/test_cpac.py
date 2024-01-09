@@ -4,10 +4,10 @@ from io import BytesIO, StringIO, TextIOWrapper
 import sys
 from unittest import mock
 
-import pytest
-
 from cpac.__main__ import run
 from cpac.backends import Backends
+import pytest
+
 from .CONSTANTS import set_commandline_args
 
 

@@ -1,14 +1,13 @@
-"""Test actually running C-PAC with cpac."""
-from datetime import date, timedelta
+from datetime import date
 import os
 from pathlib import Path
 import sys
 from unittest import mock
 
-import pytest
-
 from cpac.__main__ import run
 from cpac.utils import check_version_at_least
+import pytest
+
 from .CONSTANTS import args_before_after, set_commandline_args
 
 MINIMAL_CONFIG = os.path.join(os.path.dirname(__file__), "test_data", "minimal.min.yml")
@@ -17,8 +16,6 @@ MINIMAL_CONFIG = os.path.join(os.path.dirname(__file__), "test_data", "minimal.m
 @pytest.mark.parametrize("helpflag", ["--help", "-h"])
 @pytest.mark.parametrize("argsep", [" ", "="])
 def test_run_help(argsep, capsys, helpflag, platform, tag):
-    """Test 'help' run command."""
-
     def run_test(argv):
         argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, "argv", argv):
@@ -50,20 +47,8 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
         with mock.patch.object(sys, "argv", argv):
             run()
             possibilities = _where_to_find_runlogs(wd)
-            today = date.today()
-            datestamps = [
-                _date.isoformat()
-                for _date in [
-                    today,
-                    today - timedelta(days=1),
-                    today + timedelta(days=1),
-                ]
-            ]
-            assert any(
-                datestamp in fp for fp in possibilities for datestamp in datestamps
-            ), (
-                f"wd: {wd}\n"
-                f"expected log ({datestamps[0]} ± 1 day) not found in {possibilities}\n"
+            assert any(date.today().isoformat() in fp for fp in possibilities), (
+                f"wd: {wd}\n" f"expected log not found in {possibilities}\n"
             )
 
     wd = tmp_path  # pylint: disable=invalid-name

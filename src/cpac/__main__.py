@@ -12,12 +12,12 @@ from docker.errors import DockerException, NotFound
 
 from cpac import __version__
 from cpac.backends import Backends
-from cpac.helpers import cpac_parse_resources as parse_resources, TODOs
-from cpac.utils.bare_wrap import add_bare_wrapper, call, WRAPPED
+from cpac.helpers import TODOs, cpac_parse_resources as parse_resources
 
 _logger = logging.getLogger(__name__)
-_CLARGS: set = {"group", "utils"}
-"""commandline arguments to pass into container after `--`"""
+
+# commandline arguments to pass into container after `--`:
+clargs = {"group", "utils"}
 
 
 class ExtendAction(argparse.Action):
@@ -31,11 +31,6 @@ def address(str_addy):
     addr, port = str_addy.split(":")
     port = int(port)
     return addr, port
-
-
-def help_call(argument_list: list) -> bool:
-    """Check if the helpstring is being called."""
-    return "--help" in argument_list or "-h" in argument_list
 
 
 def _parser():
@@ -176,9 +171,10 @@ def _parser():
         "version", add_help=True, help="Print the version of C-PAC that cpac is using."
     )
 
+    help_call = "--help" in sys.argv or "-h" in sys.argv
     # run_parser.add_argument('--address', action='store', type=address)
 
-    if not help_call(sys.argv):
+    if not help_call:
         # These positional arguments are required unless we're just getting
         # the helpstring
         run_parser.add_argument("bids_dir")
@@ -197,9 +193,6 @@ def _parser():
         '--help"\nfor more information.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-
-    for bare_package in ["gradients", "tsconcat"]:
-        add_bare_wrapper(subparsers, bare_package)
 
     subparsers.add_parser(
         "pull",
@@ -358,7 +351,7 @@ def main(args):
     elif args.command in ["pull", "upgrade"]:
         Backends(**arg_vars).pull(force=True, **arg_vars)
 
-    elif args.command in _CLARGS:
+    elif args.command in clargs:
         # utils doesn't have '-h' flag for help
         if args.command == "utils" and "-h" in arg_vars.get("extra_args", []):
             arg_vars["extra_args"] = [
@@ -415,10 +408,6 @@ def run():
     if command is None:
         parser.print_help()
         parser.exit()
-    if command in WRAPPED:
-        if not help_call(args):
-            # directly call external package and exit on completion or failure
-            call(command, args)
     reordered_args = []
     option_value_setting = False
     for i, arg in enumerate(args.copy()):

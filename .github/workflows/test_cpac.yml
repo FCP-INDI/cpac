@@ -22,7 +22,7 @@ jobs:
         platform: [docker]
         tag: [latest, nightly]
         go: [1.14]
-        python: [3.8, 3.9, '3.10', 3.11, 3.12]
+        python: [3.7, 3.8, 3.9, '3.10', 3.11]
         singularity: [3.6.4]
 
     steps:
@@ -46,7 +46,7 @@ jobs:
       if: ${{ matrix.platform == 'singularity' }}
       run: mkdir -p ${SINGULARITY_CACHEDIR} && mkdir -p ${SINGULARITY_TMPDIR}
     - name: Install cpac
-      run: cd $GITHUB_WORKSPACE && pip install -e ".[dev,gradients,testing,tsconcat]"
+      run: cd $GITHUB_WORKSPACE && pip install -e ".[dev,testing]"
     - name: Test cpac, platform and tag specified
       run: |
         coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .

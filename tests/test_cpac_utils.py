@@ -2,9 +2,9 @@ import os
 import sys
 from unittest import mock
 
+from cpac.__main__ import run
 import pytest
 
-from cpac.__main__ import run
 from .CONSTANTS import args_before_after, set_commandline_args
 
 
