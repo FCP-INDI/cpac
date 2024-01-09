@@ -103,7 +103,7 @@ _SCRIPTS: Dict[str, ScriptInfo] = {
     "tsconcat": {
         "command": "ba-tsconcat",
         "helpstring": None,
-        "package": "tsconcat",
+        "package": "ba-tsconcat",
         "positional_arguments": True,
         "supported_python": "[3.11, 4.0)",
         "url": "https://cmi-dair.github.io/tsconcat/tsconcat.html",
