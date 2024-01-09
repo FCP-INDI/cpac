@@ -12,12 +12,11 @@ from docker.errors import DockerException, NotFound
 
 from cpac import __version__
 from cpac.backends import Backends
-from cpac.helpers import TODOs, cpac_parse_resources as parse_resources
+from cpac.helpers import cpac_parse_resources as parse_resources, TODOs
 
 _logger = logging.getLogger(__name__)
-
-# commandline arguments to pass into container after `--`:
-clargs = {"group", "utils"}
+_CLARGS: set = {"group", "utils"}
+"""commandline arguments to pass into container after `--`"""
 
 
 class ExtendAction(argparse.Action):
@@ -31,6 +30,11 @@ def address(str_addy):
     addr, port = str_addy.split(":")
     port = int(port)
     return addr, port
+
+
+def help_call(argument_list: list) -> bool:
+    """Check if the helpstring is being called."""
+    return "--help" in argument_list or "-h" in argument_list
 
 
 def _parser():
@@ -171,10 +175,9 @@ def _parser():
         "version", add_help=True, help="Print the version of C-PAC that cpac is using."
     )
 
-    help_call = "--help" in sys.argv or "-h" in sys.argv
     # run_parser.add_argument('--address', action='store', type=address)
 
-    if not help_call:
+    if not help_call(sys.argv):
         # These positional arguments are required unless we're just getting
         # the helpstring
         run_parser.add_argument("bids_dir")
@@ -351,7 +354,7 @@ def main(args):
     elif args.command in ["pull", "upgrade"]:
         Backends(**arg_vars).pull(force=True, **arg_vars)
 
-    elif args.command in clargs:
+    elif args.command in _CLARGS:
         # utils doesn't have '-h' flag for help
         if args.command == "utils" and "-h" in arg_vars.get("extra_args", []):
             arg_vars["extra_args"] = [
