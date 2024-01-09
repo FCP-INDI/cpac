@@ -28,7 +28,7 @@ classifiers = [
 documentation = "https://fcp-indi.github.io/docs/latest/user/cpac"
 readme = "README.rst"
 repository = "https://github.com/FCP-INDI/cpac"
-version = "1.8.5.dev1"
+version = "1.8.5.dev2"
 
 [tool.poetry.dependencies]
 python = ">=3.8"
@@ -50,6 +50,7 @@ tornado = "*"
 websocket-client = "*"
 alabaster = {version = "*", optional = true}
 ba_timeseries_gradients = {git = "https://github.com/cmi-dair/ba-timeseries-gradients.git", optional = true, markers = "python_version >= '3.11' and python_version < '3.12'"}
+ba-tsconcat = {version = "*", optional = true, markers = "python_version >= '3.11' and python_version < '4.0'"}
 coveralls = {version = "*", optional = true}
 imagesize = {version = "*", optional = true}
 pytest = {version = "*", optional = true}
@@ -57,13 +58,12 @@ pytest-cov = {version = "*", optional = true}
 pytest-remotedata = {version = ">=0.3.2", optional = true}
 pytest-runner = {version = "*", optional = true}
 sphinx = {version = "*", optional = true}
-tsconcat = {git = "https://github.com/cmi-dair/tsconcat.git", optional = true, markers = "python_version >= '3.11' and python_version < '4.0'"}
 
 [tool.poetry.extras]
 dev = ["coveralls", "pytest", "pytest-remotedata", "pytest-runner", "sphinx"]
 gradients = ["ba_timeseries_gradients"]
 testing = ["alabaster", "imagesize", "pytest", "pytest-cov", "pytest-runner", "sphinx"]
-tsconcat = ["tsconcat"]
+tsconcat = ["ba-tsconcat"]
 
 [tool.poetry.scripts]
 cpac = "cpac.__main__:run"
