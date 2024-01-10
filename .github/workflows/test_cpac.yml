@@ -7,7 +7,6 @@ on:
   push:
     paths-ignore:
     - README.rst
-  pull_request:
 
 jobs:
   test_cpac:
