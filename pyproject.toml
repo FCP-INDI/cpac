@@ -95,7 +95,7 @@ section-order = ["future", "standard-library", "third-party", "collab", "other-f
 
 [tool.ruff.lint.isort.sections]
 "collab" = ["nipype", "spython"]
-"other-first-party" = ["ba_timeseries_gradients"]
+"other-first-party" = ["ba_timeseries_gradients", "tsconcat"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
