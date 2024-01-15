@@ -10,12 +10,16 @@ A Python package that wraps `C-PAC <http://fcp-indi.github.io>`_, enabling users
 Description
 ===========
 
-C-PAC Python Package is a lightweight Python package that handles interfacing a user's machine and a C-PAC container through a command line interface.
+cpac Python Package is a lightweight Python package that handles interfacing a user's machine and a C-PAC container through a command line interface.
+
+.. admonition:: Note about cpac versioning
+
+    This package's versioning scheme changed in version 1.8.5 to match C-PAC's versioning. From cpac v1.8.5 forward, the version of cpac indicates the newest supported version of C-PAC.
 
 Dependencies
 ============
 
-* `Python <https://www.python.org>`_ ≥3.7
+* `Python <https://www.python.org>`_ ≥ 3.8
 * `pip <https://pip.pypa.io>`_
 * At least one of:
 
@@ -86,6 +90,8 @@ Usage
         enter (bash, shell)
                             Enter a new C-PAC container via BASH.
         parse-resources (parse_resources)
+                            .
+                            
                             When provided with a `callback.log` file, this utility can sort through
                             the memory `runtime` usage, `estimate`, and associated `efficiency`, to
                             identify the `n` tasks with the `highest` or `lowest` of each of these
@@ -145,4 +151,3 @@ Usage
 .. |upload| image:: https://github.com/FCP-INDI/cpac/workflows/Upload%20Python%20Package/badge.svg
     :target: https://pypi.org/project/cpac/
     :alt: upload Python package to PyPI
-

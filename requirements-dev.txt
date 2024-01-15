@@ -1,5 +1,0 @@
-coveralls
-pytest
-pytest-remotedata >= 0.3.2
-pytest-runner
-sphinx

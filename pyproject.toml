@@ -1,83 +1,65 @@
 [build-system]
-requires = [
-    "semver",
-    "setuptools>=61.2",
-    "setuptools_scm",
-    "pyyaml",
-]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.aliases]
+build = "poetry build"
+release = "poetry publish"
+test = "pytest"
+
+[tool.devpi.upload]
+no-vcs = "1"
+formats = "bdist_wheel"
+
+[tool.poetry]
 name = "cpac"
 description = "C-PAC Python Package"
-authors = [{name = "C-PAC developers", email = "cpac@cnl.childmind.org"}]
-license = {text = "mit"}
+authors = ["C-PAC developers <cpac@cnl.childmind.org>"]
+license = "MIT"
 classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
-    "Natural Language :: English",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-    "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Bio-Informatics"
 ]
-version = "0.6.0"
-urls = {Homepage = "https://github.com/FCP-INDI/cpac"}
-requires-python = ">=3.7"
-dependencies = [
-    "docker >= 4.2.1",
-    "dockerpty",
-    "docker-pycreds",
-    'importlib; python_version >= "3.8"',
-    'importlib_metadata; python_version < "3.8"',
-    "pandas >= 0.23.4",
-    "spython >= 0.0.81",
-    "pyyaml",
-    "rich",
-    "semver",
-    "tabulate >= 0.8.6",
-    "tornado",
-    "websocket-client",
-]
+documentation = "https://fcp-indi.github.io/docs/latest/user/cpac"
+readme = "README.rst"
+repository = "https://github.com/FCP-INDI/cpac"
+version = "1.8.5.dev1"
 
-[project.readme]
-file = "README.rst"
-content-type = "text/x-rst"
+[tool.poetry.dependencies]
+python = ">=3.8"
+docker = ">=4.2.1"
+dockerpty = "*"
+docker-pycreds = "*"
+importlib_metadata = {version = "*", markers = "python_version < '3.8'"}
+pandas = ">=0.23.4"
+poetry = "*"
+pyyaml = "*"
+rich = "*"
+semver = "*"
+spython = ">=0.0.81"
+tabulate = ">=0.8.6"
+tornado = "*"
+websocket-client = "*"
+alabaster = {version = "*", optional = true}
+coveralls = {version = "*", optional = true}
+imagesize = {version = "*", optional = true}
+pytest = {version = "*", optional = true}
+pytest-cov = {version = "*", optional = true}
+pytest-remotedata = {version = ">=0.3.2", optional = true}
+pytest-runner = {version = "*", optional = true}
+sphinx = {version = "*", optional = true}
 
-[project.optional-dependencies]
-testing = [
-    "alabaster",
-    "imagesize",
-    "pytest",
-    "pytest-cov",
-    "pytest-runne",
-    "sphinx",
-]
+[tool.poetry.extras]
+dev = ["coveralls", "pytest", "pytest-remotedata", "pytest-runner", "sphinx"]
+testing = ["alabaster", "imagesize", "pytest", "pytest-cov", "pytest-runner", "sphinx"]
 
-[project.scripts]
+[tool.poetry.scripts]
 cpac = "cpac.__main__:run"
-
-[tool.setuptools]
-zip-safe = false
-include-package-data = true
-package-dir = {"" = "src"}
-platforms = ["any"]
-
-[tool.setuptools.packages.find]
-where = ["src"]
-exclude = ["tests"]
-namespaces = false
-
-[tool.distutils.test]
-addopts = "--verbose -s"
-extras = true
-
-[tool.distutils.bdist_wheel]
-universal = 1
-
-[tool.distutils.build_sphinx]
-source-dir = "docs"
-build-dir = "docs/_build"
 
 [tool.pytest.ini_options]
 addopts = "-s"
@@ -85,25 +67,38 @@ addopts = "-s"
 # -s
 # --verbose
 norecursedirs = [
-    "dist",
-    "build",
-    ".tox",
+  "dist",
+  "build",
+  ".tox"
 ]
 testpaths = ["tests"]
 
-[tool.aliases]
-build = "bdist_wheel"
-release = "build upload"
-test = "pytest"
+[tool.ruff]
+extend-exclude = ["docs/conf.py"]
+extend-select = ["A", "C4", "D", "G", "I", "ICN", "NPY", "PL", "RET", "RSE", "RUF", "Q", "W"]
+target-version = "py38"
 
-[tool.devpi.upload]
-no-vcs = "1"
-formats = "bdist_wheel"
+[tool.ruff.lint.isort]
+combine-as-imports = true
+force-sort-within-sections = true
+known-first-party = ["cpac"]
+no-lines-before = ["collab", "other-first-party", "local-folder"]
+order-by-type = false
+section-order = ["future", "standard-library", "third-party", "collab", "other-first-party", "first-party", "local-folder"]
 
-[tool.flake8]
-exclude = """
-.tox
-build
-dist
-.eggs
-docs/conf.py"""
+[tool.ruff.lint.isort.sections]
+"collab" = ["nipype", "spython"]
+"other-first-party" = []
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.pylint]
+max-args = 10
+max-branches = 50
+max-returns = 12
+max-statements = 100
+
+[tool.ruff.lint.pyupgrade]
+# Until variants Python ≥ 3.10
+keep-runtime-typing = true
