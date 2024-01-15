@@ -1,11 +1,17 @@
 =========
 Changelog
 =========
-`Version 0.6.0: Support for C-PAC v1.8.5 <https://github.com/FCP-INDI/cpac/releases/tag/v0.6.0>`_
-===============
+
+`Version 1.8.5: Support for C-PAC v1.8.5 <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.5>`_
+=====================================================================================================
+
+* Changes versioning scheme to match supported C-PAC version
 * Handles relocation of default pipeline in C-PAC 1.8.5
 * Fixes a bug preventing default bindings in Mac OS ≥ 10.15
 * Replaces ``setup.cfg`` with ``pyproject.toml``
+* Replaces ``setuptools`` with ``poetry``
+* Adds pre-commit hooks for linting and formatting
+* Require Python ≥ 3.8
 
 `Version 0.5.0: Parse Resources <https://github.com/FCP-INDI/cpac/releases/tag/v0.5.0>`_
 ========================================================================================
@@ -50,11 +56,11 @@ Changelog
 ========================================================================
 * 📚 Update the main usage string to better articulate functionality
 * 📢🐳 Provide a clearer error message if package cannot connect to Docker.
-* 🐳 Fix a bug introduced in `v0.2.4 <https://github.com/shnizzedy/cpac/releases/tag/v0.2.4>` where some crashfiles would print for ``cpac --platform singularity crash`` but not for ``cpac --platform docker crash`` 
-* 🚑 Fix some installation issues: 
+* 🐳 Fix a bug introduced in `v0.2.4 <https://github.com/shnizzedy/cpac/releases/tag/v0.2.4>` where some crashfiles would print for ``cpac --platform singularity crash`` but not for ``cpac --platform docker crash``
+* 🚑 Fix some installation issues:
    * All required packages are now installed with ``pip install cpac``
    * Version is now set correctly
-* 🐳 Fix a bug introduced in `v0.2.4 <https://github.com/shnizzedy/cpac/releases/tag/v0.2.4>`_ where some crashfiles would print for ``cpac --platform singularity crash`` but not for ``cpac --platform docker crash`` 
+* 🐳 Fix a bug introduced in `v0.2.4 <https://github.com/shnizzedy/cpac/releases/tag/v0.2.4>`_ where some crashfiles would print for ``cpac --platform singularity crash`` but not for ``cpac --platform docker crash``
 * 🔬 Set `coverage reports <http://coveralls.io/github/shnizzedy/cpac>`_ to report local paths
 
 `Version 0.2.4 <https://github.com/shnizzedy/cpac/releases/tag/v0.2.4>`_

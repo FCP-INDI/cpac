@@ -1,11 +1,11 @@
-'''Constants for tests'''
+"""Constants for tests."""
 # pylint: disable=invalid-name
-TAGS = [None, 'latest', 'nightly']
+TAGS = [None, "latest", "nightly"]
 
 
 def args_before_after(argv, args):
-    '''Function to create a mock sys.argv with arguments before
-    and one with arguments after the command and its arguments.
+    """
+    Create a mock sys.argv with arguments before and one with arguments after the command and its arguments.
 
     Parameters
     ----------
@@ -21,23 +21,22 @@ def args_before_after(argv, args):
         f'cpac {args} {argv}'.split(' ')
     after : list
         f'cpac {argv} {args}'.split(' ')
-    '''
+    """
     argv = single_space(argv).strip()
     args = single_space(args).strip()
-    if argv.startswith('cpac'):
-        argv = argv.lstrip('cpac').strip()
+    if argv.startswith("cpac"):
+        argv = argv.lstrip("cpac").strip()
     if args is not None and len(args):
-        before = f'cpac {args} {argv}'.split(' ')
-        after = f'cpac {argv} {args}'.split(' ')
+        before = f"cpac {args} {argv}".split(" ")
+        after = f"cpac {argv} {args}".split(" ")
     else:
-        before = f'cpac {argv}'.split(' ')
+        before = f"cpac {argv}".split(" ")
         after = before
     return before, after
 
 
-def set_commandline_args(platform, tag, sep=' '):
-    '''Function to turn pytest commandline options into mock
-    cpac commandline option strings
+def set_commandline_args(platform, tag, sep=" "):
+    """Turn pytest commandline options into mock cpac commandline option strings.
 
     Parameters
     ----------
@@ -48,17 +47,17 @@ def set_commandline_args(platform, tag, sep=' '):
     Returns
     -------
     args : string
-    '''
-    args = ''
+    """
+    args = ""
     if platform is not None:
-        args += f' --platform{sep}{platform.lower()} '
+        args += f" --platform{sep}{platform.lower()} "
     if tag and tag is not None:
-        args = args + f' --tag{sep}{tag} '
+        args = args + f" --tag{sep}{tag} "
     return args
 
 
 def single_space(string):
-    '''Function to remove spaces from a string
+    """Remove spaces from a string.
 
     Parameters
     ----------
@@ -67,7 +66,7 @@ def single_space(string):
     Returns
     -------
     string : str
-    '''
-    while '  ' in string:
-        string = string.replace('  ', ' ')
+    """
+    while "  " in string:
+        string = string.replace("  ", " ")
     return string

@@ -1,0 +1,57 @@
+fail_fast: false
+
+repos:
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.1.8
+  hooks:
+  - id: ruff
+    args: [--fix]
+  - id: ruff-format
+
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.4.1
+  hooks:
+  - id: mypy
+    additional_dependencies:
+    - types-tabulate
+    - types-PyYAML
+    args: [--python-version=3.8, --ignore-missing-imports]
+- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  rev: v2.11.0
+  hooks:
+  - id: pretty-format-yaml
+    args:
+    - --autofix
+    - --indent=2
+  - id: pretty-format-toml
+    exclude: ^poetry.lock$
+    args:
+    - --autofix
+    - --indent=2
+    - --no-sort
+
+- repo: https://github.com/python-poetry/poetry
+  rev: 1.6.0
+  hooks:
+  - id: poetry-check
+  - id: poetry-lock
+    args: [--no-update]
+
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.1.0
+  hooks:
+  - id: check-case-conflict
+  - id: end-of-file-fixer
+  - id: mixed-line-ending
+    args:
+    - --fix=lf
+  - id: trailing-whitespace
+  - id: pretty-format-json
+    args:
+    - --autofix
+    - --indent=4
+    - --no-sort-keys
+  - id: check-merge-conflict
+  - id: check-yaml
+  - id: check-json
+  - id: check-toml
