@@ -2,6 +2,11 @@
 Changelog
 =========
 
+`Version 1.8.6: Support for C-PAC v1.8.6 <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.6>`_
+=====================================================================================================
+
+* Fixes a bug in checking for C-PAC version
+
 `Version 1.8.5: Support for C-PAC v1.8.5 <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.5>`_
 =====================================================================================================
 
