@@ -6,6 +6,7 @@ Changelog
 =====================================================================================================
 
 * Fixes a bug in checking for C-PAC version
+* Updates dependabot configuration
 
 `Version 1.8.5: Support for C-PAC v1.8.5 <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.5>`_
 =====================================================================================================
