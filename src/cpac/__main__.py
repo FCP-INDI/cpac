@@ -198,7 +198,25 @@ def _parser():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
-    for bare_package in ["gradients", "tsconcat"]:
+    gradients_parser = subparsers.add_parser(
+        "gradients",
+        add_help=False,
+        help='Run ba_timeseries_gradients. See\n"cpac [--platform '
+        '"{docker,singularity}] gradients --help" \nfor more information.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+
+    if not help_call(sys.argv):
+        # These positional arguments are required unless we're just getting
+        # the helpstring
+        gradients_parser.add_argument("bids_dir")
+        gradients_parser.add_argument(
+            "output_dir", default=os.path.join(cwd, "outputs")
+        )
+        gradients_parser.add_argument("level_of_analysis", choices=["group"])
+    gradients_parser.add_argument("extra_args", nargs=argparse.REMAINDER)
+
+    for bare_package in ["tsconcat"]:
         add_bare_wrapper(subparsers, bare_package)
 
     subparsers.add_parser(
@@ -255,6 +273,7 @@ def _parser():
         enter_parser,
         group_parser,
         run_parser,
+        gradients_parser,
         utils_parser,
         version_parser,
     ]:
@@ -283,6 +302,17 @@ def parse_args(args):
     ]
 
     return parsed
+
+
+def setup_help(arg_vars: dict, level_of_analysis: str) -> dict:
+    """Supply necessary positional arguments to get helpstring from container."""
+    pwd = os.getcwd()
+    for arg in ["output_dir", "bids_dir"]:
+        if arg_vars.get(arg) is None or arg_vars.get(arg) is arg:
+            arg_vars[arg] = pwd
+    if level_of_analysis is None:
+        arg_vars["level_of_analysis"] = level_of_analysis
+    return arg_vars
 
 
 def setup_logging(loglevel):
@@ -342,12 +372,29 @@ def main(args):
                 "-h" in args.extra_args,
             ]
         ):
-            pwd = os.getcwd()
-            if arg_vars.get("level_of_analysis") is None:
-                arg_vars["level_of_analysis"] = "participant"
-            for arg in ["output_dir", "bids_dir"]:
-                if arg_vars.get(arg) is None:
-                    arg_vars[arg] = pwd
+            arg_vars = setup_help(arg_vars, "participant")
+        Backends(**arg_vars).run(flags=args.extra_args, **arg_vars)
+
+    if args.command == "gradients":
+        arg_vars.update(
+            {
+                "image": "ghcr.io/childmindresearch/ba-timeseries-gradients",
+                "tag": "main",
+            }
+        )
+        if any(
+            [
+                "--help" in arg_vars,
+                "-h" in arg_vars,
+                "--help" in args.extra_args,
+                "-h" in args.extra_args,
+            ]
+        ):
+            arg_vars = setup_help(arg_vars, "group")
+            if "--help" in args.extra_args:
+                args.extra_args.remove("--help")
+                args.extra_args.append("-h")
+        print(arg_vars)
         Backends(**arg_vars).run(flags=args.extra_args, **arg_vars)
 
     elif args.command in ["enter", "version"]:

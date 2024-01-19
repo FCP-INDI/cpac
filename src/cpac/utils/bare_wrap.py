@@ -98,7 +98,7 @@ _SCRIPTS: Dict[str, ScriptInfo] = {
         "package": "ba_timeseries_gradients",
         "positional_arguments": True,
         "supported_python": "[3.11, 3.12)",
-        "url": "https://cmi-dair.github.io/ba-timeseries-gradients/ba_timeseries_gradients.html",
+        "url": "https://cmi-dair.github.io/ba_timeseries_gradients/ba_timeseries_gradients.html",
     },
     "tsconcat": {
         "command": "ba-tsconcat",
