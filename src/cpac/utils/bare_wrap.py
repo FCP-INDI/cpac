@@ -217,12 +217,11 @@ def check_for_package(package_name: str) -> bool:
 
 def _collect_usage_string(name: str) -> None:
     """Collect a usage string from a wrapped package to use in the helpstring."""
-    if _PARSERS[name] is not None:
+    if isinstance(_PARSERS[name], ArgumentParser):
+        _parser = cast(ArgumentParser, _PARSERS[name])
         try:
-            assert isinstance(_PARSERS[name], ArgumentParser)
-            _parser = cast(ArgumentParser, _PARSERS[name])
             _SCRIPTS[name]["helpstring"] = _parser.format_help()
-        except (AssertionError, AttributeError):
+        except AttributeError:
             print(name)
 
 

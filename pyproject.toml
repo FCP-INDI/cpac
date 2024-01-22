@@ -49,7 +49,6 @@ tabulate = ">=0.8.6"
 tornado = "*"
 websocket-client = "*"
 alabaster = {version = "*", optional = true}
-ba_timeseries_gradients = {git = "https://github.com/cmi-dair/ba-timeseries-gradients.git", optional = true, markers = "python_version >= '3.11' and python_version < '3.12'"}
 ba-tsconcat = {version = "*", optional = true, markers = "python_version >= '3.11' and python_version < '4.0'"}
 coveralls = {version = "*", optional = true}
 imagesize = {version = "*", optional = true}
@@ -61,7 +60,7 @@ sphinx = {version = "*", optional = true}
 
 [tool.poetry.extras]
 dev = ["coveralls", "pytest", "pytest-remotedata", "pytest-runner", "sphinx"]
-gradients = ["ba_timeseries_gradients"]
+gradients = []
 testing = ["alabaster", "imagesize", "pytest", "pytest-cov", "pytest-runner", "sphinx"]
 tsconcat = ["ba-tsconcat"]
 
@@ -95,7 +94,7 @@ section-order = ["future", "standard-library", "third-party", "collab", "other-f
 
 [tool.ruff.lint.isort.sections]
 "collab" = ["nipype", "spython"]
-"other-first-party" = ["ba_timeseries_gradients", "tsconcat"]
+"other-first-party" = ["tsconcat"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"

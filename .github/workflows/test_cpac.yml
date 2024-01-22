@@ -46,7 +46,7 @@ jobs:
       if: ${{ matrix.platform == 'singularity' }}
       run: mkdir -p ${SINGULARITY_CACHEDIR} && mkdir -p ${SINGULARITY_TMPDIR}
     - name: Install cpac
-      run: cd $GITHUB_WORKSPACE && pip install -e ".[dev,gradients,testing,tsconcat]"
+      run: cd $GITHUB_WORKSPACE && pip install -e ".[dev,testing,tsconcat]"
     - name: Test cpac, platform and tag specified
       run: |
         coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
