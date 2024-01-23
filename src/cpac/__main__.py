@@ -454,8 +454,8 @@ def run():
     # keep help option with specific command
     for option in ("-h", "--help"):
         options.discard(option)
-    for cmd in commands:
-        if command is None and cmd in args:
+    for cmd in args:
+        if command is None and cmd in commands:
             command_index = args.index(cmd)
             command = args.pop(command_index)
     if command is None:
