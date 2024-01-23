@@ -2,13 +2,17 @@
 Changelog
 =========
 
-`Version 1.8.6.post1: Support for C-PAC v1.8.6 <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.6.post1>`_
-=============================================================================================================
+`Version 1.8.6.post1`_: Wrapped ``gradients`` and ``tsconcat`` commands
+=======================================================================
+
+* Wrap ``ghcr.io/childmindresearch/ba-timeseries-gradients:main`` as ``gradients`` command
+* Wrap ``ba-tsconcat`` as ``tsconcat`` command
+
+`Version 1.8.6: Support for C-PAC v1.8.6 <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.6>`_
+=================================================================================================
 
 * Fixes a bug in checking for C-PAC version
 * Updates dependabot configuration
-* Wrap ``ghcr.io/childmindresearch/ba-timeseries-gradients:main`` as ``gradients`` command
-* Wrap ``ba-tsconcat`` as ``tsconcat`` command
 
 `Version 1.8.5: Support for C-PAC v1.8.5 <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.5>`_
 =====================================================================================================
@@ -131,3 +135,5 @@ Version 0.1.1
 Version 0.1.0
 =============
 * ✨🐳 Ported Docker support from Theodore
+
+.. _Version 1.8.6.post1: https://github.com/FCP-INDI/cpac/releases/tag/v1.8.6.post1
