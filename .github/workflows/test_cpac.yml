@@ -7,7 +7,6 @@ on:
   push:
     paths-ignore:
     - README.rst
-  pull_request:
 
 jobs:
   test_cpac:
@@ -26,13 +25,13 @@ jobs:
         singularity: [3.6.4]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ matrix.go }}
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
     - name: Install --upgrade pip setuptools wheel
@@ -88,7 +87,7 @@ jobs:
     - test_cpac
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Install cpac

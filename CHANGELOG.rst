@@ -2,6 +2,18 @@
 Changelog
 =========
 
+
+`Version 1.8.6.post1`_: Wrapped ``gradients`` and ``tsconcat`` commands
+=======================================================================
+* Wrap ``cmi-dair/ba_timeseries_gradients`` as ``gradients`` command
+* Wrap ``ba-tsconcat`` as ``tsconcat`` command
+
+`Version 1.8.6: Support for C-PAC v1.8.6 <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.6>`_
+=====================================================================================================
+
+* Fixes a bug in checking for C-PAC version
+* Updates dependabot configuration
+
 `Version 1.8.5: Support for C-PAC v1.8.5 <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.5>`_
 =====================================================================================================
 
@@ -12,7 +24,6 @@ Changelog
 * Replaces ``setuptools`` with ``poetry``
 * Adds pre-commit hooks for linting and formatting
 * Require Python ≥ 3.8
-* Wrap ``cmi-dair/ba_timeseries_gradients`` as ``gradients`` command
 
 `Version 0.5.0: Parse Resources <https://github.com/FCP-INDI/cpac/releases/tag/v0.5.0>`_
 ========================================================================================
@@ -124,3 +135,5 @@ Version 0.1.1
 Version 0.1.0
 =============
 * ✨🐳 Ported Docker support from Theodore
+
+.. _Version 1.8.6.post1: https://github.com/FCP-INDI/cpac/releases/tag/v1.8.6.post1
