@@ -394,7 +394,6 @@ def main(args):
             if "--help" in args.extra_args:
                 args.extra_args.remove("--help")
                 args.extra_args.append("-h")
-        print(arg_vars)
         Backends(**arg_vars).run(flags=args.extra_args, **arg_vars)
 
     elif args.command in ["enter", "version"]:
