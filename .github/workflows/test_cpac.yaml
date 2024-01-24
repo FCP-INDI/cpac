@@ -68,8 +68,9 @@ jobs:
     - name: Report coverage
       uses: AndreMiras/coveralls-python-action@v20201129
       with:
-        parallel: true
+        base-path: ${{ github.workspace }}
         flag-name: Test cpac ${{ matrix.platform }} with Python ${{ matrix.python }}
+        parallel: true
       continue-on-error: true
   finalize_coverage-report:
     needs:
