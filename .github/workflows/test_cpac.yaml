@@ -66,22 +66,23 @@ jobs:
         coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules .
         coverage report -m
     - name: Report coverage
-      uses: AndreMiras/coveralls-python-action@v20201129
-      with:
-        base-path: ${{ github.workspace }}
-        flag-name: Test cpac ${{ matrix.platform }} with Python ${{ matrix.python }}
-        parallel: true
-      continue-on-error: true
+      run: coveralls --service=github
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COVERALLS_PARALLEL: true
+
   finalize_coverage-report:
     needs:
     - test_cpac
     runs-on: ubuntu-latest
     steps:
     - name: Finalize coverage report
-      uses: AndreMiras/coveralls-python-action@v20201129
-      with:
-        parallel-finished: true
-      continue-on-error: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        pip3 install --upgrade coveralls
+        coveralls --service=github --finish
+
   update_README:
     # Only update README if tests succeed
     needs:
