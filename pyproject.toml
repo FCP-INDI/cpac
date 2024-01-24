@@ -31,11 +31,10 @@ repository = "https://github.com/FCP-INDI/cpac"
 version = "1.8.6.post1.dev2"
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.10"
 docker = ">=4.2.1"
 dockerpty = "*"
 docker-pycreds = "*"
-importlib_metadata = {version = "*", markers = "python_version < '3.8'"}
 pandas = [
   {version = ">=0.23.4"},
   {version = "<2.1", markers = "extra == 'tsconcat'"}

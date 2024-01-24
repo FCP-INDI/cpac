@@ -1,71 +1,107 @@
-""" Unit tests for the command-line interface (CLI) module """
-# pylint: disable=redefined-outer-name
-# pylint: disable=protected-access
-
-import argparse
+"""Unit tests for the command-line interface module of ``ba-timeseries-gradients``."""
+from argparse import Namespace
 import logging
-import pathlib
+from pathlib import Path
+import sys
+from typing import Callable
 from unittest import mock
 
-import pytest
+from _pytest.capture import CaptureFixture
+from pytest import fixture
 
-from ba_timeseries_gradients import cli, exceptions
+from cpac.__main__ import run
+from .CONSTANTS import args_before_after, set_commandline_args
 
 
-@pytest.fixture
-def mock_args() -> mock.MagicMock:
-    """Returns a mock argparse.Namespace object with default values for testing purposes.
+@fixture
+def mock_args(tmp_path: Path) -> mock.MagicMock:
+    """Return a mock argparse.Namespace object with default values for testing purposes.
 
-    Returns:
-        mock.MagicMock: A mock argparse.Namespace object.
+    Returns
+    -------
+    mock.MagicMock: A mock argparse.Namespace object.
     """
-    args = mock.MagicMock(spec=argparse.Namespace)
+    args = mock.MagicMock(spec=Namespace)
     args.verbose = logging.INFO
     args.parcellation = "test.nii.gz"
-    args.output_dir = pathlib.Path("/path/to/output")
-    args.bids_dir = pathlib.Path("/path/to/bids")
+    args.output_dir = tmp_path / "output"
+    args.output_dir.mkdir(exist_ok=True, parents=True)
+    args.bids_dir = tmp_path / "bids_dir"
+    args.bids_dir.mkdir(exist_ok=True, parents=True)
     args.force = False
     args.output_format = "hdf5"
     return args
 
 
-@pytest.fixture
-def mock_files() -> list[str]:
-    """Returns a list of mock file paths for testing purposes.
+def _run_mocked_argv(argv: str, platform: str, run_test: Callable) -> None:
+    """Run a test with mocked sys.argv."""
+    args = set_commandline_args(platform)
+    if len(args):
+        before, after = args_before_after(argv, args)
+        # test with args before command
+        run_test(before)
+        # test with args after command
+        run_test(after)
+    else:
+        # test without --platform and --tag args
+        run_test(f"cpac {argv}".split(" "))
 
-    Returns:
-        list[str]: A list of mock file paths.
-    """
-    return ["/path/to/bids/sub-01/func/sub-01_task-rest_bold.nii.gz"]
+
+def _run_error_test(
+    argv: list[str], capsys: CaptureFixture, error_excerpt: str
+) -> None:
+    """Run a test and check for a string in the error message."""
+    argv = [arg for arg in argv if arg]
+    with mock.patch.object(sys, "argv", argv):
+        run()
+        captured = capsys.readouterr()
+        assert error_excerpt in captured.out + captured.err
 
 
-def test_raise_invalid_input_existing_output_file(mock_args: mock.MagicMock) -> None:
+def test_raise_invalid_input_existing_output_file(
+    capsys: CaptureFixture, mock_args: mock.MagicMock, platform: str
+) -> None:
     """Test _raise_invalid_input when output file already exists."""
-    mock_output_file = mock.MagicMock()
-    mock_output_file.exists.return_value = True
-    mock_args.output_dir = mock_output_file
 
-    with pytest.raises(exceptions.InputError) as exc_info:
-        cli._raise_invalid_input(mock_args, [])
+    def run_test(argv: list[str]) -> None:
+        _run_error_test(argv, capsys, "Output file already exists")
 
-    assert "Output file already exists" in str(exc_info.value)
+    output_file = mock_args.output_dir / "gradients.h5"
+    output_file.touch()
+    _run_mocked_argv(
+        f"gradients {mock_args.bids_dir} {mock_args.output_dir} group",
+        platform,
+        run_test,
+    )
 
 
-def test_raise_invalid_input_no_input_files(mock_args: mock.MagicMock) -> None:
+def test_raise_invalid_input_no_input_files(
+    capsys: CaptureFixture, mock_args: mock.MagicMock, platform: str
+) -> None:
     """Test _raise_invalid_input when no input files are provided."""
-    with pytest.raises(exceptions.InputError) as exc_info:
-        cli._raise_invalid_input(mock_args, [])
 
-    assert "No input files found" in str(exc_info.value)
+    def run_test(argv: list[str]) -> None:
+        _run_error_test(argv, capsys, "No input files found")
+
+    _run_mocked_argv(
+        f"gradients {mock_args.bids_dir} {mock_args.output_dir} group",
+        platform,
+        run_test,
+    )
 
 
 def test_raise_invalid_input_no_parcellation(
-    mock_args: mock.MagicMock, mock_files: list[str]
+    capsys: CaptureFixture, mock_args: mock.MagicMock, platform: str
 ) -> None:
     """Test _raise_invalid_input when no parcellation is provided."""
-    mock_args.parcellation = None
 
-    with pytest.raises(exceptions.InputError) as exc_info:
-        cli._raise_invalid_input(mock_args, mock_files)
+    def run_test(argv: list[str]) -> None:
+        _run_error_test(argv, capsys, "Must provide a parcellation")
 
-    assert "Must provide a parcellation" in str(exc_info.value)
+    (mock_args.bids_dir / "sub-01/func").mkdir(parents=True)
+    (mock_args.bids_dir / "sub-01/func/sub-01_task-rest_bold.nii.gz").touch()
+    _run_mocked_argv(
+        f"gradients {mock_args.bids_dir} {mock_args.output_dir} group",
+        platform,
+        run_test,
+    )
