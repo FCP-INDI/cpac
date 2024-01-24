@@ -7,7 +7,7 @@ from typing import Callable
 from unittest import mock
 
 from _pytest.capture import CaptureFixture
-from pytest import fixture
+from pytest import fixture, mark
 
 from cpac.__main__ import run
 from .CONSTANTS import args_before_after, set_commandline_args
@@ -105,3 +105,13 @@ def test_raise_invalid_input_no_parcellation(
         platform,
         run_test,
     )
+
+
+@mark.parametrize("helpstring", ["-h", "--help"])
+def test_usage_string(capsys: CaptureFixture, helpstring: str, platform: str) -> None:
+    """Check that usage string is passed through."""
+
+    def run_test(argv: list[str]) -> None:
+        _run_error_test(argv, capsys, "usage: ba_timeseries_gradients")
+
+    _run_mocked_argv(f"gradients {helpstring}", platform, run_test)
