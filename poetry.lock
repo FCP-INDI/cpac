@@ -1821,12 +1821,12 @@ optional = ["python-socks", "wsaccel"]
 test = ["websockets"]
 
 [extras]
-dev = ["coveralls", "pytest", "pytest-remotedata", "pytest-runner", "sphinx"]
+dev = ["coverage", "coveralls", "pytest", "pytest-remotedata", "pytest-runner", "sphinx"]
 gradients = []
-testing = ["alabaster", "imagesize", "pytest", "pytest-cov", "pytest-runner", "sphinx"]
+testing = ["alabaster", "coverage", "imagesize", "pytest", "pytest-cov", "pytest-runner", "sphinx"]
 tsconcat = ["ba-tsconcat"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10"
-content-hash = "cee2cb143f128f39d699032408d28818de97220d8d42fb43d64a387cda36d189"
+content-hash = "85f662ca71800033b37ab8265c96c2c498d75405c30fae69acf940a271adc2c4"

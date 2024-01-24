@@ -7,6 +7,9 @@ build = "poetry build"
 release = "poetry publish"
 test = "pytest"
 
+[tool.coverage.run]
+relative_files = true
+
 [tool.devpi.upload]
 no-vcs = "1"
 formats = "bdist_wheel"
@@ -49,6 +52,7 @@ tornado = "*"
 websocket-client = "*"
 alabaster = {version = "*", optional = true}
 ba-tsconcat = {version = "*", optional = true, markers = "python_version >= '3.11' and python_version < '4.0'"}
+coverage = {version = "*", extras = ["toml"], optional = true}
 coveralls = {version = "*", optional = true}
 imagesize = {version = "*", optional = true}
 pytest = {version = "*", optional = true}
@@ -58,9 +62,9 @@ pytest-runner = {version = "*", optional = true}
 sphinx = {version = "*", optional = true}
 
 [tool.poetry.extras]
-dev = ["coveralls", "pytest", "pytest-remotedata", "pytest-runner", "sphinx"]
+dev = ["coverage", "coveralls", "pytest", "pytest-remotedata", "pytest-runner", "sphinx"]
 gradients = []
-testing = ["alabaster", "imagesize", "pytest", "pytest-cov", "pytest-runner", "sphinx"]
+testing = ["alabaster", "coverage", "imagesize", "pytest", "pytest-cov", "pytest-runner", "sphinx"]
 tsconcat = ["ba-tsconcat"]
 
 [tool.poetry.scripts]
