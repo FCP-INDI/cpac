@@ -2,6 +2,12 @@
 Changelog
 =========
 
+
+`Version 1.8.6.post1`_: Wrapped ``gradients`` and ``tsconcat`` commands
+=======================================================================
+* Wrap ``cmi-dair/ba_timeseries_gradients`` as ``gradients`` command
+* Wrap ``ba-tsconcat`` as ``tsconcat`` command
+
 `Version 1.8.6: Support for C-PAC v1.8.6 <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.6>`_
 =====================================================================================================
 
@@ -129,3 +135,5 @@ Version 0.1.1
 Version 0.1.0
 =============
 * ✨🐳 Ported Docker support from Theodore
+
+.. _Version 1.8.6.post1: https://github.com/FCP-INDI/cpac/releases/tag/v1.8.6.post1

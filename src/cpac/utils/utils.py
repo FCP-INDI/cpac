@@ -9,6 +9,8 @@ import yaml
 
 from cpac import DIST_NAME
 
+INTERVAL_CHECKS = {"[": "__ge__", "]": "__le__", "(": "__gt__", ")": "__lt__"}
+
 
 class LocalsToBind:
     """Class to collect local directories to bind to containers."""
@@ -186,6 +188,11 @@ class PermissionMode:
             )
             return True
         return False
+
+
+def version_tuple(version: str) -> tuple:
+    """Convert version string to tuple."""
+    return tuple(int(v) for v in version.split("."))
 
 
 class Volume:
