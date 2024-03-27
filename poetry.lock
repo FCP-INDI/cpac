@@ -1755,4 +1755,4 @@ testing = ["alabaster", "imagesize", "pytest", "pytest-cov", "pytest-runner", "s
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8"
-content-hash = "f1345bd4f365e448f30fbedda8808c2f18161f1bcceda4480d94063495549325"
+content-hash = "32b175f8ed7f7c0e04cfb8ab697e90fcf098e4e977c48df6412ac67e67ee6366"
