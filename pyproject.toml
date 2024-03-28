@@ -28,7 +28,7 @@ classifiers = [
 documentation = "https://fcp-indi.github.io/docs/latest/user/cpac"
 readme = "README.rst"
 repository = "https://github.com/FCP-INDI/cpac"
-version = "1.8.6"
+version = "1.8.6.post1.dev1"
 
 [tool.poetry.dependencies]
 python = ">=3.8"
@@ -41,7 +41,7 @@ poetry = "*"
 pyyaml = "*"
 rich = "*"
 semver = "*"
-spython = ">=0.0.81"
+spython = ">=0.0.81,<0.3.0"
 tabulate = ">=0.8.6"
 tornado = "*"
 websocket-client = "*"
