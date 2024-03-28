@@ -25,7 +25,9 @@ Dependencies
 
   * `Docker <https://www.docker.com>`_
   * `Apptainer <https://apptainer.org/documentation/>`_ ≥ 1.0
-  * `Singularity <https://sylabs.io/singularity>`_ ≥ 3.0
+  * `Singularity <https://sylabs.io/singularity>`_ ≥ 3.0 [*]_
+
+.. [*] ``cpac`` *may* work with older versions of Singularity, but `Singularity Python <https://singularityhub.github.io/singularity-cli/>`_ dropped support for Singularity < 3.0 in version 0.3.0. If you're running an older version of Singularity, you can try maually downgrading Singularity Python (:code:`pip install "spython<0.3.0"`) or try `running C-PAC in Singuliarty without this commandline wrapper <https://fcp-indi.github.io/docs/latest/user/singularity>`_
 
 Usage
 =====
