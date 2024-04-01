@@ -1,3 +1,4 @@
+"""Backend for Singularity images."""
 from itertools import chain
 import os
 
@@ -10,6 +11,8 @@ BINDING_MODES = {"ro": "ro", "w": "rw", "rw": "rw"}
 
 
 class Singularity(Backend):
+    """Backend for Singularity images."""
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.container = None
@@ -64,6 +67,7 @@ class Singularity(Backend):
                 self.image = Image(Client._get_filename(img))
 
     def pull(self, force=False, **kwargs):
+        """Pull a Singularity container."""
         image = kwargs["image"] if kwargs.get("image") is not None else "fcpindi/c-pac"
         tag = kwargs.get("tag")
         pwd = os.getcwd()
@@ -113,7 +117,7 @@ class Singularity(Backend):
         self._bindings_as_option()
         if stream_command == "run":
             self.container = Client.run(
-                Client.instance(self.image),
+                self.image,
                 args=args,
                 options=self.options,
                 stream=not silent,
@@ -157,6 +161,7 @@ class Singularity(Backend):
         )
 
     def run(self, flags=None, run_type="run", **kwargs):
+        """Run a Singularity container."""
         # pylint: disable=expression-not-assigned
         if flags is None:
             flags = []
