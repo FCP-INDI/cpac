@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        platform: [docker]
+        platform: [docker, singularity]
         tag: [latest, nightly]
         go: [1.14]
         python: [3.8, 3.9, '3.10', 3.11, 3.12]
