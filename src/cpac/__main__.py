@@ -20,13 +20,17 @@ _CLARGS: set = {"group", "utils"}
 
 
 class ExtendAction(argparse.Action):
+    """Flatten commandline arguments for argparse."""
+
     def __call__(self, parser, namespace, values, option_string=None):
+        """Set flattened attributes on the namespace."""
         items = (getattr(namespace, self.dest) or []) + values
         items = [x for n, x in enumerate(items) if x not in items[:n]]
         setattr(namespace, self.dest, items)
 
 
 def address(str_addy):
+    """Split address into string and int components."""
     addr, port = str_addy.split(":")
     port = int(port)
     return addr, port
@@ -111,17 +115,17 @@ def _parser():
 
     parser.add_argument(
         "--platform",
-        choices=["docker", "singularity"],
+        choices=["docker", "singularity", "apptainer"],
         help="If neither platform nor image is specified,\ncpac will try "
-        "Docker first, then try\nSingularity if Docker fails.",
+        "Docker first, then try\nApptainer/Singularity if Docker fails.",
     )
 
     parser.add_argument(
         "--image",
-        help="path to Singularity image file OR name of Docker image (eg, "
+        help="path to Apptainer/Singularity image file OR name of Docker image (eg, "
         '"fcpindi/c-pac").\nWill attempt to pull from Singularity Hub or '
         "Docker Hub if not provided.\nIf image is specified but platform "
-        "is not, platform is\nassumed to be Singularity if image is a "
+        "is not, platform is\nassumed to be Apptainer/Singularity if image is a "
         "path or \nDocker if image is an image name.",
     )
 
@@ -156,7 +160,7 @@ def _parser():
     run_parser = subparsers.add_parser(
         "run",
         add_help=False,
-        help='Run C-PAC. See\n"cpac [--platform {docker,singularity}] '
+        help='Run C-PAC. See\n"cpac [--platform {docker,apptainer,singularity}] '
         '[--image IMAGE] [--tag TAG] run --help"\nfor more '
         "information.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -166,7 +170,7 @@ def _parser():
         "utils",
         add_help=False,
         help='Run C-PAC commandline utilities. See\n"cpac [--platform '
-        "{docker,singularity}] [--image IMAGE] [--tag TAG] utils "
+        "{docker,apptainer,singularity}] [--image IMAGE] [--tag TAG] utils "
         '--help"\nfor more information.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -192,7 +196,7 @@ def _parser():
         "group",
         add_help=False,
         help='Run a group level analysis in C-PAC. See\n"cpac [--platform '
-        "{docker,singularity}] [--image IMAGE] [--tag TAG] group "
+        "{docker,apptainer,singularity}] [--image IMAGE] [--tag TAG] group "
         '--help"\nfor more information.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -282,6 +286,7 @@ def parse_args(args):
 
 
 def setup_logging(loglevel):
+    """Set up logging."""
     logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
     logging.basicConfig(
         level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S"
@@ -371,7 +376,7 @@ def main(args):
 
 def run():
     """
-    Try Docker first and fall back on Singularity if Docker fails if --platform is not specified.
+    Try Docker first and fall back on Apptainer/Singularity if Docker fails if --platform is not specified.
 
     Parameters
     ----------
@@ -441,6 +446,8 @@ def run():
         except (DockerException, NotFound):  # pragma: no cover
             parsed.platform = "singularity"
             main(parsed)
+    elif parsed.platform == "apptainer":
+        parsed.platform = "singularity"
     else:
         main(parsed)
 

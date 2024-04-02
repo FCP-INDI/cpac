@@ -92,7 +92,8 @@ class Singularity(Backend):
                     "docker://fcpindi/c-pac:latest", force=force, pull_folder=pwd
                 )
             except Exception as exception:
-                raise OSError("Could not connect to Singularity") from exception
+                msg = f"Could not connect to {self.platform.name}"
+                raise OSError(msg) from exception
 
     def get_response(self, command, **kwargs):
         """
