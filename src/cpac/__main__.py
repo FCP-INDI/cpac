@@ -446,8 +446,6 @@ def run():
         except (DockerException, NotFound):  # pragma: no cover
             parsed.platform = "singularity"
             main(parsed)
-    elif parsed.platform == "apptainer":
-        parsed.platform = "singularity"
     else:
         main(parsed)
 

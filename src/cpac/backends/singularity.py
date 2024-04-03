@@ -13,11 +13,20 @@ BINDING_MODES = {"ro": "ro", "w": "rw", "rw": "rw"}
 class Singularity(Backend):
     """Backend for Singularity images."""
 
+    @Backend.platform.setter  # type: ignore[attr-defined]
+    def platform(self, value):
+        """Set metadata for Singularity platform."""
+        self._platform = value
+        self._platform.version = Client.version().split(" ")[-1]
+
+    def _set_platform(self):
+        """Set metadata for Apptainer platform."""
+        self.platform = PlatformMeta("Singularity", "Ⓢ")
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.container = None
-        self.platform = PlatformMeta("Singularity", "Ⓢ")
-        self.platform.version = Client.version().split(" ")[-1]
+        self._set_platform()
         self._print_loading_with_symbol(self.platform.name)
         self.pull(**kwargs, force=False)
         self.options = (
