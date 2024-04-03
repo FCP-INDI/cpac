@@ -1,5 +1,5 @@
 """Tests for top-level cpac cli."""
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from io import BytesIO, StringIO, TextIOWrapper
 import sys
 from unittest import mock
@@ -15,7 +15,7 @@ def test_loading_message(platform, tag):
     """Test loading message."""
     if platform is not None:
         redirect_out = StringIO()
-        with redirect_stdout(redirect_out):
+        with redirect_stdout(redirect_out), redirect_stderr(redirect_out):
             loaded = Backends(platform, tag=tag)
         with_symbol = " ".join(
             ["Loading", loaded.platform.symbol, loaded.platform.name]
@@ -25,7 +25,7 @@ def test_loading_message(platform, tag):
         redirect_out = TextIOWrapper(
             BytesIO(), encoding="latin-1", errors="strict", write_through=True
         )
-        with redirect_stdout(redirect_out):
+        with redirect_stdout(redirect_out), redirect_stderr(redirect_out):
             loaded = Backends(platform, tag=tag)
         without_symbol = " ".join(["Loading", loaded.platform.name])
         # pylint: disable=no-member
