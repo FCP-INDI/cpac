@@ -49,6 +49,10 @@ jobs:
     - name: Pull images
       if: ${{ matrix.platform == 'apptainer' }}
       run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
         cpac --platform ${{ matrix.platform }} pull --tag ${{ matrix.tag }}
     - name: Test cpac, platform and tag specified
       run: |
