@@ -12,9 +12,9 @@ jobs:
   test_cpac:
 
     runs-on: ubuntu-latest
-    env:
-      APPTAINER_CACHEDIR: $GITHUB_WORKSPACE/.apptainer/cache
-      APPTAINER_TMPDIR: $GITHUB_WORKSPACE/.apptainer/tmp
+    # env:
+    #   APPTAINER_CACHEDIR: $GITHUB_WORKSPACE/.apptainer/cache
+    #   APPTAINER_TMPDIR: $GITHUB_WORKSPACE/.apptainer/tmp
 
     strategy:
       matrix:
@@ -41,9 +41,9 @@ jobs:
       uses: eWaterCycle/setup-apptainer@v2.0.0
       with:
         apptainer-version: ${{ matrix.apptainer }}
-    - name: Prepare Apptainer cache and tmp directories
-      if: ${{ matrix.platform == 'apptainer' }}
-      run: mkdir -p ${APPTAINER_CACHEDIR} && mkdir -p ${APPTAINER_TMPDIR}
+    # - name: Prepare Apptainer cache and tmp directories
+    #   if: ${{ matrix.platform == 'apptainer' }}
+    #   run: mkdir -p ${APPTAINER_CACHEDIR} && mkdir -p ${APPTAINER_TMPDIR}
     - name: Install cpac
       run: cd $GITHUB_WORKSPACE && pip install -e ".[dev,testing]"
     - name: Pull images
