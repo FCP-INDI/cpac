@@ -19,4 +19,5 @@ class Apptainer(Singularity):
         spython_main.base.Client._init_command = init_command
 
     def __init__(self, **kwargs):
+        self._set_platform()
         super().__init__(**kwargs)

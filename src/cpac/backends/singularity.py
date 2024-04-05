@@ -27,8 +27,8 @@ class Singularity(Backend):
         self.container = None
         self._set_platform()
         self._print_loading_with_symbol(self.platform.name)
-        self.pull(**kwargs, force=False)
         self.options = list(kwargs.get("container_options", []))
+        self.pull(**kwargs, force=False)
         if isinstance(self.pipeline_config, str):
             self.config = Client.execute(
                 image=self.image,
@@ -64,7 +64,12 @@ class Singularity(Backend):
     def _pull(self, img, force, pull_folder):
         """Try to pull image gracefully."""
         try:
-            self.image = Client.pull(img, force=force, pull_folder=pull_folder)
+            self.image = Client.pull(
+                img,
+                force=force,
+                pull_folder=pull_folder,
+                singularity_options=self.options,
+            )
         except ValueError as value_error:
             if "closed file" in str(value_error):
                 # pylint: disable=protected-access
