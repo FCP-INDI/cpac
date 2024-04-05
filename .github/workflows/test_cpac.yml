@@ -62,7 +62,7 @@ jobs:
       run: cd $GITHUB_WORKSPACE && pip install -e ".[dev,testing]"
     - name: Pull images
       if: ${{ matrix.platform == 'apptainer' }}
-      run: cpac --platform ${{ matrix.platform }} pull --tag ${{ matrix.tag }}
+      run: cpac -o="--disable-cache" --platform ${{ matrix.platform }} pull --tag ${{ matrix.tag }}
     - name: Test cpac, platform and tag specified
       run: |
         coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .

@@ -90,7 +90,8 @@ def _parser():
     parser.add_argument(
         "-o",
         "--container_option",
-        dest="container_option",
+        "--container_options",
+        dest="container_options",
         action="append",
         help="parameters and flags to pass through to Docker or Singularity\n"
         "\nThis flag can take multiple arguments so cannot "

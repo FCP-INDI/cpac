@@ -1,5 +1,4 @@
 """Backend for Singularity images."""
-from itertools import chain
 import os
 
 from spython.image import Image
@@ -29,11 +28,7 @@ class Singularity(Backend):
         self._set_platform()
         self._print_loading_with_symbol(self.platform.name)
         self.pull(**kwargs, force=False)
-        self.options = (
-            list(chain.from_iterable(kwargs["container_options"]))
-            if bool(kwargs.get("container_options"))
-            else []
-        )
+        self.options = list(kwargs.get("container_options", []))
         if isinstance(self.pipeline_config, str):
             self.config = Client.execute(
                 image=self.image,
