@@ -25,6 +25,11 @@ jobs:
         apptainer: [1.0.0, 1.3.0]
 
     steps:
+    - name: Clear up some space on runner
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
     - uses: actions/checkout@v4
     - name: Set up Go
       uses: actions/setup-go@v5
@@ -48,12 +53,7 @@ jobs:
       run: cd $GITHUB_WORKSPACE && pip install -e ".[dev,testing]"
     - name: Pull images
       if: ${{ matrix.platform == 'apptainer' }}
-      run: |
-        sudo rm -rf /usr/share/dotnet
-        sudo rm -rf /opt/ghc
-        sudo rm -rf "/usr/local/share/boost"
-        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-        cpac --platform ${{ matrix.platform }} pull --tag ${{ matrix.tag }}
+      run: cpac --platform ${{ matrix.platform }} pull --tag ${{ matrix.tag }}
     - name: Test cpac, platform and tag specified
       run: |
         coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
