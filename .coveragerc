@@ -1,7 +1,7 @@
 # .coveragerc to control coverage.py
 [run]
 branch = True
-source = cpac
+source = src/cpac
 relative_files = True
 omit =
     # runs in container so unseen by coverage
