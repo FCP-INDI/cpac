@@ -99,7 +99,7 @@ jobs:
         mkdir -p ${{ env.APPTAINER_TMPDIR }}
         export APPTAINER_CACHEDIR=${{ env.APPTAINER_CACHEDIR }}
         export APPTAINER_TMPDIR=${{ env.APPTAINER_TMPDIR }}
-        cpac -o="--disable-cache" --platform ${{ matrix.platform }} pull --image ${{ needs.set_docker_image.outputs.docker_image }} --tag ${{ matrix.tag }}
+        cpac --platform ${{ matrix.platform }} pull --image ${{ needs.set_docker_image.outputs.docker_image }} --tag ${{ matrix.tag }}
     - name: Test cpac, platform and tag specified
       run: |
         coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --image=${{ needs.set_docker_image.outputs.docker_image }} --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
