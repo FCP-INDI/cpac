@@ -11,12 +11,12 @@ from cpac.backends import Backends
 from .CONSTANTS import set_commandline_args
 
 
-def test_loading_message(platform, tag):
+def test_loading_message(image, platform, tag):
     """Test loading message."""
     if platform is not None:
         redirect_out = StringIO()
         with redirect_stdout(redirect_out), redirect_stderr(redirect_out):
-            loaded = Backends(platform, tag=tag)
+            loaded = Backends(platform, image=image, tag=tag)
         with_symbol = " ".join(
             ["Loading", loaded.platform.symbol, loaded.platform.name]
         )
@@ -26,14 +26,14 @@ def test_loading_message(platform, tag):
             BytesIO(), encoding="latin-1", errors="strict", write_through=True
         )
         with redirect_stdout(redirect_out), redirect_stderr(redirect_out):
-            loaded = Backends(platform, tag=tag)
+            loaded = Backends(platform, image=image, tag=tag)
         without_symbol = " ".join(["Loading", loaded.platform.name])
         # pylint: disable=no-member
         assert without_symbol in redirect_out.buffer.getvalue().decode()
 
 
 @pytest.mark.parametrize("argsep", [" ", "="])
-def test_pull(argsep, capsys, platform, tag):
+def test_pull(argsep, capsys, image, platform, tag):
     """Test pull command."""
 
     def run_test(argv):
@@ -45,7 +45,7 @@ def test_pull(argsep, capsys, platform, tag):
             outstring = captured.out + captured.err
             assert checkstring in outstring or "cached" in outstring
 
-    args = set_commandline_args(platform, tag, argsep)
+    args = set_commandline_args(image, platform, tag, argsep)
 
     # test args before command
     run_test(f"cpac {args} pull".split(" "))
