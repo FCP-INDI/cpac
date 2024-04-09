@@ -27,7 +27,8 @@ class Singularity(Backend):
         self.container = None
         self._set_platform()
         self._print_loading_with_symbol(self.platform.name)
-        self.options = list(kwargs.get("container_options", []))
+        container_options = kwargs.get("container_options")
+        self.options = container_options if isinstance(container_options, list) else []
         self.pull(**kwargs, force=False)
         if isinstance(self.pipeline_config, str):
             self.config = Client.execute(
