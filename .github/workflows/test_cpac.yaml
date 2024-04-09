@@ -50,6 +50,9 @@ jobs:
         tag: [latest, nightly]
 
   test_cpac:
+    env:
+      APPTAINER_CACHEDIR: ${{ github.workspace }}/.apptainer/cache
+      APPTAINER_TMPDIR: ${{ github.workspace }}/.apptainer/tmp
     needs:
     - build_dry_run_image
     - set_docker_image
@@ -91,7 +94,12 @@ jobs:
       run: cd $GITHUB_WORKSPACE && pip install -e ".[dev,testing]"
     - name: Pull images
       if: ${{ matrix.platform == 'apptainer' }}
-      run: cpac -o="--disable-cache" --platform ${{ matrix.platform }} pull --image ${{ needs.set_docker_image.outputs.docker_image }} --tag ${{ matrix.tag }}
+      run: |
+        mkdir -p ${{ env.APPTAINER_CACHEDIR }}
+        mkdir -p ${{ env.APPTAINER_TMPDIR }}
+        export APPTAINER_CACHEDIR=${{ env.APPTAINER_CACHEDIR }}
+        export APPTAINER_TMPDIR=${{ env.APPTAINER_TMPDIR }}
+        cpac -o="--disable-cache" --platform ${{ matrix.platform }} pull --image ${{ needs.set_docker_image.outputs.docker_image }} --tag ${{ matrix.tag }}
     - name: Test cpac, platform and tag specified
       run: |
         coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --image=${{ needs.set_docker_image.outputs.docker_image }} --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
