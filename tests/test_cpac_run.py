@@ -76,7 +76,7 @@ def test_run_test_config(argsep, pipeline_file, image, platform, tag, tmp_path):
         f"s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU {wd} "
         f"test_config --participant_ndx=2{pipeline}"
     )
-    if check_version_at_least("1.8.4", platform):
+    if check_version_at_least("1.8.4", platform=platform, image=image):
         argv += " --tracking_opt-out"
     if args:
         before, after = args_before_after(argv, args)
@@ -84,8 +84,10 @@ def test_run_test_config(argsep, pipeline_file, image, platform, tag, tmp_path):
         run_test(before, wd)
         # test with args after command
         run_test(after, wd)
+    # test without --platform and --tag args
+    elif image is not None:
+        run_test(f"cpac --image={image} {argv}".split(" "), wd)
     else:
-        # test without --platform and --tag args
         run_test(f"cpac {argv}".split(" "), wd)
 
 
