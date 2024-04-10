@@ -34,4 +34,5 @@ ENV PATH=$PATH:/home/c-pac_user/.local/bin \
     PYTHONPATH=$PYTHONPATH:$PYTHONUSERBASE/lib/python3.10/site-packages
 USER c-pac_user
 RUN pip install -r /code/requirements.txt && pip install -e /code
+ENV FSLDIR="/FSLDIR"
 ENTRYPOINT [ "/code/run.py" ]
