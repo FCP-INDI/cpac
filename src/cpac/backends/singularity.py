@@ -87,15 +87,13 @@ class Singularity(Backend):
         image_path = Client._get_filename(  # pylint: disable=protected-access
             image if tag is None else ":".join([image, tag])
         )
-        if (
-            not force
-            and image
-            and isinstance(image, str)
-            and os.path.exists(image_path)
-        ):
-            self.image = image_path
-        elif tag and isinstance(tag, str):  # pragma: no cover
-            self._pull(f"docker://{image}:{tag}", force=force, pull_folder=pwd)
+        if image:
+            if not force and isinstance(image, str) and os.path.exists(image_path):
+                self.image = image_path
+            elif tag and isinstance(tag, str):  # pragma: no cover
+                self._pull(f"docker://{image}:{tag}", force=force, pull_folder=pwd)
+            else:
+                self._pull(f"docker://{image}", force=force, pull_folder=pwd)
         else:  # pragma: no cover
             try:
                 self._pull(
