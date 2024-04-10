@@ -86,7 +86,7 @@ def test_run_test_config(argsep, pipeline_file, image, platform, tag, tmp_path):
         run_test(after, wd)
     # test without --platform and --tag args
     elif image is not None:
-        run_test(f"cpac --image={image} {argv}".split(" "), wd)
+        run_test(f"cpac --image{argsep}{image} {argv}".split(" "), wd)
     else:
         run_test(f"cpac {argv}".split(" "), wd)
 
