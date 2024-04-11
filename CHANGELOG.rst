@@ -2,6 +2,17 @@
 Changelog
 =========
 
+`Version 1.8.6.post2: Explicit Apptainer support <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.6.post2>`_
+===============================================================================================================
+
+* Adds explicit support for Apptainer
+* Replaces disabled Singularity tests with enabled Apptainer tests in GitHub Actions
+
+`Version 1.8.6.post1: Broader Singularity & Apptainer support <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.6.post1>`_
+============================================================================================================================
+
+* Fixes a bug when trying to run in some versions of Singularity
+
 `Version 1.8.6: Support for C-PAC v1.8.6 <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.6>`_
 =====================================================================================================
 
