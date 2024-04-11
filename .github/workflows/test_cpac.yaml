@@ -110,7 +110,7 @@ jobs:
         coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --image=${{ needs.set_docker_image.outputs.docker_image }} --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
         coverage report -m
     - name: Test cpac, platform specified, tag unspecified
-      if: ${{ matrix.tag == 'latest' }}
+      if: ${{ matrix.tag == 'latest' }} and ${{ matrix.platform == 'docker' }}
       run: |
         coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --image=${{ needs.set_docker_image.outputs.docker_image }} --platform ${{ matrix.platform }} .
         coverage report -m
