@@ -83,6 +83,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
+        cache: false
         go-version: ${{ matrix.go }}
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -103,7 +104,9 @@ jobs:
         mkdir -p ${{ env.APPTAINER_CACHEDIR }}
         mkdir -p ${{ env.APPTAINER_TMPDIR }}
         export APPTAINER_CACHEDIR=${{ env.APPTAINER_CACHEDIR }}
+        export SINGULARITY_CACHEDIR=${{ env.APPTAINER_CACHEDIR }}
         export APPTAINER_TMPDIR=${{ env.APPTAINER_TMPDIR }}
+        export SINGULARITY_TMPDIR=${{ env.APPTAINER_TMPDIR }}
         cpac --platform ${{ matrix.platform }} pull --image ${{ needs.set_docker_image.outputs.docker_image }} --tag ${{ matrix.tag }}
     - name: Test cpac, platform and tag specified
       run: |
