@@ -38,53 +38,53 @@ Usage
 
     cpac --help
     usage: cpac [-h] [--version] [-o OPT] [-B CUSTOM_BINDING]
-                [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
-                [--working_dir PATH] [-v] [-vv]
+                [--platform {docker,singularity,apptainer}] [--image IMAGE]
+                [--tag TAG] [--working_dir PATH] [-v] [-vv]
                 {run,utils,version,group,pull,upgrade,enter,bash,shell,parse-resources,parse_resources,crash}
                 ...
-    
-    cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io> containerized images. 
-    
+
+    cpac: a Python package that simplifies using C-PAC <http://fcp-indi.github.io> containerized images.
+
     This commandline interface package is designed to minimize repetition.
     As such, nearly all arguments are optional.
-    
-    When launching a container, this package will try to bind any paths mentioned in 
+
+    When launching a container, this package will try to bind any paths mentioned in
      • the command
      • the data configuration
-    
+
     An example minimal run command:
     	cpac run /path/to/data /path/for/outputs
-    
+
     An example run command with optional arguments:
     	cpac -B /path/to/data/configs:/configs \
     		--image fcpindi/c-pac --tag latest \
     		run /path/to/data /path/for/outputs \
     		--data_config_file /configs/data_config.yml \
     		--save_working_dir
-    
+
     Each command can take "--help" to provide additonal usage information, e.g.,
-    
+
     	cpac run --help
-    
+
     Known issues:
     - Some Docker containers unexpectedly persist after cpac finishes. To clear them, run
         1. `docker ps` to list the containers
       For each C-PAC conatainer that persists, run
-        1. `docker attach <container_name>`
-        2. `exit`
+        2. `docker attach <container_name>`
+        3. `exit`
     - https://github.com/FCP-INDI/cpac/issues
-    
+
     positional arguments:
       {run,utils,version,group,pull,upgrade,enter,bash,shell,parse-resources,parse_resources,crash}
         run                 Run C-PAC. See
-                            "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] run --help"
+                            "cpac [--platform {docker,apptainer,singularity}] [--image IMAGE] [--tag TAG] run --help"
                             for more information.
         utils               Run C-PAC commandline utilities. See
-                            "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] utils --help"
+                            "cpac [--platform {docker,apptainer,singularity}] [--image IMAGE] [--tag TAG] utils --help"
                             for more information.
         version             Print the version of C-PAC that cpac is using.
         group               Run a group level analysis in C-PAC. See
-                            "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] group --help"
+                            "cpac [--platform {docker,apptainer,singularity}] [--image IMAGE] [--tag TAG] group --help"
                             for more information.
         pull (upgrade)      Upgrade your local C-PAC version to the latest version
                             by pulling from Docker Hub or other repository.
@@ -94,7 +94,7 @@ Usage
                             Enter a new C-PAC container via BASH.
         parse-resources (parse_resources)
                             .
-                            
+
                             When provided with a `callback.log` file, this utility can sort through
                             the memory `runtime` usage, `estimate`, and associated `efficiency`, to
                             identify the `n` tasks with the `highest` or `lowest` of each of these
@@ -102,13 +102,13 @@ Usage
                             "parse-resources" is intended to be run outside a C-PAC container.
                             See "cpac parse-resources --help" for more information.
         crash               Convert a crash pickle to plain text (C-PAC < 1.8.0).
-    
+
     options:
       -h, --help            show this help message and exit
       --version             show program's version number and exit
-      -o OPT, --container_option OPT
+      -o OPT, --container_option OPT, --container_options OPT
                             parameters and flags to pass through to Docker or Singularity
-                            
+
                             This flag can take multiple arguments so cannot be
                             the final argument before the command argument (i.e.,
                             run or any other command that does not start with - or --)
@@ -119,18 +119,18 @@ Usage
                             	real_path:container_path
                             (eg, /home/C-PAC/run5/outputs:/outputs).
                             Use absolute paths for both paths.
-                            
+
                             This flag can take multiple arguments so cannot be
                             the final argument before the command argument (i.e.,
                             run or any other command that does not start with - or --)
-      --platform {docker,singularity}
+      --platform {docker,singularity,apptainer}
                             If neither platform nor image is specified,
                             cpac will try Docker first, then try
-                            Singularity if Docker fails.
-      --image IMAGE         path to Singularity image file OR name of Docker image (eg, "fcpindi/c-pac").
+                            Apptainer/Singularity if Docker fails.
+      --image IMAGE         path to Apptainer/Singularity image file OR name of Docker image (eg, "fcpindi/c-pac").
                             Will attempt to pull from Singularity Hub or Docker Hub if not provided.
                             If image is specified but platform is not, platform is
-                            assumed to be Singularity if image is a path or 
+                            assumed to be Apptainer/Singularity if image is a path or
                             Docker if image is an image name.
       --tag TAG             tag of the Docker image to use (eg, "latest" or "nightly").
       --working_dir PATH    working directory
