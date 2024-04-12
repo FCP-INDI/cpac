@@ -70,8 +70,8 @@ Usage
     - Some Docker containers unexpectedly persist after cpac finishes. To clear them, run
         1. `docker ps` to list the containers
       For each C-PAC conatainer that persists, run
-        1. `docker attach <container_name>`
-        2. `exit`
+        2. `docker attach <container_name>`
+        3. `exit`
     - https://github.com/FCP-INDI/cpac/issues
     
     positional arguments:
