@@ -2903,4 +2903,4 @@ tsconcat = ["ba-tsconcat"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8"
-content-hash = "f3a770ecd58a22f189dbc7d0c9eb3fce3ddd1484e3c24a61bbb3f4a96db0bb87"
+content-hash = "e6d697d345be02f32ac6a33a0a8566dadf6705da02b614a5a91b6dd3545b577a"
