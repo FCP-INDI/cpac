@@ -28,7 +28,7 @@ classifiers = [
 documentation = "https://fcp-indi.github.io/docs/latest/user/cpac"
 readme = "README.rst"
 repository = "https://github.com/FCP-INDI/cpac"
-version = "1.8.6.post1.dev2"
+version = "1.8.7.dev1"
 
 [tool.poetry.dependencies]
 python = ">=3.10"
@@ -37,7 +37,7 @@ dockerpty = "*"
 docker-pycreds = "*"
 pandas = [
   {version = ">=0.23.4"},
-  {version = "<2.1", markers = "extra == 'tsconcat'"}
+  {version = "2.2.2", markers = "python_version >= '3.11' and python_version < '4.0' and extra == 'tsconcat'"}
 ]
 poetry = "*"
 pyyaml = "*"
@@ -48,9 +48,13 @@ tabulate = ">=0.8.6"
 tornado = "*"
 websocket-client = "*"
 alabaster = {version = "*", optional = true}
-ba-tsconcat = {version = "*", optional = true, markers = "python_version >= '3.11' and python_version < '4.0'"}
+ba-tsconcat = {version = ">=0.1.1", optional = true, markers = "python_version >= '3.11' and python_version < '4.0'"}
+bids2table = {version = "0.1.0b0", markers = "extra == 'tsconcat'"}
 coveralls = {version = "*", optional = true}
+elbow = {version = "0.1.1", markers = "extra == 'tsconcat'"}
 imagesize = {version = "*", optional = true}
+nibabel = {version = "5.2.1", markers = "extra == 'tsconcat'"}
+pyarrow = {version = "16.0.0", markers = "extra == 'tsconcat'"}
 pytest = {version = "*", optional = true}
 pytest-cov = {version = "*", optional = true}
 pytest-remotedata = {version = ">=0.3.2", optional = true}
@@ -93,7 +97,7 @@ section-order = ["future", "standard-library", "third-party", "collab", "other-f
 
 [tool.ruff.lint.isort.sections]
 "collab" = ["nipype", "spython"]
-"other-first-party" = ["tsconcat"]
+"other-first-party" = ["ba_timeseries_gradients", "bids2table", "tsconcat"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
