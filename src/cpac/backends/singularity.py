@@ -1,4 +1,4 @@
-from itertools import chain
+"""Backend for Singularity images."""
 import os
 
 from spython.image import Image
@@ -10,18 +10,26 @@ BINDING_MODES = {"ro": "ro", "w": "rw", "rw": "rw"}
 
 
 class Singularity(Backend):
+    """Backend for Singularity images."""
+
+    @Backend.platform.setter  # type: ignore[attr-defined]
+    def platform(self, value):
+        """Set metadata for Singularity platform."""
+        self._platform = value
+        self._platform.version = Client.version().split(" ")[-1]
+
+    def _set_platform(self):
+        """Set metadata for Apptainer platform."""
+        self.platform = PlatformMeta("Singularity", "Ⓢ")
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.container = None
-        self.platform = PlatformMeta("Singularity", "Ⓢ")
-        self.platform.version = Client.version().split(" ")[-1]
+        self._set_platform()
         self._print_loading_with_symbol(self.platform.name)
+        container_options = kwargs.get("container_options")
+        self.options = container_options if isinstance(container_options, list) else []
         self.pull(**kwargs, force=False)
-        self.options = (
-            list(chain.from_iterable(kwargs["container_options"]))
-            if bool(kwargs.get("container_options"))
-            else []
-        )
         if isinstance(self.pipeline_config, str):
             self.config = Client.execute(
                 image=self.image,
@@ -57,13 +65,19 @@ class Singularity(Backend):
     def _pull(self, img, force, pull_folder):
         """Try to pull image gracefully."""
         try:
-            self.image = Client.pull(img, force=force, pull_folder=pull_folder)
+            self.image = Client.pull(
+                img,
+                force=force,
+                pull_folder=pull_folder,
+                singularity_options=self.options,
+            )
         except ValueError as value_error:
             if "closed file" in str(value_error):
                 # pylint: disable=protected-access
                 self.image = Image(Client._get_filename(img))
 
     def pull(self, force=False, **kwargs):
+        """Pull a Singularity container."""
         image = kwargs["image"] if kwargs.get("image") is not None else "fcpindi/c-pac"
         tag = kwargs.get("tag")
         pwd = os.getcwd()
@@ -73,22 +87,21 @@ class Singularity(Backend):
         image_path = Client._get_filename(  # pylint: disable=protected-access
             image if tag is None else ":".join([image, tag])
         )
-        if (
-            not force
-            and image
-            and isinstance(image, str)
-            and os.path.exists(image_path)
-        ):
-            self.image = image_path
-        elif tag and isinstance(tag, str):  # pragma: no cover
-            self._pull(f"docker://{image}:{tag}", force=force, pull_folder=pwd)
+        if image:
+            if not force and isinstance(image, str) and os.path.exists(image_path):
+                self.image = image_path
+            elif tag and isinstance(tag, str):  # pragma: no cover
+                self._pull(f"docker://{image}:{tag}", force=force, pull_folder=pwd)
+            else:
+                self._pull(f"docker://{image}", force=force, pull_folder=pwd)
         else:  # pragma: no cover
             try:
                 self._pull(
                     "docker://fcpindi/c-pac:latest", force=force, pull_folder=pwd
                 )
             except Exception as exception:
-                raise OSError("Could not connect to Singularity") from exception
+                msg = f"Could not connect to {self.platform.name}"
+                raise OSError(msg) from exception
 
     def get_response(self, command, **kwargs):
         """
@@ -113,7 +126,7 @@ class Singularity(Backend):
         self._bindings_as_option()
         if stream_command == "run":
             self.container = Client.run(
-                Client.instance(self.image),
+                self.image,
                 args=args,
                 options=self.options,
                 stream=not silent,
@@ -157,6 +170,7 @@ class Singularity(Backend):
         )
 
     def run(self, flags=None, run_type="run", **kwargs):
+        """Run a Singularity container."""
         # pylint: disable=expression-not-assigned
         if flags is None:
             flags = []

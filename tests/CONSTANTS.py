@@ -1,4 +1,5 @@
 """Constants for tests."""
+
 # pylint: disable=invalid-name
 from typing import Optional
 
@@ -38,21 +39,15 @@ def args_before_after(argv: str, args: str) -> tuple[list[str], list[str]]:
 
 
 def set_commandline_args(
-    platform: Optional[str] = None, tag: Optional[str] = None, sep: str = " "
+    image: Optional[str] = None,
+    platform: Optional[str] = None,
+    tag: Optional[str] = None,
+    sep: str = " ",
 ) -> str:
-    """Turn pytest commandline options into mock cpac commandline option strings.
-
-    Parameters
-    ----------
-    platform : string
-
-    tag : string
-
-    Returns
-    -------
-    args : string
-    """
+    """Turn pytest commandline options into mock cpac commandline option strings."""
     args = ""
+    if image is not None:
+        args += f" --image{sep}{image.lower()}"
     if platform is not None:
         args += f" --platform{sep}{platform.lower()} "
     if tag and tag is not None:
