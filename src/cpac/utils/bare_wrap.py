@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Wrap another Python package without any modifications."""
+
 from argparse import _SubParsersAction, ArgumentParser, HelpFormatter, REMAINDER
 from dataclasses import dataclass
 from importlib.metadata import requires
@@ -8,14 +9,7 @@ from logging import ERROR, log
 from shutil import which
 from subprocess import call as sub_call, CalledProcessError
 from sys import exit as sys_exit, version_info
-from typing import Optional, TypedDict
-
-if version_info.minor < 9:  # noqa: PLR2004
-    from typing import Dict, List, Tuple
-else:
-    Dict = dict  # type: ignore
-    List = list  # type: ignore
-    Tuple = tuple  # type: ignore
+from typing import ClassVar, Optional, TypedDict
 
 from packaging.requirements import Requirement
 
@@ -34,7 +28,7 @@ from cpac.utils import INTERVAL_CHECKS, version_tuple
 if build_bidsapp_group_parser is not None:
     """
     This parser is built in the main function of the wrapped package https://github.com/cmi-dair/tsconcat/blob/a7e31880431621fe47f48664df4736eb7a455859/src/tsconcat/cli.py#L78C14-L104 , so we recreate it here to generate the usage string for the wrapper."""
-    from tsconcat.cli import REDUCE_COLUMNS
+    from tsconcat.cli import REDUCE_COLUMNS_ALIAS
 
     tsconcat_parser = build_bidsapp_group_parser(
         prog="ba-tsconcat", description="Concatenate MRI timeseries."
@@ -43,7 +37,7 @@ if build_bidsapp_group_parser is not None:
         "-c",
         "--concat",
         type=str,
-        help=f"Concat across. Can be any combination of {', '.join(REDUCE_COLUMNS)} separated by spaces. "
+        help=f"Concat across. Can be any combination of {', '.join(REDUCE_COLUMNS_ALIAS.keys())} separated by spaces. "
         f"Output data will be grouped by the set difference.",
         default="ses",
     )
@@ -61,6 +55,14 @@ if build_bidsapp_group_parser is not None:
         action="store_true",
         help="Fake output. Output a bids2table parquet directory instead of actually doing something.",
         default=False,
+    )
+    # workers
+    tsconcat_parser.add_argument(
+        "-w",
+        "--workers",
+        type=int,
+        help="Number of workers for bids2table. Default is 1.",
+        default=1,
     )
 
 _PARSERS = {
@@ -91,7 +93,7 @@ class ScriptInfo(TypedDict):
     """The URL to the wrapped package's documentation."""
 
 
-_SCRIPTS: Dict[str, ScriptInfo] = {
+_SCRIPTS: dict[str, ScriptInfo] = {
     "gradients": {
         "command": "ba_timeseries_gradients",
         "helpstring": None,
@@ -126,6 +128,8 @@ class WrappedBare:
     """The canonical name of the wrapped package."""
     positional_arguments: bool
     """Whether the original command takes positional arguments."""
+    _requirements: ClassVar[Optional[dict[str, Requirement]]]
+    """Memoized requirements dictionary."""
     supported_python_range: str
     """Constraints for supported Python versions in interval notation."""
     url: str
@@ -142,7 +146,25 @@ class WrappedBare:
         return self._helpstring.replace(f"usage: {self.command}", f"cpac {self.name}")
 
     @property
-    def split_range(self) -> Tuple[str, str]:
+    def package_info(self) -> Requirement:
+        """Return metadata about how a package is required for this version of cpac."""
+        return self.requirements()[self.package]
+
+    @classmethod
+    def requirements(cls) -> dict[str, Requirement]:
+        """Return a dictionary of requirements keyed by name."""
+        _reqs: Optional[dict[str, Requirement]] = getattr(cls, "_requirements", None)
+        if _reqs is not None:
+            return _reqs
+        cpac_requires = requires("cpac") or []
+        _requirements: list[Requirement] = [Requirement(req) for req in cpac_requires]
+        requirements: dict[str, Requirement] = {req.name: req for req in _requirements}
+        del _requirements
+        cls._requirements = requirements
+        return cls._requirements
+
+    @property
+    def split_range(self) -> tuple[str, str]:
         """Split the supported Python range into min and max."""
         if not hasattr(self, "_split_range"):
             py_min, py_max = (
@@ -160,6 +182,13 @@ class WrappedBare:
         ) and getattr(version_info, INTERVAL_CHECKS[py_max[-1]])(
             version_tuple(py_max[:-1])
         )
+
+    @property
+    def version(self) -> str:
+        """Return the supported version(s) of the wrapped package."""
+        if self.package_info.specifier:
+            return self.package_info.specifier
+        return getattr(self.package_info, "url", "*")
 
 
 class WrappedHelpFormatter(HelpFormatter):
@@ -183,11 +212,12 @@ def add_bare_wrapper(parser: _SubParsersAction, command: str) -> None:
     """
     from cpac.__main__ import ExtendAction
 
+    wrapped = get_wrapped(command)
     bare_parser: ArgumentParser = parser.add_parser(
         command,
         formatter_class=WrappedHelpFormatter,
-        help=f"Run {get_wrapped(command).command}",
-        usage=get_wrapped(command).helpstring,
+        help=f"Run {wrapped.command} ({wrapped.version})",
+        usage=wrapped.helpstring,
     )
     bare_parser.add_argument("args", nargs=REMAINDER)
     bare_parser.register("action", "extend", ExtendAction)
@@ -205,12 +235,8 @@ def call(name: str, command: list) -> None:
         The command to run
     """
     script = get_wrapped(name)
-    cpac_requires = requires("cpac") or []
-    _requirements: List[Requirement] = [Requirement(req) for req in cpac_requires]
-    requirements: Dict[str, Requirement] = {req.name: req for req in _requirements}
-    del _requirements
     try:
-        package_info = requirements[script.package]
+        package_info = script.package_info
     except KeyError as ke:
         raise KeyError(f"Package {name} not defined in dependencies") from ke
     marker = getattr(package_info, "marker", None)

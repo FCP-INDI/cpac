@@ -31,7 +31,7 @@ repository = "https://github.com/FCP-INDI/cpac"
 version = "1.8.6.post1.dev1"
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.10"
 docker = ">=4.2.1"
 dockerpty = "*"
 docker-pycreds = "*"
@@ -50,7 +50,7 @@ tornado = "*"
 websocket-client = "*"
 alabaster = {version = "*", optional = true}
 ba_timeseries_gradients = {git = "https://github.com/cmi-dair/ba-timeseries-gradients.git", optional = true, markers = "python_version >= '3.11' and python_version < '3.12'"}
-ba-tsconcat = {version = ">=0.1.1", optional = true, markers = "python_version >= '3.11' and python_version < '4.0'"}
+ba-tsconcat = {version = "==0.1.1", optional = true, markers = "python_version >= '3.11' and python_version < '4.0'"}
 bids2table = {version = "0.1.0b0", markers = "extra == 'tsconcat'"}
 coveralls = {version = "*", optional = true}
 elbow = {version = "0.1.1", markers = "extra == 'tsconcat'"}
