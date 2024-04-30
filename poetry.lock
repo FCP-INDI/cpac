@@ -1818,4 +1818,4 @@ tsconcat = ["ba-tsconcat"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10"
-content-hash = "c94929f734ec2b10102a925bc37d72a6738c58b0e7a3bd2e7e758310d6380659"
+content-hash = "cf184262266948e26f0dce8fbaa2347352778ec1729e742d56833c95c165a833"
