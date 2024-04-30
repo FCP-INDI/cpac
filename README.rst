@@ -83,8 +83,8 @@ Usage
         group               Run a group level analysis in C-PAC. See
                             "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] group --help"
                             for more information.
-        gradients           Run ba_timeseries_gradients
-        tsconcat            Run ba-tsconcat
+        gradients           Run ba_timeseries_gradients (git+https://github.com/cmi-dair/ba-timeseries-gradients.git)
+        tsconcat            Run ba-tsconcat (==0.1.1)
         pull (upgrade)      Upgrade your local C-PAC version to the latest version
                             by pulling from Docker Hub or other repository.
                             Use with "--image" and/or "--tag" to specify an image
