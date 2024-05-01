@@ -84,7 +84,7 @@ Usage
                             "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] group --help"
                             for more information.
         gradients           Run ba_timeseries_gradients (git+https://github.com/cmi-dair/ba-timeseries-gradients.git)
-        tsconcat            Run ba-tsconcat (==0.1.1)
+        tsconcat            Run ba-tsconcat (<0.2.0,>=0.1.2)
         pull (upgrade)      Upgrade your local C-PAC version to the latest version
                             by pulling from Docker Hub or other repository.
                             Use with "--image" and/or "--tag" to specify an image
