@@ -130,9 +130,9 @@ class WrappedBare:
         return self._helpstring.replace(f"usage: {self.command}", f"cpac {self.name}")
 
     @property
-    def package_info(self) -> Requirement:
+    def package_info(self) -> Optional[Requirement]:
         """Return metadata about how a package is required for this version of cpac."""
-        return self.requirements()[self.package]
+        return self.requirements().get(self.package)
 
     @classmethod
     def requirements(cls) -> dict[str, Requirement]:
@@ -170,9 +170,11 @@ class WrappedBare:
     @property
     def version(self) -> str:
         """Return the supported version(s) of the wrapped package."""
-        if self.package_info.specifier:
-            return self.package_info.specifier
-        return getattr(self.package_info, "url", "*")
+        if self.package_info:
+            if self.package_info.specifier:
+                return self.package_info.specifier
+            return getattr(self.package_info, "url", "*")
+        return "*"
 
 
 class WrappedHelpFormatter(HelpFormatter):

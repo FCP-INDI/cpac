@@ -32,13 +32,13 @@ tests-no-zope = ["attrs[tests-mypy]", "cloudpickle", "hypothesis", "pympler", "p
 
 [[package]]
 name = "ba-tsconcat"
-version = "0.1.1"
+version = "0.1.2"
 description = "BIDS App and Python library for concatenating MRI time series."
 optional = true
 python-versions = "<4.0,>=3.10"
 files = [
-    {file = "ba_tsconcat-0.1.1-py3-none-any.whl", hash = "sha256:4dcf4ba839442b9890961531294e268e69edafe5e72491c9c77501cf65a600aa"},
-    {file = "ba_tsconcat-0.1.1.tar.gz", hash = "sha256:3a2c1ac2135c81f7005fa6ad7262eed69391451ad20d7d88f011cefc58ce90ca"},
+    {file = "ba_tsconcat-0.1.2-py3-none-any.whl", hash = "sha256:9bbcccf69ff4dccddb304541182c3fca5c92fd30679c42acb3d9722f974eec95"},
+    {file = "ba_tsconcat-0.1.2.tar.gz", hash = "sha256:b73bc5340cac8391c0ffca02f4f4568cca47bf3bc8699857d49c4199c3c5af82"},
 ]
 
 [package.dependencies]
@@ -1818,4 +1818,4 @@ tsconcat = ["ba-tsconcat"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10"
-content-hash = "cf184262266948e26f0dce8fbaa2347352778ec1729e742d56833c95c165a833"
+content-hash = "ca5f0f84d4c58fb37a4c056059355a3131e5beaba38a9952d40ec062f6db41f7"
