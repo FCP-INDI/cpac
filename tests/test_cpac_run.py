@@ -16,7 +16,7 @@ MINIMAL_CONFIG = os.path.join(os.path.dirname(__file__), "test_data", "minimal.m
 
 @pytest.mark.parametrize("helpflag", ["--help", "-h"])
 @pytest.mark.parametrize("argsep", [" ", "="])
-def test_run_help(argsep, capsys, helpflag, platform, tag):
+def test_run_help(argsep, capsys, helpflag, image, platform, tag):
     """Test 'help' run command."""
 
     def run_test(argv):
@@ -26,7 +26,7 @@ def test_run_help(argsep, capsys, helpflag, platform, tag):
             captured = capsys.readouterr()
             assert "participant" in captured.out + captured.err
 
-    args = set_commandline_args(platform, tag, argsep)
+    args = set_commandline_args(image, platform, tag, argsep)
     argv = f"run {helpflag}"
     if len(args):
         before, after = args_before_after(argv, args)
@@ -41,7 +41,7 @@ def test_run_help(argsep, capsys, helpflag, platform, tag):
 
 @pytest.mark.parametrize("argsep", [" ", "="])
 @pytest.mark.parametrize("pipeline_file", [None, MINIMAL_CONFIG])
-def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
+def test_run_test_config(argsep, pipeline_file, image, platform, tag, tmp_path):
     """Test 'test_config' run command."""
 
     def run_test(argv, wd):  # pylint: disable=invalid-name
@@ -67,7 +67,7 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
             )
 
     wd = tmp_path  # pylint: disable=invalid-name
-    args = set_commandline_args(platform, tag, argsep)
+    args = set_commandline_args(image, platform, tag, argsep)
     pipeline = (
         "" if pipeline_file is None else " ".join([" --pipeline_file", pipeline_file])
     )
@@ -76,7 +76,7 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
         f"s3://fcp-indi/data/Projects/ABIDE/RawDataBIDS/NYU {wd} "
         f"test_config --participant_ndx=2{pipeline}"
     )
-    if check_version_at_least("1.8.4", platform):
+    if check_version_at_least("1.8.4", platform=platform, image=image):
         argv += " --tracking_opt-out"
     if args:
         before, after = args_before_after(argv, args)
@@ -84,8 +84,10 @@ def test_run_test_config(argsep, pipeline_file, tmp_path, platform, tag):
         run_test(before, wd)
         # test with args after command
         run_test(after, wd)
+    # test without --platform and --tag args
+    elif image is not None:
+        run_test(f"cpac --image{argsep}{image} {argv}".split(" "), wd)
     else:
-        # test without --platform and --tag args
         run_test(f"cpac {argv}".split(" "), wd)
 
 

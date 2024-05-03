@@ -7,7 +7,7 @@ import os
 import pwd
 import tempfile
 import textwrap
-from typing import overload
+from typing import Union
 from warnings import warn
 
 from docker import errors as docker_errors
@@ -32,6 +32,7 @@ class CpacVersion:
         self.platform = backend.platform
 
     def __str__(self):
+        """Return string representation of CpacVersion."""
         return (
             f"cpac (convenience wrapper) version {self.versions.cpac}\n"
             f"C-PAC version {self.versions.CPAC} running on "
@@ -64,11 +65,21 @@ class PlatformMeta:
         self.symbol = symbol
         self.version = "unknown"
 
+    def __repr__(self):
+        """Return reproducible string reprensentation of platform metadata."""
+        return f"PlatformMeta({self.name}, {self.symbol})"
+
     def __str__(self):
-        return f"{self.symbol} {self.name}"
+        """Return string representation of platform metadata."""
+        _str = f"{self.symbol} {self.name}"
+        if self.version != "unknown":
+            _str += f" {self.version}"
+        return _str
 
 
 class Backend:
+    """Generic class for container backends."""
+
     def __init__(self, **kwargs):
         self.pipeline_config = None
         if "extra_args" in kwargs and isinstance(kwargs["extra_args"], list):
@@ -105,7 +116,6 @@ class Backend:
         self.bindings = {}
         self.container = None
         self.image = None
-        self.platform = None
         self._run = None
         self.uid = 0
         self.username = "root"
@@ -113,6 +123,7 @@ class Backend:
         atexit.register(self._cleanup)
 
     def __del__(self):
+        """Clean up container when finished."""
         self._cleanup()
 
     def read_crash(self, crashfile, flags=None, **kwargs):
@@ -310,7 +321,7 @@ class Backend:
         table = pd.DataFrame(
             [
                 (volume.local, volume.bind, volume.mode)
-                for volume in self.bindings["volumes"]
+                for volume in self.bindings.get("volumes", [])
             ]
         )
         if not table.empty:
@@ -341,6 +352,19 @@ class Backend:
             print(
                 f"Logging messages will refer to the {self.platform.name} " "paths.\n"
             )
+
+    @property
+    def platform(self):
+        """Platform metadata."""
+        try:
+            return self._platform
+        except AttributeError:
+            return None
+
+    @platform.setter
+    def platform(self, value):
+        """Set platform metadata."""
+        self._platform = value
 
     def _prep_binding(self, volume: Volume, second_try: bool = False) -> Volume:
         """Prepare a volume binding for the container.
@@ -381,19 +405,10 @@ class Backend:
         except UnicodeEncodeError:
             print(message)
 
-    @overload
-    def __setattr__(self, name: str, value: Volume) -> None:
-        ...
-
-    @overload
-    def __setattr__(self, name: str, value: list) -> None:
-        ...
-
-    @overload
-    def __setattr__(self, name: str, value: Volumes) -> None:
-        ...
-
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Union[list, Volume, Volumes]) -> None:
+        """Coerce self.volumes to be a Volumes instance."""
+        if name == "platform":
+            super().__setattr__(name, value)
         if name == "volumes":
             if isinstance(value, Volumes):
                 self.__dict__[name] = value
@@ -463,6 +478,8 @@ class Backend:
 
 
 class Result:
+    """Yield result."""
+
     mime = None
 
     def __init__(self, name, value):
@@ -470,20 +487,25 @@ class Result:
         self.value = value
 
     def __call__(self):
+        """Yield result."""
         yield self.value
 
     @property
     def description(self):
+        """Return dict of {'type': 'object'}."""
         return {"type": "object"}
 
 
 class FileResult(Result):
+    """Yield a file."""
+
     def __init__(self, name, value, mime):
         self.name = name
         self.value = value
         self.mime = mime
 
     def __call__(self):
+        """Yeild file."""
         with open(self.value, "rb") as f:
             while True:
                 piece = f.read(1024)
@@ -494,4 +516,5 @@ class FileResult(Result):
 
     @property
     def description(self):
+        """Return dict of 'type' and 'mime' for file."""
         return {"type": "file", "mime": self.mime}

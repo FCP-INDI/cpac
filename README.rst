@@ -38,8 +38,8 @@ Usage
 
     cpac --help
     usage: cpac [-h] [--version] [-o OPT] [-B CUSTOM_BINDING]
-                [--platform {docker,singularity}] [--image IMAGE] [--tag TAG]
-                [--working_dir PATH] [-v] [-vv]
+                [--platform {docker,singularity,apptainer}] [--image IMAGE]
+                [--tag TAG] [--working_dir PATH] [-v] [-vv]
                 {run,utils,version,group,pull,upgrade,enter,bash,shell,parse-resources,parse_resources,crash}
                 ...
     
@@ -77,14 +77,14 @@ Usage
     positional arguments:
       {run,utils,version,group,pull,upgrade,enter,bash,shell,parse-resources,parse_resources,crash}
         run                 Run C-PAC. See
-                            "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] run --help"
+                            "cpac [--platform {docker,apptainer,singularity}] [--image IMAGE] [--tag TAG] run --help"
                             for more information.
         utils               Run C-PAC commandline utilities. See
-                            "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] utils --help"
+                            "cpac [--platform {docker,apptainer,singularity}] [--image IMAGE] [--tag TAG] utils --help"
                             for more information.
         version             Print the version of C-PAC that cpac is using.
         group               Run a group level analysis in C-PAC. See
-                            "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] group --help"
+                            "cpac [--platform {docker,apptainer,singularity}] [--image IMAGE] [--tag TAG] group --help"
                             for more information.
         pull (upgrade)      Upgrade your local C-PAC version to the latest version
                             by pulling from Docker Hub or other repository.
@@ -106,7 +106,7 @@ Usage
     options:
       -h, --help            show this help message and exit
       --version             show program's version number and exit
-      -o OPT, --container_option OPT
+      -o OPT, --container_option OPT, --container_options OPT
                             parameters and flags to pass through to Docker or Singularity
                             
                             This flag can take multiple arguments so cannot be
@@ -123,14 +123,14 @@ Usage
                             This flag can take multiple arguments so cannot be
                             the final argument before the command argument (i.e.,
                             run or any other command that does not start with - or --)
-      --platform {docker,singularity}
+      --platform {docker,singularity,apptainer}
                             If neither platform nor image is specified,
                             cpac will try Docker first, then try
-                            Singularity if Docker fails.
-      --image IMAGE         path to Singularity image file OR name of Docker image (eg, "fcpindi/c-pac").
+                            Apptainer/Singularity if Docker fails.
+      --image IMAGE         path to Apptainer/Singularity image file OR name of Docker image (eg, "fcpindi/c-pac").
                             Will attempt to pull from Singularity Hub or Docker Hub if not provided.
                             If image is specified but platform is not, platform is
-                            assumed to be Singularity if image is a path or 
+                            assumed to be Apptainer/Singularity if image is a path or 
                             Docker if image is an image name.
       --tag TAG             tag of the Docker image to use (eg, "latest" or "nightly").
       --working_dir PATH    working directory

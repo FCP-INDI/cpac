@@ -8,7 +8,7 @@ from .CONSTANTS import args_before_after, set_commandline_args
 
 
 @pytest.mark.parametrize("argsep", [" ", "="])
-def test_utils_help(argsep, capsys, platform, tag):
+def test_utils_help(argsep, capsys, image, platform, tag):
     def run_test(argv, platform):
         argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, "argv", argv):
@@ -19,7 +19,7 @@ def test_utils_help(argsep, capsys, platform, tag):
             assert "COMMAND" in captured.out
 
     argv = "group --help"
-    args = set_commandline_args(platform, tag, argsep)
+    args = set_commandline_args(image, platform, tag, argsep)
     if len(args):
         before, after = args_before_after(argv, args)
         # test with args before command
