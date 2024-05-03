@@ -9,14 +9,9 @@ from logging import ERROR, log
 from shutil import which
 from subprocess import call as sub_call, CalledProcessError
 from sys import exit as sys_exit, version_info
-from typing import ClassVar, Optional, TypedDict
+from typing import cast, ClassVar, Optional, TypedDict
 
 from packaging.requirements import Requirement
-
-try:
-    from ba_timeseries_gradients.parser import get_parser as gradients_parser
-except (ImportError, ModuleNotFoundError):
-    gradients_parser = None
 
 try:
     from tsconcat.utils import build_bidsapp_group_parser
@@ -66,9 +61,6 @@ if build_bidsapp_group_parser is not None:
     )
 
 _PARSERS = {
-    "gradients": gradients_parser()
-    if gradients_parser is not None
-    else gradients_parser,
     "tsconcat": tsconcat_parser,
 }
 """CLI parsers for wrapped packages"""
@@ -94,14 +86,6 @@ class ScriptInfo(TypedDict):
 
 
 _SCRIPTS: dict[str, ScriptInfo] = {
-    "gradients": {
-        "command": "ba_timeseries_gradients",
-        "helpstring": None,
-        "package": "ba_timeseries_gradients",
-        "positional_arguments": True,
-        "supported_python": "[3.11, 3.12)",
-        "url": "https://cmi-dair.github.io/ba-timeseries-gradients/ba_timeseries_gradients.html",
-    },
     "tsconcat": {
         "command": "ba-tsconcat",
         "helpstring": None,
@@ -128,12 +112,12 @@ class WrappedBare:
     """The canonical name of the wrapped package."""
     positional_arguments: bool
     """Whether the original command takes positional arguments."""
-    _requirements: ClassVar[Optional[dict[str, Requirement]]]
-    """Memoized requirements dictionary."""
     supported_python_range: str
     """Constraints for supported Python versions in interval notation."""
     url: str
     """The URL to the wrapped package's documentation."""
+    _requirements: ClassVar[Optional[dict[str, Requirement]]]
+    """Memoized requirements dictionary."""
 
     @property
     def helpstring(self):
@@ -261,9 +245,10 @@ def check_for_package(package_name: str) -> bool:
 
 def _collect_usage_string(name: str) -> None:
     """Collect a usage string from a wrapped package to use in the helpstring."""
-    if _PARSERS[name] is not None:
+    if isinstance(_PARSERS[name], ArgumentParser):
+        _parser = cast(ArgumentParser, _PARSERS[name])
         try:
-            _SCRIPTS[name]["helpstring"] = _PARSERS[name].format_help()
+            _SCRIPTS[name]["helpstring"] = _parser.format_help()
         except AttributeError:
             print(name)
 

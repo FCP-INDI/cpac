@@ -19,7 +19,7 @@ cpac Python Package is a lightweight Python package that handles interfacing a u
 Dependencies
 ============
 
-* `Python <https://www.python.org>`_ ≥ 3.8
+* `Python <https://www.python.org>`_ ≥ 3.10
 * `pip <https://pip.pypa.io>`_
 * At least one of:
 
@@ -83,7 +83,9 @@ Usage
         group               Run a group level analysis in C-PAC. See
                             "cpac [--platform {docker,singularity}] [--image IMAGE] [--tag TAG] group --help"
                             for more information.
-        gradients           Run ba_timeseries_gradients (git+https://github.com/cmi-dair/ba-timeseries-gradients.git)
+        gradients           Run ba_timeseries_gradients. See
+                            "cpac [--platform "{docker,singularity}] gradients --help" 
+                            for more information.
         tsconcat            Run ba-tsconcat (<0.2.0,>=0.1.2)
         pull (upgrade)      Upgrade your local C-PAC version to the latest version
                             by pulling from Docker Hub or other repository.

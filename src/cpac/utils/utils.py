@@ -28,8 +28,8 @@ class LocalsToBind:
         """
         Add local bindings from a configuration file.
 
-        Paramter.
-        --------
+        Parameters
+        ----------
         config_path : str
             path to data config file
         """
