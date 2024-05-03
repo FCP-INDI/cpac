@@ -14,8 +14,9 @@ repos:
   - id: mypy
     additional_dependencies:
     - types-tabulate
+    - types-toml
     - types-PyYAML
-    args: [--python-version=3.8, --ignore-missing-imports]
+    args: [--python-version=3.10, --ignore-missing-imports]
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
   rev: v2.13.0
   hooks:
