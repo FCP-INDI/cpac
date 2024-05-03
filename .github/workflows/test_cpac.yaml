@@ -93,7 +93,7 @@ jobs:
       with:
         apptainer-version: ${{ matrix.apptainer }}
     - name: Install cpac
-      run: cd $GITHUB_WORKSPACE && pip install -e ".[dev,testing]"
+      run: cd $GITHUB_WORKSPACE && pip install -e ".[dev,testing,tsconcat]"
     - name: Pull images
       if: ${{ matrix.platform == 'apptainer' }}
       run: |
