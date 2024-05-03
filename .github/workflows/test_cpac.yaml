@@ -62,13 +62,9 @@ jobs:
         apptainer: [1.0.0, 1.3.0]
         go: [1.14]
         platform: [apptainer, docker]
-        python: [3.8, 3.9, '3.10', 3.11, 3.12]
+        python: ['3.10', 3.11, 3.12]
         tag: [latest, nightly]
         exclude:
-        - platform: apptainer
-          python: 3.8
-        - platform: apptainer
-          python: 3.9
         - platform: apptainer
           python: 3.11
         - platform: apptainer
