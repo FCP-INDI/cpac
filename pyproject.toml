@@ -58,7 +58,7 @@ classifiers = [
 documentation = "https://fcp-indi.github.io/docs/latest/user/cpac"
 readme = "README.rst"
 repository = "https://github.com/FCP-INDI/cpac"
-version = "1.8.7.dev1"
+version = "1.8.7"
 
 [tool.poetry.dependencies]
 python = ">=3.10"
