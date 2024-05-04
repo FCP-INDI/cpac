@@ -232,6 +232,9 @@ def call(name: str, command: list) -> None:
         )
     try:
         sub_call([script.command, *command])
+    except FileNotFoundError:
+        log(ERROR, script.helpstring)
+        sys_exit(127)
     except CalledProcessError as cpe:
         log(ERROR, str(cpe))
         sys_exit(cpe.returncode)

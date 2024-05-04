@@ -1,0 +1,175 @@
+# This workflow will test cpac
+
+name: Test cpac
+
+on:
+  push:
+    paths-ignore:
+    - README.rst
+
+jobs:
+  set_docker_image:
+    outputs:
+      docker_image: ${{ steps.set_docker_image.outputs.docker_image }}
+    runs-on: ubuntu-latest
+    steps:
+    - id: set_docker_image
+      name: set tag name
+      run: |
+        DOCKER_IMAGE="ghcr.io/${{ github.repository }}/api-test"
+        DOCKER_IMAGE="${DOCKER_IMAGE@L}"
+        echo "docker_image=${DOCKER_IMAGE}" >> "${GITHUB_OUTPUT}"
+
+  build_dry_run_image:
+    needs: set_docker_image
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3.3.0
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3.1.0
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Build and push
+      uses: docker/build-push-action@v5.3.0
+      with:
+        context: .
+        file: ./.github/Dockerfiles/c-pac_api.${{ matrix.tag }}.Dockerfile
+        provenance: false
+        sbom: false
+        push: true
+        tags: |
+          ${{ needs.set_docker_image.outputs.docker_image }}:${{ matrix.tag }}
+    strategy:
+      matrix:
+        tag: [latest, nightly]
+
+  test_cpac:
+    env:
+      APPTAINER_CACHEDIR: ${{ github.workspace }}/.apptainer/cache
+      APPTAINER_TMPDIR: ${{ github.workspace }}/.apptainer/tmp
+    needs:
+    - build_dry_run_image
+    - set_docker_image
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        apptainer: [1.0.0, 1.3.0]
+        go: [1.14]
+        platform: [apptainer, docker]
+        python: ['3.10', 3.11, 3.12]
+        tag: [latest, nightly]
+        exclude:
+        - platform: apptainer
+          python: 3.11
+        - platform: apptainer
+          python: 3.12
+    steps:
+    - name: Clear up some space on runner
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+    - uses: actions/checkout@v4
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        cache: false
+        go-version: ${{ matrix.go }}
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install --upgrade pip setuptools wheel
+      run: python -m pip install --upgrade pip setuptools wheel
+    - name: Setup apptainer
+      if: ${{ matrix.platform == 'apptainer' }}
+      uses: eWaterCycle/setup-apptainer@v2.0.0
+      with:
+        apptainer-version: ${{ matrix.apptainer }}
+    - name: Install cpac
+      run: cd $GITHUB_WORKSPACE && pip install -e ".[dev,testing,tsconcat]"
+    - name: Pull images
+      if: ${{ matrix.platform == 'apptainer' }}
+      run: |
+        mkdir -p ${{ env.APPTAINER_CACHEDIR }}
+        mkdir -p ${{ env.APPTAINER_TMPDIR }}
+        export APPTAINER_CACHEDIR=${{ env.APPTAINER_CACHEDIR }}
+        export SINGULARITY_CACHEDIR=${{ env.APPTAINER_CACHEDIR }}
+        export APPTAINER_TMPDIR=${{ env.APPTAINER_TMPDIR }}
+        export SINGULARITY_TMPDIR=${{ env.APPTAINER_TMPDIR }}
+        cpac --platform ${{ matrix.platform }} pull --image ${{ needs.set_docker_image.outputs.docker_image }} --tag ${{ matrix.tag }}
+    - name: Test cpac, platform and tag specified
+      run: |
+        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --image=${{ needs.set_docker_image.outputs.docker_image }} --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
+        coverage report -m
+    - name: Test cpac, platform specified, tag unspecified
+      if: ${{ matrix.tag == 'latest' }} and ${{ matrix.platform == 'docker' }}
+      run: |
+        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --image=${{ needs.set_docker_image.outputs.docker_image }} --platform ${{ matrix.platform }} .
+        coverage report -m
+    - name: Test cpac, platform unspecified, tag specified
+      if: ${{ matrix.platform == 'docker' }}
+      run: |
+        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --image=${{ needs.set_docker_image.outputs.docker_image }} --tag ${{ matrix.tag }} .
+        coverage report -m
+    - name: Test cpac, platform and tag unspecified
+      if: ${{ matrix.platform == 'docker' }} && ${{ matrix.tag }} == 'latest'
+      run: |
+        coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --image=${{ needs.set_docker_image.outputs.docker_image }} .
+        coverage report -m
+    - name: Report coverage
+      uses: AndreMiras/coveralls-python-action@v20201129
+      with:
+        parallel: true
+        flag-name: Test cpac ${{ matrix.platform }} with Python ${{ matrix.python }}
+      continue-on-error: true
+  finalize_coverage-report:
+    needs:
+    - test_cpac
+    runs-on: ubuntu-latest
+    steps:
+    - name: Finalize coverage report
+      uses: AndreMiras/coveralls-python-action@v20201129
+      with:
+        parallel-finished: true
+      continue-on-error: true
+  update_README:
+    # Only update README if tests succeed
+    needs:
+    - test_cpac
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Install cpac
+      run: |
+        export DEB_PYTHON_INSTALL_LAYOUT=deb_system
+        cd $GITHUB_WORKSPACE
+        pip install .
+    - name: Configure Git credentials
+      uses: oleksiyrudenko/gha-git-credentials@v2.1.2
+      with:
+        global: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Update README
+      run: |
+        (head -n $(read -d : <<< $(less README.rst | grep ".. BEGIN USAGE" -n); expr $REPLY + 1) README.rst; \
+        printf ".. code-block:: shell\n\n    cpac --help\n"; \
+        cpac --help | sed 's/^/    /'; \
+        tail --lines=+$(read -d : <<< $(less README.rst | grep ".. END USAGE" -n); expr $REPLY - 1) README.rst\
+        ) > tempREADME &&
+        mv tempREADME README.rst &
+        wait %1
+        if [[ $(git diff --numstat README.rst) ]]; then
+            git add README.rst
+            git commit -m ":memo: Update usage from helpstring"
+            git push origin HEAD:${GITHUB_REF}
+        fi
+      shell: bash

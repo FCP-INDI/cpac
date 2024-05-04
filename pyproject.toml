@@ -7,6 +7,36 @@ build = "poetry build"
 release = "poetry publish"
 test = "pytest"
 
+[tool.coverage.run]
+branch = true
+relative_files = true
+omit = [
+  # runs in container so unseen by coverage
+  "src/cpac/helpers/cpac_read_crash.py"
+]
+
+[tool.coverage.paths]
+source = [
+  "src/",
+  "*/site-packages/"
+]
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_lines = [
+  # Standard pragma
+  "pragma: no cover",
+  # Don't complain about missing debug-only code:
+  "def __repr__",
+  "if self\\.debug",
+  # Don't complain if tests don't hit defensive assertion code:
+  "raise AssertionError",
+  "raise NotImplementedError",
+  # Don't complain if non-runnable code isn't run:
+  "if 0:",
+  "if __name__ == .__main__.:"
+]
+
 [tool.devpi.upload]
 no-vcs = "1"
 formats = "bdist_wheel"
@@ -28,7 +58,7 @@ classifiers = [
 documentation = "https://fcp-indi.github.io/docs/latest/user/cpac"
 readme = "README.rst"
 repository = "https://github.com/FCP-INDI/cpac"
-version = "1.8.7.dev1"
+version = "1.8.7"
 
 [tool.poetry.dependencies]
 python = ">=3.10"
@@ -43,7 +73,7 @@ poetry = "*"
 pyyaml = "*"
 rich = "*"
 semver = "*"
-spython = ">=0.0.81"
+spython = ">=0.3.0"
 tabulate = ">=0.8.6"
 tornado = "*"
 websocket-client = "*"
@@ -84,8 +114,10 @@ testpaths = ["tests"]
 
 [tool.ruff]
 extend-exclude = ["docs/conf.py"]
-extend-select = ["A", "C4", "D", "G", "I", "ICN", "NPY", "PL", "RET", "RSE", "RUF", "Q", "W"]
 target-version = "py38"
+
+[tool.ruff.lint]
+extend-select = ["A", "C4", "D", "G", "I", "ICN", "NPY", "PL", "RET", "RSE", "RUF", "Q", "W"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
