@@ -89,7 +89,7 @@ jobs:
       run: python -m pip install --upgrade pip setuptools wheel
     - name: Setup apptainer
       if: ${{ matrix.platform == 'apptainer' }}
-      uses: eWaterCycle/setup-apptainer@v2.0.0
+      uses: eWaterCycle/setup-apptainer@v2
       with:
         apptainer-version: ${{ matrix.apptainer }}
     - name: Install cpac
