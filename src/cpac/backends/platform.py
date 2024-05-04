@@ -1,4 +1,5 @@
 """Base classes for platform-specific implementations."""
+
 import atexit
 from collections import namedtuple
 from contextlib import redirect_stderr
@@ -125,6 +126,20 @@ class Backend:
     def __del__(self):
         """Clean up container when finished."""
         self._cleanup()
+
+    @staticmethod
+    def drop_missing_positional_arguments(kwargs: dict, flags: list) -> list:
+        """Return ordered list of positional args and flags without placeholders."""
+        return [
+            i
+            for i in [
+                kwargs.get("bids_dir"),
+                kwargs.get("output_dir"),
+                kwargs.get("level_of_analysis"),
+                *flags,
+            ]
+            if (i is not None and len(i))
+        ]
 
     def read_crash(self, crashfile, flags=None, **kwargs):
         """

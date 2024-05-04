@@ -1,4 +1,5 @@
 """Backend for Singularity images."""
+
 import os
 
 from spython.image import Image
@@ -180,12 +181,7 @@ class Singularity(Backend):
                 print(o, end="")
                 for o in self._try_to_stream(
                     args=" ".join(
-                        [
-                            kwargs["bids_dir"],
-                            kwargs["output_dir"],
-                            kwargs["level_of_analysis"],
-                            *flags,
-                        ]
+                        self.drop_missing_positional_arguments(kwargs, flags)
                     ).strip(" ")
                 )
             ]
