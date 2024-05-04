@@ -13,6 +13,7 @@ from docker.errors import DockerException, NotFound
 from cpac import __version__
 from cpac.backends import Backends
 from cpac.helpers import cpac_parse_resources as parse_resources, TODOs
+from cpac.utils.bare_wrap import add_bare_wrapper, call, WRAPPED
 
 _logger = logging.getLogger(__name__)
 _CLARGS: set = {"group", "utils"}
@@ -20,13 +21,17 @@ _CLARGS: set = {"group", "utils"}
 
 
 class ExtendAction(argparse.Action):
+    """Flatten commandline arguments for argparse."""
+
     def __call__(self, parser, namespace, values, option_string=None):
+        """Set flattened attributes on the namespace."""
         items = (getattr(namespace, self.dest) or []) + values
         items = [x for n, x in enumerate(items) if x not in items[:n]]
         setattr(namespace, self.dest, items)
 
 
 def address(str_addy):
+    """Split address into string and int components."""
     addr, port = str_addy.split(":")
     port = int(port)
     return addr, port
@@ -86,7 +91,8 @@ def _parser():
     parser.add_argument(
         "-o",
         "--container_option",
-        dest="container_option",
+        "--container_options",
+        dest="container_options",
         action="append",
         help="parameters and flags to pass through to Docker or Singularity\n"
         "\nThis flag can take multiple arguments so cannot "
@@ -111,17 +117,17 @@ def _parser():
 
     parser.add_argument(
         "--platform",
-        choices=["docker", "singularity"],
+        choices=["docker", "singularity", "apptainer"],
         help="If neither platform nor image is specified,\ncpac will try "
-        "Docker first, then try\nSingularity if Docker fails.",
+        "Docker first, then try\nApptainer/Singularity if Docker fails.",
     )
 
     parser.add_argument(
         "--image",
-        help="path to Singularity image file OR name of Docker image (eg, "
+        help="path to Apptainer/Singularity image file OR name of Docker image (eg, "
         '"fcpindi/c-pac").\nWill attempt to pull from Singularity Hub or '
         "Docker Hub if not provided.\nIf image is specified but platform "
-        "is not, platform is\nassumed to be Singularity if image is a "
+        "is not, platform is\nassumed to be Apptainer/Singularity if image is a "
         "path or \nDocker if image is an image name.",
     )
 
@@ -156,7 +162,7 @@ def _parser():
     run_parser = subparsers.add_parser(
         "run",
         add_help=False,
-        help='Run C-PAC. See\n"cpac [--platform {docker,singularity}] '
+        help='Run C-PAC. See\n"cpac [--platform {docker,apptainer,singularity}] '
         '[--image IMAGE] [--tag TAG] run --help"\nfor more '
         "information.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -166,7 +172,7 @@ def _parser():
         "utils",
         add_help=False,
         help='Run C-PAC commandline utilities. See\n"cpac [--platform '
-        "{docker,singularity}] [--image IMAGE] [--tag TAG] utils "
+        "{docker,apptainer,singularity}] [--image IMAGE] [--tag TAG] utils "
         '--help"\nfor more information.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -192,10 +198,31 @@ def _parser():
         "group",
         add_help=False,
         help='Run a group level analysis in C-PAC. See\n"cpac [--platform '
-        "{docker,singularity}] [--image IMAGE] [--tag TAG] group "
+        "{docker,apptainer,singularity}] [--image IMAGE] [--tag TAG] group "
         '--help"\nfor more information.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
+
+    gradients_parser = subparsers.add_parser(
+        "gradients",
+        add_help=False,
+        help='Run ba_timeseries_gradients. See\n"cpac [--platform '
+        '"{docker,singularity}] gradients --help" \nfor more information.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+
+    if not help_call(sys.argv):
+        # These positional arguments are required unless we're just getting
+        # the helpstring
+        gradients_parser.add_argument("bids_dir")
+        gradients_parser.add_argument(
+            "output_dir", default=os.path.join(cwd, "outputs")
+        )
+        gradients_parser.add_argument("level_of_analysis", choices=["group"])
+    gradients_parser.add_argument("extra_args", nargs=argparse.REMAINDER)
+
+    for bare_package in ["tsconcat"]:
+        add_bare_wrapper(subparsers, bare_package)
 
     subparsers.add_parser(
         "pull",
@@ -251,6 +278,7 @@ def _parser():
         enter_parser,
         group_parser,
         run_parser,
+        gradients_parser,
         utils_parser,
         version_parser,
     ]:
@@ -281,7 +309,19 @@ def parse_args(args):
     return parsed
 
 
+def setup_help(arg_vars: dict, level_of_analysis: str) -> dict:
+    """Supply necessary positional arguments to get helpstring from container."""
+    pwd = os.getcwd()
+    for arg in ["output_dir", "bids_dir"]:
+        if arg_vars.get(arg) is None or arg_vars.get(arg) is arg:
+            arg_vars[arg] = pwd
+    if level_of_analysis is None:
+        arg_vars["level_of_analysis"] = level_of_analysis
+    return arg_vars
+
+
 def setup_logging(loglevel):
+    """Set up logging."""
     logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
     logging.basicConfig(
         level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S"
@@ -338,12 +378,28 @@ def main(args):
                 "-h" in args.extra_args,
             ]
         ):
-            pwd = os.getcwd()
-            if arg_vars.get("level_of_analysis") is None:
-                arg_vars["level_of_analysis"] = "participant"
-            for arg in ["output_dir", "bids_dir"]:
-                if arg_vars.get(arg) is None:
-                    arg_vars[arg] = pwd
+            arg_vars = setup_help(arg_vars, "participant")
+        Backends(**arg_vars).run(flags=args.extra_args, **arg_vars)
+
+    if args.command == "gradients":
+        arg_vars.update(
+            {
+                "image": "ghcr.io/childmindresearch/ba-timeseries-gradients",
+                "tag": "main",
+            }
+        )
+        if any(
+            [
+                "--help" in arg_vars,
+                "-h" in arg_vars,
+                "--help" in args.extra_args,
+                "-h" in args.extra_args,
+            ]
+        ):
+            arg_vars = setup_help(arg_vars, "group")
+            if "--help" in args.extra_args:
+                args.extra_args.remove("--help")
+                args.extra_args.append("-h")
         Backends(**arg_vars).run(flags=args.extra_args, **arg_vars)
 
     elif args.command in ["enter", "version"]:
@@ -371,7 +427,7 @@ def main(args):
 
 def run():
     """
-    Try Docker first and fall back on Singularity if Docker fails if --platform is not specified.
+    Try Docker first and fall back on Apptainer/Singularity if Docker fails if --platform is not specified.
 
     Parameters
     ----------
@@ -404,13 +460,17 @@ def run():
     # keep help option with specific command
     for option in ("-h", "--help"):
         options.discard(option)
-    for cmd in commands:
-        if command is None and cmd in args:
+    for cmd in args:
+        if command is None and cmd in commands:
             command_index = args.index(cmd)
             command = args.pop(command_index)
     if command is None:
         parser.print_help()
         parser.exit()
+    if command in WRAPPED:
+        if not help_call(args):
+            # directly call external package and exit on completion or failure
+            call(command, args)
     reordered_args = []
     option_value_setting = False
     for i, arg in enumerate(args.copy()):

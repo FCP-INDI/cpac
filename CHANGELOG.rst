@@ -2,6 +2,21 @@
 Changelog
 =========
 
+`Version 1.8.7`_: Wrapped ``gradients`` and ``tsconcat`` commands & explicit Apptainer support
+======================================================================================================================================================================================
+
+* Wrap ``ghcr.io/childmindresearch/ba-timeseries-gradients:main`` as ``gradients`` command
+* Wrap ``ba-tsconcat`` as ``tsconcat`` command
+* Require Python ≥ 3.10
+* Fix a bug in which an argument with the same string as a command would supercede the given command if the same-string argument is listed first in argument parser and the usage string (e.g., ``cpac gradients ${BIDS_DIR} ${OUTPUT_DIR} group`` would run ``cpac group gradients ${BIDS_DIR} ${OUTPUT_DIR}`` instead of ``cpac gradients ${BIDS_DIR} ${OUTPUT_DIR} group``)
+* Adds explicit support for Apptainer
+* Replaces disabled Singularity tests with enabled Apptainer tests in GitHub Actions
+
+`Version 1.8.6.post1: Broader Singularity & Apptainer support <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.6.post1>`_
+============================================================================================================================
+
+* Fixes a bug when trying to run in some versions of Singularity
+
 `Version 1.8.6: Support for C-PAC v1.8.6 <https://github.com/FCP-INDI/cpac/releases/tag/v1.8.6>`_
 =====================================================================================================
 
@@ -129,3 +144,5 @@ Version 0.1.1
 Version 0.1.0
 =============
 * ✨🐳 Ported Docker support from Theodore
+
+.. _Version 1.8.7: https://github.com/FCP-INDI/cpac/releases/tag/v1.8.7

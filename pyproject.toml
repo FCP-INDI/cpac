@@ -7,6 +7,36 @@ build = "poetry build"
 release = "poetry publish"
 test = "pytest"
 
+[tool.coverage.run]
+branch = true
+relative_files = true
+omit = [
+  # runs in container so unseen by coverage
+  "src/cpac/helpers/cpac_read_crash.py"
+]
+
+[tool.coverage.paths]
+source = [
+  "src/",
+  "*/site-packages/"
+]
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_lines = [
+  # Standard pragma
+  "pragma: no cover",
+  # Don't complain about missing debug-only code:
+  "def __repr__",
+  "if self\\.debug",
+  # Don't complain if tests don't hit defensive assertion code:
+  "raise AssertionError",
+  "raise NotImplementedError",
+  # Don't complain if non-runnable code isn't run:
+  "if 0:",
+  "if __name__ == .__main__.:"
+]
+
 [tool.devpi.upload]
 no-vcs = "1"
 formats = "bdist_wheel"
@@ -28,26 +58,33 @@ classifiers = [
 documentation = "https://fcp-indi.github.io/docs/latest/user/cpac"
 readme = "README.rst"
 repository = "https://github.com/FCP-INDI/cpac"
-version = "1.8.6"
+version = "1.8.7"
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.10,<4.0"
 docker = ">=4.2.1"
 dockerpty = "*"
 docker-pycreds = "*"
-importlib_metadata = {version = "*", markers = "python_version < '3.8'"}
-pandas = ">=0.23.4"
-poetry = "*"
+pandas = [
+  {version = ">=0.23.4"},
+  {version = "2.2.2", markers = "python_version >= '3.11' and python_version < '4.0' and extra == 'tsconcat'"}
+]
+poetry = ">=1.8.2"
 pyyaml = "*"
 rich = "*"
 semver = "*"
-spython = ">=0.0.81"
+spython = ">=0.3.0"
 tabulate = ">=0.8.6"
 tornado = "*"
 websocket-client = "*"
 alabaster = {version = "*", optional = true}
+ba-tsconcat = {version = ">=0.1.2,<0.2.0", optional = true, markers = "python_version >= '3.11' and python_version < '4.0'"}
+bids2table = {version = "0.1.0b0", markers = "extra == 'tsconcat'"}
 coveralls = {version = "*", optional = true}
+elbow = {version = "0.1.1", markers = "extra == 'tsconcat'"}
 imagesize = {version = "*", optional = true}
+nibabel = {version = "5.2.1", markers = "extra == 'tsconcat'"}
+pyarrow = {version = "16.0.0", markers = "extra == 'tsconcat'"}
 pytest = {version = "*", optional = true}
 pytest-cov = {version = "*", optional = true}
 pytest-remotedata = {version = ">=0.3.2", optional = true}
@@ -56,7 +93,9 @@ sphinx = {version = "*", optional = true}
 
 [tool.poetry.extras]
 dev = ["coveralls", "pytest", "pytest-remotedata", "pytest-runner", "sphinx"]
+gradients = []
 testing = ["alabaster", "imagesize", "pytest", "pytest-cov", "pytest-runner", "sphinx"]
+tsconcat = ["ba-tsconcat"]
 
 [tool.poetry.scripts]
 cpac = "cpac.__main__:run"
@@ -75,8 +114,10 @@ testpaths = ["tests"]
 
 [tool.ruff]
 extend-exclude = ["docs/conf.py"]
-extend-select = ["A", "C4", "D", "G", "I", "ICN", "NPY", "PL", "RET", "RSE", "RUF", "Q", "W"]
 target-version = "py38"
+
+[tool.ruff.lint]
+extend-select = ["A", "C4", "D", "G", "I", "ICN", "NPY", "PL", "RET", "RSE", "RUF", "Q", "W"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
@@ -88,7 +129,7 @@ section-order = ["future", "standard-library", "third-party", "collab", "other-f
 
 [tool.ruff.lint.isort.sections]
 "collab" = ["nipype", "spython"]
-"other-first-party" = []
+"other-first-party" = ["ba_timeseries_gradients", "bids2table", "tsconcat"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"

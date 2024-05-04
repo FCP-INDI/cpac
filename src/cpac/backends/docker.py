@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 import docker
 from docker.errors import ImageNotFound
@@ -88,17 +89,10 @@ class Docker(Backend):
     def _read_crash(self, read_crash_command, **kwargs):
         return self._execute(command=read_crash_command, run_type="exec", **kwargs)
 
-    def run(self, flags=[], **kwargs):
-        kwargs["command"] = [
-            i
-            for i in [
-                kwargs.get("bids_dir"),
-                kwargs.get("output_dir"),
-                kwargs.get("level_of_analysis"),
-                *flags,
-            ]
-            if (i is not None and len(i))
-        ]
+    def run(self, flags: Optional[list] = None, **kwargs):
+        if not flags:
+            flags = []
+        kwargs["command"] = self.drop_missing_positional_arguments(kwargs, flags)
         return self._execute(**kwargs)
 
     def clarg(self, clcommand, flags=None, **kwargs):

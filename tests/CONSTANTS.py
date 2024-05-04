@@ -1,9 +1,12 @@
 """Constants for tests."""
+
 # pylint: disable=invalid-name
+from typing import Optional
+
 TAGS = [None, "latest", "nightly"]
 
 
-def args_before_after(argv, args):
+def args_before_after(argv: str, args: str) -> tuple[list[str], list[str]]:
     """
     Create a mock sys.argv with arguments before and one with arguments after the command and its arguments.
 
@@ -35,20 +38,16 @@ def args_before_after(argv, args):
     return before, after
 
 
-def set_commandline_args(platform, tag, sep=" "):
-    """Turn pytest commandline options into mock cpac commandline option strings.
-
-    Parameters
-    ----------
-    platform : string
-
-    tag : string
-
-    Returns
-    -------
-    args : string
-    """
+def set_commandline_args(
+    image: Optional[str] = None,
+    platform: Optional[str] = None,
+    tag: Optional[str] = None,
+    sep: str = " ",
+) -> str:
+    """Turn pytest commandline options into mock cpac commandline option strings."""
     args = ""
+    if image is not None:
+        args += f" --image{sep}{image.lower()}"
     if platform is not None:
         args += f" --platform{sep}{platform.lower()} "
     if tag and tag is not None:
