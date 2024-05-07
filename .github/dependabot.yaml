@@ -4,9 +4,16 @@
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 
 version: 2
+registries:
+  ghcr: # Define access for a private registry
+    type: docker-registry
+    url: ghcr.io
+    username: ChildMindInstituteCNL  # machine user
+    password: ${{ secrets.GHCR_REGISTRY_TOKEN }}
 updates:
 - package-ecosystem: github-actions  # https://docs.github.com/en/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot
   directory: /
+  registries: '*'
   schedule:
     interval: monthly
 - package-ecosystem: pip
@@ -18,4 +25,5 @@ updates:
       dependency-type: production
     development dependencies:
       dependency-type: development
+  registries: '*'
   target-branch: develop
