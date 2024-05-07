@@ -7,6 +7,9 @@ on:
     paths-ignore:
     - README.rst
 
+permissions:
+  packages: write
+
 jobs:
   set_docker_image:
     outputs:
