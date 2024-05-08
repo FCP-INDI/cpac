@@ -79,7 +79,7 @@ tornado = "*"
 websocket-client = "*"
 alabaster = {version = "*", optional = true}
 ba-tsconcat = {version = ">=0.1.2,<0.2.0", optional = true, markers = "python_version >= '3.11' and python_version < '4.0'"}
-bids2table = {version = "0.1.0b0", markers = "extra == 'tsconcat'"}
+bids2table = {version = "0.1.0", markers = "extra == 'tsconcat'"}
 coveralls = {version = "*", optional = true}
 elbow = {version = "0.1.1", markers = "extra == 'tsconcat'"}
 imagesize = {version = "*", optional = true}
