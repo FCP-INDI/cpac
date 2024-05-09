@@ -1,4 +1,5 @@
 """Test actually running C-PAC with cpac."""
+
 from datetime import date, timedelta
 import os
 from pathlib import Path
@@ -84,11 +85,12 @@ def test_run_test_config(argsep, pipeline_file, image, platform, tag, tmp_path):
         run_test(before, wd)
         # test with args after command
         run_test(after, wd)
-    # test without --platform and --tag args
-    elif image is not None:
-        run_test(f"cpac --image{argsep}{image} {argv}".split(" "), wd)
-    else:
-        run_test(f"cpac {argv}".split(" "), wd)
+    elif tag == "latest":
+        # test without --platform and --tag args
+        if image is not None:
+            run_test(f"cpac --image{argsep}{image} {argv}".split(" "), wd)
+        else:
+            run_test(f"cpac {argv}".split(" "), wd)
 
 
 def _where_to_find_runlogs(_wd) -> list:
