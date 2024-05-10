@@ -46,7 +46,7 @@ def test_utils_new_settings_template(argsep, image, platform, tag, tmp_path):
         argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, "argv", argv):
             run()
-            template_path = os.path.join(wd, "data_settings.yaml")
+            template_path = os.path.join(wd, "data_settings.yml")
             assert os.path.exists(template_path)
 
     args = set_commandline_args(image, platform, tag, argsep)
