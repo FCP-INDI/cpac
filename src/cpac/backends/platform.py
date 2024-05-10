@@ -93,7 +93,7 @@ class Backend:
                     self.pipeline_config = "/".join(
                         [
                             "/code/CPAC/resources/configs",
-                            f"pipeline_config_{pipeline_config}.yml",
+                            f"pipeline_config_{pipeline_config}.yaml",
                         ]
                     )
         self.volumes = Volume("/etc/passwd", mode="ro")
