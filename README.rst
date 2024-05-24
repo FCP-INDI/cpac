@@ -33,7 +33,6 @@ Usage
 =====
 
 .. BEGIN USAGE
-
 .. code-block:: shell
 
     cpac --help
