@@ -38,6 +38,14 @@ repos:
   - id: poetry-lock
     args: [--no-update]
 
+- repo: local
+  hooks:
+  - id: update-README
+    name: Update README from usage string
+    entry: ./.pre-commit-hooks/update_README.py
+    language: python
+    always_run: true
+
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.6.0
   hooks:

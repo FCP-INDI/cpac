@@ -1,4 +1,5 @@
 """Hepler functions for cpac Python package."""
+
 from itertools import chain
 import re
 
@@ -32,12 +33,12 @@ def get_extra_arg_value(extra_args, argument):
     --------
     >>> get_extra_arg_value([
     ...     '--preconfig=fmriprep-options',
-    ...     '--data_config_file=/configs/data_config_regtest.yml',
+    ...     '--data_config_file=/configs/data_config_regtest.yaml',
     ...     '--participant_ndx=3'], 'preconfig')
     'fmriprep-options'
     >>> get_extra_arg_value([
     ...     '--preconfig=fmriprep-options',
-    ...     '--data_config_file=/configs/data_config_regtest.yml',
+    ...     '--data_config_file=/configs/data_config_regtest.yaml',
     ...     '--participant_ndx 3'], 'participant_ndx')
     '3'
     """
