@@ -29,8 +29,11 @@ class Singularity(Backend):
         self._set_platform()
         self._print_loading_with_symbol(self.platform.name)
         container_options = kwargs.get("container_options")
-        self.options = container_options if isinstance(container_options, list) else []
         self.pull(**kwargs, force=False)
+        _options = container_options if isinstance(container_options, list) else []
+        if os.path.exists(str(self.image)):
+            _options += ["--no-mount", str(self.image)]
+        self.options = _options
         if isinstance(self.pipeline_config, str):
             self.config = Client.execute(
                 image=self.image,

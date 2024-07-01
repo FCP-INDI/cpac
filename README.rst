@@ -58,7 +58,7 @@ Usage
     	cpac -B /path/to/data/configs:/configs \
     		--image fcpindi/c-pac --tag latest \
     		run /path/to/data /path/for/outputs \
-    		--data_config_file /configs/data_config.yaml \
+    		--data_config_file /configs/data_config.yml \
     		--save_working_dir
 
     Each command can take "--help" to provide additonal usage information, e.g.,
@@ -88,7 +88,7 @@ Usage
         gradients           Run ba_timeseries_gradients. See
                             "cpac [--platform "{docker,singularity}] gradients --help"
                             for more information.
-        tsconcat            Run ba-tsconcat (<0.2.0,>=0.1.2)
+        tsconcat            Run ba-tsconcat (*)
         pull (upgrade)      Upgrade your local C-PAC version to the latest version
                             by pulling from Docker Hub or other repository.
                             Use with "--image" and/or "--tag" to specify an image
