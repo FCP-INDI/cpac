@@ -1,4 +1,5 @@
 """Functions to check things like the in-container C-PAC version."""
+
 from packaging.version import Version
 from semver import VersionInfo
 
@@ -27,10 +28,12 @@ def check_version_at_least(min_version, platform, image=None, tag=None):
     if platform is None:
         platform = "docker"
     arg_vars = {"platform": platform, "image": image, "tag": tag, "command": "version"}
+    version_string = (
+        Backends(**arg_vars).run(run_type="version").versions.CPAC.lstrip("v")
+    )
+    dot_count = version_string.count(".")
+    if dot_count > 2:  # noqa: PLR2004
+        version_string = version_string.rsplit(".", dot_count - 2)[0]
     return VersionInfo.parse(min_version) <= VersionInfo(
-        *(
-            Version(
-                Backends(**arg_vars).run(run_type="version").versions.CPAC.lstrip("v")
-            ).release
-        )
+        *(Version(version_string).release)
     )
