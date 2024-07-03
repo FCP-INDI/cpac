@@ -1,6 +1,7 @@
 """Backend for Singularity images."""
 
 import os
+from pathlib import Path
 
 from spython.image import Image
 from spython.main import Client
@@ -29,7 +30,7 @@ class Singularity(Backend):
         self._set_platform()
         self._print_loading_with_symbol(self.platform.name)
         container_options = kwargs.get("container_options")
-        self.options = container_options if isinstance(container_options, list) else []
+        self._options = container_options if isinstance(container_options, list) else []
         self.pull(**kwargs, force=False)
         if isinstance(self.pipeline_config, str):
             self.config = Client.execute(
@@ -43,8 +44,14 @@ class Singularity(Backend):
         del self.config
         self._set_bindings(**kwargs)
 
+    def options(self, pull: bool = False) -> list[str]:
+        """Return the list of options for Singularity."""
+        if not pull and os.path.exists(str(self.image)):
+            return [*self._options, "--no-mount", str(Path(str(self.image)).absolute())]
+        return self._options
+
     def _bindings_as_option(self):
-        self.options += [
+        self._options += [
             "-B",
             ",".join(
                 [
@@ -56,11 +63,11 @@ class Singularity(Backend):
 
     def _bindings_from_option(self):
         enter_options = {}
-        if "-B" in self.options:
-            enter_options["bind"] = self.options[self.options.index("-B") + 1]
-            self.options.remove(enter_options["bind"])
-            self.options.remove("-B")
-        enter_options["singularity_options"] = self.options
+        if "-B" in self._options:
+            enter_options["bind"] = self._options[self._options.index("-B") + 1]
+            self._options.remove(enter_options["bind"])
+            self._options.remove("-B")
+        enter_options["singularity_options"] = self.options()
         return enter_options
 
     def _pull(self, img, force, pull_folder):
@@ -70,7 +77,7 @@ class Singularity(Backend):
                 img,
                 force=force,
                 pull_folder=pull_folder,
-                singularity_options=self.options,
+                singularity_options=self.options(pull=True),
             )
         except ValueError as value_error:
             if "closed file" in str(value_error):
@@ -129,7 +136,7 @@ class Singularity(Backend):
             self.container = Client.run(
                 self.image,
                 args=args,
-                options=self.options,
+                options=self.options(),
                 stream=not silent,
                 return_result=True,
                 **kwargs,
@@ -140,7 +147,7 @@ class Singularity(Backend):
                 self.container = Client.execute(
                     self.image,
                     command=args["command"].split(" "),
-                    options=self.options,
+                    options=self.options(),
                     stream=not silent,
                     quiet=silent,
                     **{
