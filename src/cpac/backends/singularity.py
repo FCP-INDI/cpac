@@ -1,6 +1,7 @@
 """Backend for Singularity images."""
 
 import os
+from pathlib import Path
 
 from spython.image import Image
 from spython.main import Client
@@ -32,7 +33,7 @@ class Singularity(Backend):
         self.options = container_options if isinstance(container_options, list) else []
         self.pull(**kwargs, force=False)
         if os.path.exists(str(self.image)):
-            self.options += ["--no-mount", str(self.image)]
+            self.options += ["--no-mount", str(Path(str(self.image)).absolute())]
         if isinstance(self.pipeline_config, str):
             self.config = Client.execute(
                 image=self.image,
