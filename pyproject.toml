@@ -84,7 +84,7 @@ coveralls = {version = "*", optional = true}
 elbow = {version = "0.1.1", markers = "extra == 'tsconcat'"}
 imagesize = {version = "*", optional = true}
 nibabel = {version = "5.2.1", markers = "extra == 'tsconcat'"}
-pyarrow = {version = "16.1.0", markers = "extra == 'tsconcat'"}
+pyarrow = {version = "17.0.0", markers = "extra == 'tsconcat'"}
 pytest = {version = "*", optional = true}
 pytest-cov = {version = "*", optional = true}
 pytest-remotedata = {version = ">=0.3.2", optional = true}
