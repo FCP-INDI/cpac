@@ -45,7 +45,7 @@ jobs:
         sudo rm -rf /opt/ghc
         sudo rm -rf "/usr/local/share/boost"
     - name: Build and push
-      uses: docker/build-push-action@v6.5.0
+      uses: docker/build-push-action@v6.7.0
       with:
         context: .
         file: ./.github/Dockerfiles/c-pac_api.${{ matrix.tag }}.Dockerfile
