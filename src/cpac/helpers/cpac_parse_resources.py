@@ -7,6 +7,7 @@ identify the `n` tasks with the `highest` or `lowest` of each of these
 categories.
 `cpac_parse_resources` is intended to be run outside a C-PAC container.
 """
+
 from argparse import ArgumentParser
 import configparser
 import json

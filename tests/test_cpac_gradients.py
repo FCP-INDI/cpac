@@ -1,4 +1,5 @@
 """Unit tests for the command-line interface module of ``ba-timeseries-gradients``."""
+
 from argparse import Namespace
 import logging
 from pathlib import Path
