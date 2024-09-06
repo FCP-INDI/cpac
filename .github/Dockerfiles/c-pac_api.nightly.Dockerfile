@@ -14,10 +14,10 @@
 
 # You should have received a copy of the GNU Lesser General Public
 # License along with C-PAC. If not, see <https://www.gnu.org/licenses/>.
-FROM ghcr.io/fcp-indi/c-pac/ubuntu:jammy-non-free as src
-LABEL org.opencontainers.image.description "NOT INTENDED FOR USE OTHER THAN AS A DRY-RUN TESTING IMAGE \
+FROM ghcr.io/fcp-indi/c-pac/ubuntu:jammy-non-free AS src
+LABEL org.opencontainers.image.description="NOT INTENDED FOR USE OTHER THAN AS A DRY-RUN TESTING IMAGE \
 Dry-run C-PAC nightly API."
-LABEL org.opencontainers.image.source https://github.com/FCP-INDI/cpac
+LABEL org.opencontainers.image.source=https://github.com/FCP-INDI/cpac
 USER root
 COPY --from=fcpindi/c-pac:nightly /code /code
 RUN mkdir -p /home/user/c-pac_user \
@@ -33,6 +33,6 @@ ENV PYTHONUSERBASE=/home/c-pac_user/.local
 ENV PATH=$PATH:/home/c-pac_user/.local/bin \
     PYTHONPATH=$PYTHONPATH:$PYTHONUSERBASE/lib/python3.10/site-packages
 USER c-pac_user
-RUN pip install -r /code/requirements.txt && pip install --user /code
+RUN pip install "nitransforms>=21.0.0,<24.0.0" && pip install -r /code/requirements.txt && pip install --user /code
 ENV FSLDIR="/FSLDIR"
 ENTRYPOINT [ "/code/CPAC/_entrypoints/run.py" ]
