@@ -1,5 +1,7 @@
 ci:
-  skip: [update-README]
+  skip:
+  - poetry-lock
+  - update-README
 
 fail_fast: false
 
