@@ -1,3 +1,5 @@
+"""General utilities for ``cpac``."""
+
 from __future__ import annotations
 
 from itertools import permutations
@@ -16,12 +18,15 @@ class LocalsToBind:
     """Class to collect local directories to bind to containers."""
 
     def __init__(self):
+        """Initialize ``LocalsToBind``."""
         self.locals = set()
 
     def __repr__(self):
-        return str(self)
+        """Return reproducible string representation for ``LocalsToBind``."""
+        return f"{self.__class__.__name__}()"
 
     def __str__(self):
+        """Return string representation for ``LocalsToBind``."""
         return str(self.locals)
 
     def from_config_file(self, config_path):
@@ -133,12 +138,15 @@ class PermissionMode:
         self._warn_if_undefined()
 
     def __repr__(self):
-        return self.mode
+        """Return reproducible string representation for ``PermissionMode``."""
+        return f"PermissionMode({self.mode})"
 
     def __eq__(self, other):
+        """Return True if self.mode == other.mode, False otherwise."""
         return self.mode == other.mode
 
     def __gt__(self, other):
+        """Return True if self.mode > other.mode, False otherwise."""
         for permission in (self, other):
             if permission._warn_if_undefined():
                 return NotImplemented
@@ -150,6 +158,7 @@ class PermissionMode:
         return False
 
     def __ge__(self, other):
+        """Return True if self.mode >= other.mode, False otherwise."""
         for permission in (self, other):
             if permission._warn_if_undefined():
                 return NotImplemented
@@ -158,6 +167,7 @@ class PermissionMode:
         return False
 
     def __lt__(self, other):
+        """Return True if self.mode < other.mode, False otherwise."""
         for permission in (self, other):
             if permission._warn_if_undefined():
                 return NotImplemented
@@ -169,12 +179,17 @@ class PermissionMode:
         return False
 
     def __le__(self, other):
+        """Return True if self.mode <= other.mode, False otherwise."""
         for permission in (self, other):
             if permission._warn_if_undefined():
                 return NotImplemented
         if self.mode == other.mode or self < other:
             return True
         return False
+
+    def __str__(self):
+        """Return string representation for ``PermissionMode``."""
+        return str(self.mode)
 
     def _warn_if_undefined(self):
         if not self.defined:
@@ -216,9 +231,11 @@ class Volume:
             self.mode = PermissionMode("rw")
 
     def __repr__(self):
+        """Return reproducible string representation of ``Volume``."""
         return str(self)
 
     def __str__(self):
+        """Return string representation of ``Volume``."""
         return f"{self.local}:{self.bind}:{self.mode}"
 
 
@@ -302,9 +319,11 @@ class Volumes:
         return iter(self.volumes.values())
 
     def __repr__(self) -> str:
+        """Return reproducible string representation of ``Volumes``."""
         return str(self)
 
     def __str__(self) -> str:
+        """Return string representation of ``Volumes``."""
         return str(list(self.volumes.values()))
 
     def __sub__(self, bind: str) -> Volumes:

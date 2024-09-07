@@ -1,3 +1,5 @@
+"""Utilities for ``cpac``."""
+
 from .checks import check_version_at_least
 from .utils import (
     INTERVAL_CHECKS,

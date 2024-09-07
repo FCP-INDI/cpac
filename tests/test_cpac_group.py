@@ -1,3 +1,5 @@
+"""Test ``cpac group``."""
+
 import sys
 from unittest import mock
 
@@ -8,7 +10,9 @@ from .CONSTANTS import args_before_after, set_commandline_args
 
 
 @pytest.mark.parametrize("argsep", [" ", "="])
-def test_utils_help(argsep, capsys, image, platform, tag):
+def test_group_help(argsep, capsys, image, platform, tag):
+    """Test ``cpac group --help``."""
+
     def run_test(argv, platform):
         argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, "argv", argv):

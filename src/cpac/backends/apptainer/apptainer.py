@@ -1,4 +1,5 @@
 """Backend for Apptainer images."""
+
 from spython import main as spython_main
 from spython.main.base import command
 

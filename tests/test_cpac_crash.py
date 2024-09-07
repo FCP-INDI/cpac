@@ -1,3 +1,5 @@
+"""Test ``cpac crash``."""
+
 import os
 import sys
 from unittest import mock
@@ -10,6 +12,7 @@ from .CONSTANTS import set_commandline_args
 
 @pytest.mark.parametrize("argsep", [" ", "="])
 def test_cpac_crash(argsep, capsys, image, platform, tag):
+    """Test ``cpac crash $CRASHFILE``."""
     args = set_commandline_args(image, platform, tag, argsep)
     crashfile = os.path.join(os.path.dirname(__file__), "test_data", "test_pickle.pklz")
     argv = ["cpac", "crash", crashfile]

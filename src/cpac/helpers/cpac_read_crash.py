@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# ruff: noqa: D101,D103
 """cpac_read_crash.py.
 
 `cpac_read_crash` is intended to be run inside a C-PAC container.

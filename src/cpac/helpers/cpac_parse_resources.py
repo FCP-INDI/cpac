@@ -7,6 +7,7 @@ identify the `n` tasks with the `highest` or `lowest` of each of these
 categories.
 `cpac_parse_resources` is intended to be run outside a C-PAC container.
 """
+
 from argparse import ArgumentParser
 import configparser
 import json
@@ -24,6 +25,7 @@ field = {"runtime": runti, "estimate": estim, "efficiency": "efficiency"}
 
 
 def display(df):
+    """Display a DataFrame."""
     console = Console()
 
     table = Table(show_header=True, header_style="bold magenta")
@@ -63,6 +65,7 @@ def get_or_create_config(udir):
 
 
 def load_runtime_stats(callback):
+    """Load stats from a callback log."""
     with open(callback) as fhandle:
         logs = [json.loads(log) for log in fhandle.readlines()]
 
@@ -101,6 +104,7 @@ def main(args):
 
 
 def query(usage, f, g, c):
+    """Return a sorted subset from a usage DataFrame."""
     order = g == "lowest"
     usage.sort_values(by=field[f], ascending=order, inplace=True)
     usage.reset_index(inplace=True, drop=True)

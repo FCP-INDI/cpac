@@ -5,6 +5,7 @@
 Read more about conftest.py under:
 https://pytest.org/latest/plugins.html
 """
+
 import logging
 
 import pytest  # pylint: disable=import-error
@@ -14,6 +15,7 @@ LOGGER = logging.getLogger()
 
 @pytest.fixture(autouse=True)
 def ensure_logging_framework_not_altered():
+    """Reset ``logging.getLogger().handlers`` after use."""
     before_handlers = list(LOGGER.handlers)
     yield
     LOGGER.handlers = before_handlers
@@ -31,8 +33,11 @@ def pytest_addoption(parser):
 
 
 def pytest_generate_tests(metafunc):
-    # This is called for every test. Only get/set command line arguments
-    # if the argument is specified in the list of test 'fixturenames'.
+    """Generate fixtures for pytest.
+
+    This is called for every test. Only get/set command line arguments
+    if the argument is specified in the list of test 'fixturenames'.
+    """
     for option in ["image", "platform", "tag"]:
         fixture = getattr(metafunc.config.option, option)
         if option in metafunc.fixturenames:

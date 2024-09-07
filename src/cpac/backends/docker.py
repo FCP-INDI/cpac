@@ -1,3 +1,5 @@
+"""Backend for Docker images."""
+
 import os
 from typing import Optional
 
@@ -9,7 +11,10 @@ from cpac.backends.platform import Backend, PlatformMeta
 
 
 class Docker(Backend):
+    """Docker backend."""
+
     def __init__(self, **kwargs):
+        """Initialize Docker backend."""
         super().__init__(**kwargs)
         self.container = None
         self.platform = PlatformMeta("Docker", "🐳")
@@ -76,6 +81,7 @@ class Docker(Backend):
             self._set_bindings(**kwargs)
 
     def pull(self, **kwargs):
+        """Pull a Docker image."""
         image, tag = self.image.split(":")
         [
             print(layer[k])
@@ -87,9 +93,11 @@ class Docker(Backend):
         ]
 
     def _read_crash(self, read_crash_command, **kwargs):
+        """Read a crash file using a Docker image."""
         return self._execute(command=read_crash_command, run_type="exec", **kwargs)
 
     def run(self, flags: Optional[list] = None, **kwargs):
+        """Run a Docker command."""
         if not flags:
             flags = []
         kwargs["command"] = self.drop_missing_positional_arguments(kwargs, flags)
@@ -194,18 +202,22 @@ class Docker(Backend):
 
 
 class DockerRun:
+    """A run within a Docker container."""
+
     def __init__(self, container):
+        """Initialize a Docker container run."""
         # pylint: disable=expression-not-assigned
         self.container = container
         [
             print(l.decode("utf-8"), end="")
-            for l in self.container.attach(  # noqa E741
+            for l in self.container.attach(  # noqa: E741
                 logs=True, stderr=True, stdout=True, stream=True
             )
         ]
 
     @property
     def status(self):
+        """Return Docker container run status."""
         try:
             self.container.reload()
         except Exception:
