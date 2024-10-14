@@ -3,8 +3,10 @@
 from contextlib import redirect_stderr, redirect_stdout
 from io import BytesIO, StringIO, TextIOWrapper
 import sys
+from typing import Literal, Optional
 from unittest import mock
 
+from _pytest.capture import CaptureResult
 import pytest
 
 from cpac.__main__ import run
@@ -34,19 +36,29 @@ def test_loading_message(image, platform, tag):
 
 
 @pytest.mark.parametrize("argsep", [" ", "="])
-def test_pull(argsep, capsys, image, platform, tag):
+def test_pull(
+    argsep: Literal[" ", "="],
+    capsys: pytest.CaptureFixture[str],
+    image: Optional[str],
+    platform: Optional[str],
+    tag: Optional[str],
+) -> None:
     """Test pull command."""
 
-    def run_test(argv):
+    def run_test(argv: list[str] | list[Optional[str]]) -> None:
         argv = [arg for arg in argv if arg]
         with mock.patch.object(sys, "argv", argv):
             run()
-            captured = capsys.readouterr()
-            checkstring = f":{tag}" if tag is not None else ":latest"
-            outstring = captured.out + captured.err
+            captured: CaptureResult[str] = capsys.readouterr()
+            checkstring: str = tag if tag else "latest"
+            if platform == "apptainer":
+                checkstring = f"\n{tag}\n"
+            if platform == "docker":
+                checkstring = f":{tag}"
+            outstring: str = captured.out + captured.err
             assert checkstring in outstring or "cached" in outstring
 
-    args = set_commandline_args(image, platform, tag, argsep)
+    args: str = set_commandline_args(image, platform, tag, argsep)
 
     # test args before command
     run_test(f"cpac {args} pull".split(" "))
