@@ -1,3 +1,7 @@
+ci:
+  autoupdate_branch: develop
+  autoupdate_commit_msg: ':arrow_up: pre-commit.ci autoupdate'
+
 fail_fast: false
 
 repos:
