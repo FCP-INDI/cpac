@@ -114,6 +114,8 @@ jobs:
         export APPTAINER_TMPDIR=${{ env.APPTAINER_TMPDIR }}
         export SINGULARITY_TMPDIR=${{ env.APPTAINER_TMPDIR }}
         cpac --platform ${{ matrix.platform }} pull --image ${{ needs.set_docker_image.outputs.docker_image }} --tag ${{ matrix.tag }}
+    - name: Setup upterm session
+      uses: lhotari/action-upterm@v1
     - name: Test cpac, platform and tag specified
       run: |
         coverage run --append -m pytest --basetemp=${PWD}/tmp --doctest-modules --image=${{ needs.set_docker_image.outputs.docker_image }} --platform ${{ matrix.platform }} --tag ${{ matrix.tag }} .
