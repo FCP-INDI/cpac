@@ -96,7 +96,7 @@ class Backend:
                             f"pipeline_config_{pipeline_config}.yml",
                         ]
                     )
-        self.volumes = Volume("/etc/passwd", mode="ro")
+        self.volumes = Volumes()
         tracking_opt_out = "--tracking_opt-out"
         if not (
             tracking_opt_out in kwargs

@@ -8,6 +8,7 @@ from docker.errors import ImageNotFound
 import dockerpty
 
 from cpac.backends.platform import Backend, PlatformMeta
+from cpac.utils import Volume
 
 
 class Docker(Backend):
@@ -16,6 +17,7 @@ class Docker(Backend):
     def __init__(self, **kwargs):
         """Initialize Docker backend."""
         super().__init__(**kwargs)
+        self.volumes += Volume("/etc/passwd", mode="ro")
         self.container = None
         self.platform = PlatformMeta("Docker", "🐳")
         self._print_loading_with_symbol(self.platform.name)
