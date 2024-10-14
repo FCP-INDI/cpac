@@ -16,6 +16,7 @@ updates:
   registries: '*'
   schedule:
     interval: monthly
+  target-branch: develop
 - package-ecosystem: pip
   directory: /
   schedule:
