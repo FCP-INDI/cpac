@@ -1,4 +1,5 @@
 """Tests for top-level cpac cli."""
+
 from contextlib import redirect_stderr, redirect_stdout
 from io import BytesIO, StringIO, TextIOWrapper
 import sys
