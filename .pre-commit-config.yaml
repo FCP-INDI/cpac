@@ -39,7 +39,7 @@ repos:
     - --no-sort
 
 - repo: https://github.com/python-poetry/poetry
-  rev: 1.8.3
+  rev: 1.8.0
   hooks:
   - id: poetry-check
   - id: poetry-lock
