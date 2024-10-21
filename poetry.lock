@@ -1054,13 +1054,13 @@ files = [
 
 [[package]]
 name = "nibabel"
-version = "5.3.0"
+version = "5.3.1"
 description = "Access a multitude of neuroimaging data formats"
 optional = true
 python-versions = ">=3.9"
 files = [
-    {file = "nibabel-5.3.0-py3-none-any.whl", hash = "sha256:c2232fa8422c501d84e7af76304df5d2d16e3855ab328ca2d5185defccbf8506"},
-    {file = "nibabel-5.3.0.tar.gz", hash = "sha256:6162184e0249b317bca42b2f43c02734a51e82ebd4ca9ee6200e25648493438e"},
+    {file = "nibabel-5.3.1-py3-none-any.whl", hash = "sha256:5c04c7139d41a59ef92839f1cabbe73061edd5787340bf2c9a34ed71f0db9d07"},
+    {file = "nibabel-5.3.1.tar.gz", hash = "sha256:aec1b75dcf6bd9595a9196ff341b87957c69fb21bc5e38719463478dad83000a"},
 ]
 
 [package.dependencies]
@@ -2322,4 +2322,4 @@ tsconcat = ["ba-tsconcat"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "91de5acc2569d81428f4dedc7f451fea828ec77651651cba96e502eff52cc563"
+content-hash = "0fb7aea777b2eeda04e7ce972f4e35e4bb5e223026cd1b807dd862629b24bdf2"
