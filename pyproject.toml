@@ -83,7 +83,7 @@ bids2table = {version = "0.1.0", markers = "extra == 'tsconcat'"}
 coveralls = {version = "*", optional = true}
 elbow = {version = "0.1.1", markers = "extra == 'tsconcat'"}
 imagesize = {version = "*", optional = true}
-nibabel = {version = "5.3.0", markers = "extra == 'tsconcat'"}
+nibabel = {version = "5.3.1", markers = "extra == 'tsconcat'"}
 pyarrow = {version = "17.0.0", markers = "extra == 'tsconcat'"}
 pytest = {version = "*", optional = true}
 pytest-cov = {version = "*", optional = true}
