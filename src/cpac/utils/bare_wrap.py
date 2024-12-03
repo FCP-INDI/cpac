@@ -286,4 +286,4 @@ def get_wrapped(name: str) -> WrappedBare:
     return WRAPPED[name]
 
 
-__all__ = ["add_bare_wrapper", "call", "WRAPPED"]
+__all__ = ["WRAPPED", "add_bare_wrapper", "call"]
