@@ -11,11 +11,11 @@ from .utils import (
 )
 
 __all__ = [
-    "check_version_at_least",
     "INTERVAL_CHECKS",
     "LocalsToBind",
     "PermissionMode",
-    "version_tuple",
     "Volume",
     "Volumes",
+    "check_version_at_least",
+    "version_tuple",
 ]
