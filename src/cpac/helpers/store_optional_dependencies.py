@@ -4,10 +4,15 @@
 from itertools import chain
 from pathlib import Path
 from pickle import dump, load
-import tomllib
 from typing import cast
 
 from packaging.requirements import Requirement
+
+try:
+    import tomllib
+except ImportError:
+    # Python < 3.11
+    import tomli as tomllib
 
 PICKLE_PATH = Path(__file__).parents[1] / "optional_dependencies.pkl"
 

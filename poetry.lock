@@ -2575,4 +2575,4 @@ tsconcat = ["ba-tsconcat", "bids2table", "elbow", "imagesize", "nibabel", "numpy
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "780014116856fb94b6e446101486e3326496cbd3d8212e1381cfd1935adce53d"
+content-hash = "e28e90e667b21a672cfcdb93cfe3c5fb01d4f5b5c72c9e8f9528cb064dfaed34"
