@@ -5,7 +5,10 @@
 from argparse import _SubParsersAction, ArgumentParser, HelpFormatter, REMAINDER
 from dataclasses import dataclass
 from importlib.metadata import requires
+from importlib.resources import files
 from logging import ERROR, log
+from pathlib import Path
+import pickle
 from shutil import which
 from subprocess import call as sub_call, CalledProcessError
 from sys import exit as sys_exit, version_info
@@ -132,7 +135,15 @@ class WrappedBare:
     @property
     def package_info(self) -> Optional[Requirement]:
         """Return metadata about how a package is required for this version of cpac."""
-        return self.requirements().get(self.package)
+        pkg_info = self.requirements().get(self.package)
+        if not pkg_info:
+            optional_deps = Path(
+                str(files("cpac").joinpath("optional_dependencies.pkl"))
+            )
+            if optional_deps.exists():
+                with optional_deps.open("rb") as _pickle:
+                    pkg_info = pickle.load(_pickle).get(self.package)
+        return pkg_info
 
     @classmethod
     def requirements(cls) -> dict[str, Requirement]:
@@ -172,7 +183,7 @@ class WrappedBare:
         """Return the supported version(s) of the wrapped package."""
         if self.package_info:
             if self.package_info.specifier:
-                return self.package_info.specifier
+                return str(self.package_info.specifier)
             return getattr(self.package_info, "url", "*")
         return "*"
 
