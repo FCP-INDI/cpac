@@ -75,7 +75,7 @@ jobs:
         tag: [latest, nightly]
         exclude:
         - platform: apptainer
-          python: 3.11
+          python: '3.10'
         - platform: apptainer
           python: 3.12
     steps:
@@ -102,6 +102,11 @@ jobs:
       uses: eWaterCycle/setup-apptainer@v2
       with:
         apptainer-version: ${{ matrix.apptainer }}
+    - name: Allow unprivileged user namespaces
+      if: ${{ matrix.platform == 'applainer' }}
+      run: |
+        sudo sh -c 'echo kernel.apparmor_restrict_unprivileged_userns=0 >/etc/sysctl.d/90-disable-userns-restrictions.conf'
+        sudo sysctl -p /etc/sysctl.d/90-disable-userns-restrictions.conf
     - name: Install cpac
       run: cd $GITHUB_WORKSPACE && pip install -e ".[dev,testing,tsconcat]"
     - name: Pull images
