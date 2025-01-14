@@ -364,9 +364,7 @@ class Backend:
                     "  ",
                 )
             )
-            print(
-                f"Logging messages will refer to the {self.platform.name} " "paths.\n"
-            )
+            print(f"Logging messages will refer to the {self.platform.name} paths.\n")
 
     @property
     def platform(self):
@@ -462,7 +460,7 @@ class Backend:
                     self._bind_volume(Volume(bind_parts[0]))
                 else:
                     raise SyntaxError(
-                        "I don't know what to do with custom " "binding {}".format(d)
+                        "I don't know what to do with custom binding {}".format(d)
                     )
         for d in ["bids_dir", "output_dir"]:  # pylint: disable=invalid-name
             if d in kwargs and isinstance(kwargs[d], str) and os.path.exists(kwargs[d]):

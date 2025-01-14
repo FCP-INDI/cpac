@@ -7,7 +7,7 @@ import docker
 from docker.errors import ImageNotFound
 import dockerpty
 
-from cpac.backends.platform import Backend, PlatformMeta
+from cpac.backends.container_platform import Backend, PlatformMeta
 
 
 class Docker(Backend):
@@ -25,7 +25,7 @@ class Docker(Backend):
             self.client.ping()
         except (docker.errors.APIError, ConnectionError):  # pragma: no cover
             raise OSError(
-                f"Could not connect to {self.platform.name}. " "Is Docker running?"
+                f"Could not connect to {self.platform.name}. Is Docker running?"
             )
 
         image = kwargs["image"] if kwargs.get("image") is not None else "fcpindi/c-pac"

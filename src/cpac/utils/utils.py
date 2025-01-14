@@ -196,9 +196,9 @@ class PermissionMode:
             warn(
                 f"'{self.mode}' is not a fully-configured permission "
                 f"level in {DIST_NAME}. Configured permission levels are "
-                f"""{", ".join([
-                     f"'{mode}'" for mode in PermissionMode.defined_modes
-                 ])}""",
+                f"""{
+                    ", ".join([f"'{mode}'" for mode in PermissionMode.defined_modes])
+                }""",
                 UserWarning,
             )
             return True

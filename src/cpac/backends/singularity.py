@@ -6,7 +6,7 @@ from pathlib import Path
 from spython.image import Image
 from spython.main import Client
 
-from cpac.backends.platform import Backend, PlatformMeta
+from cpac.backends.container_platform import Backend, PlatformMeta
 
 BINDING_MODES = {"ro": "ro", "w": "rw", "rw": "rw"}
 

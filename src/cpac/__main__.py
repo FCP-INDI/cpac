@@ -353,10 +353,9 @@ def main(args):
                 )
             except Exception:  # pragma: no cover
                 raise ValueError(
-                    f"""Something about {[
-                        arg for arg in args.extra_args if
-                        '--data_config_file' in arg
-                    ]} is confusing."""
+                    f"""Something about {
+                        [arg for arg in args.extra_args if "--data_config_file" in arg]
+                    } is confusing."""
                 )
     else:
         args.data_config_file = (
