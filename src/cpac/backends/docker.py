@@ -7,7 +7,7 @@ import docker
 from docker.errors import ImageNotFound
 import dockerpty
 
-from cpac.backends.platform import Backend, PlatformMeta
+from cpac.backends.container_platform import Backend, PlatformMeta
 
 
 class Docker(Backend):

@@ -3,7 +3,7 @@
 from spython import main as spython_main
 from spython.main.base import command
 
-from cpac.backends.platform import PlatformMeta
+from cpac.backends.container_platform import PlatformMeta
 from cpac.backends.singularity import Singularity
 from .spython import get_client, init_command
 
