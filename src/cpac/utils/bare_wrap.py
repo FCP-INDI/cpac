@@ -127,7 +127,7 @@ class WrappedBare:
         """Get the helpstring."""
         if self._helpstring is None:
             if not self.supported_python:
-                self._helpstring = f"Extra command '{self.name}' not supported on Python {f'{version_info.major}.{version_info.minor}.{ version_info.micro}'}; supported Python versions range is {self.supported_python_range}.\n\nSee {self.url} for more information and system requirements."
+                self._helpstring = f"Extra command '{self.name}' not supported on Python {f'{version_info.major}.{version_info.minor}.{version_info.micro}'}; supported Python versions range is {self.supported_python_range}.\n\nSee {self.url} for more information and system requirements."
             else:
                 self._helpstring = f"Extra package {self.package} not found. See {self.url} for more information and system requirements, or run `pip install cpac[{self.name}]` to try to install it."
         return self._helpstring.replace(f"usage: {self.command}", f"cpac {self.name}")

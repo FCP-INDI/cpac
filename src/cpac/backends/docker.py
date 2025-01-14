@@ -25,7 +25,7 @@ class Docker(Backend):
             self.client.ping()
         except (docker.errors.APIError, ConnectionError):  # pragma: no cover
             raise OSError(
-                f"Could not connect to {self.platform.name}. " "Is Docker running?"
+                f"Could not connect to {self.platform.name}. Is Docker running?"
             )
 
         image = kwargs["image"] if kwargs.get("image") is not None else "fcpindi/c-pac"
