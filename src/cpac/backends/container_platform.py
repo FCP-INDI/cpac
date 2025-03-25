@@ -177,7 +177,7 @@ class Backend:
                     else crash_line
                     for crash_line in (
                         [line[0] for line in crash_lines]
-                        if (len(crash_lines) and isinstance(crash_lines[0], tuple))
+                        if (crash_lines and isinstance(crash_lines[0], tuple))
                         else crash_lines
                     )
                 ]
