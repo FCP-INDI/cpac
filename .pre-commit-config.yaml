@@ -9,14 +9,14 @@ fail_fast: false
 
 repos:
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.11.7
+  rev: v0.11.12
   hooks:
   - id: ruff
     args: [--fix]
   - id: ruff-format
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.15.0
+  rev: v1.16.0
   hooks:
   - id: mypy
     additional_dependencies:
@@ -39,7 +39,7 @@ repos:
     - --no-sort
 
 - repo: https://github.com/python-poetry/poetry
-  rev: 2.1.2
+  rev: 2.1.3
   hooks:
   - id: poetry-check
   - id: poetry-lock
