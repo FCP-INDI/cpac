@@ -117,6 +117,7 @@ target-version = "py38"
 
 [tool.ruff.lint]
 extend-select = ["A", "C4", "D", "G", "I", "ICN", "NPY", "PL", "RET", "RSE", "RUF", "Q", "W"]
+ignore = ["PLC0415"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true

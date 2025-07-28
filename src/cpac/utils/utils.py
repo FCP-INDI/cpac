@@ -166,6 +166,10 @@ class PermissionMode:
             return True
         return False
 
+    def __hash__(self):
+        """Return hash for ``PermissionMode``."""
+        return hash(self.mode)
+
     def __lt__(self, other):
         """Return True if self.mode < other.mode, False otherwise."""
         for permission in (self, other):
