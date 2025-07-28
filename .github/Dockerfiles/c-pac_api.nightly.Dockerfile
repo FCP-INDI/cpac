@@ -1,4 +1,4 @@
-# Copyright (C) 2023-2024  C-PAC Developers
+# Copyright (C) 2023-2025  C-PAC Developers
 
 # This file is modified from a file that is part of C-PAC.
 
@@ -28,6 +28,7 @@ RUN mkdir -p /home/user/c-pac_user \
        python3-pip \
        python3.10 \
        python-is-python3 \
+    && chmod -R ugo+w /usr/local/lib/python3.10 /usr/local \
     && rm -rf /var/lib/apt/lists/*
 ENV PYTHONUSERBASE=/home/c-pac_user/.local
 ENV PATH=$PATH:/home/c-pac_user/.local/bin \
