@@ -92,7 +92,7 @@ jobs:
         cache: false
         go-version: ${{ matrix.go }}
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python }}
     - name: Install --upgrade pip setuptools wheel
