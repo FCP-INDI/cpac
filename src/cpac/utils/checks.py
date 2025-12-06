@@ -1,4 +1,5 @@
 """Functions to check things like the in-container C-PAC version."""
+
 from packaging.version import Version
 from semver import VersionInfo
 
