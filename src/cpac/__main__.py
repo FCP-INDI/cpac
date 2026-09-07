@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Main module for cpac package."""
 
 import argparse
@@ -82,10 +81,10 @@ def _parser():
     parser.add_argument(
         "--version",
         action="version",
-        version="cpac (convenience wrapper) version {ver}\nFor C-PAC version, "
+        version=f"cpac (convenience wrapper) version {__version__}\nFor C-PAC version, "
         "run `cpac version` with any cpac options (e.g., "
         "`--platform`, `--image`, `--tag`) that you would use "
-        "while running".format(ver=__version__),
+        "while running",
     )
 
     parser.add_argument(
@@ -475,10 +474,7 @@ def run():
     for i, arg in enumerate(args.copy()):
         if i == command_index:
             option_value_setting = False
-        if arg in options:
-            reordered_args.append(args.pop(args.index(arg)))
-            option_value_setting = True
-        elif any(arg.startswith(f"{option}=") for option in options):
+        if arg in options or any(arg.startswith(f"{option}=") for option in options):
             reordered_args.append(args.pop(args.index(arg)))
             option_value_setting = True
         elif option_value_setting:
