@@ -39,9 +39,9 @@ def display(df):
         tmp += [d["id"]]
         tmp += [d[runti]]
         tmp += [d[estim]]
-        tmp += ["{0:.2f} %".format(100 * d[runti] * 1.0 / d[estim])]
+        tmp += [f"{100 * d[runti] * 1.0 / d[estim]:.2f} %"]
 
-        tmp = ["{0:.4f}".format(t) if isinstance(t, float) else str(t) for t in tmp]
+        tmp = [f"{t:.4f}" if isinstance(t, float) else str(t) for t in tmp]
         table.add_row(*tmp)
         del tmp
 
@@ -67,7 +67,7 @@ def get_or_create_config(udir):
 def load_runtime_stats(callback):
     """Load stats from a callback log."""
     with open(callback) as fhandle:
-        logs = [json.loads(log) for log in fhandle.readlines()]
+        logs = [json.loads(log) for log in fhandle]
 
     pruned_logs = []
     for log in logs:
