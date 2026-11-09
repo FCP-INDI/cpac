@@ -210,7 +210,7 @@ class DockerRun:
         self.container = container
         [
             print(l.decode("utf-8"), end="")
-            for l in self.container.attach(  # noqa: E741
+            for l in self.container.attach(
                 logs=True, stderr=True, stdout=True, stream=True
             )
         ]

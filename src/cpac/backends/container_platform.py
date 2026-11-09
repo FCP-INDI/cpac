@@ -107,7 +107,7 @@ class Backend:
                 tracking_path = get_or_create_config(udir)
                 self.volumes += Volume(tracking_path)
             else:
-                raise EnvironmentError(
+                raise OSError(
                     "Unable to create tracking "
                     "configuration. Please run with "
                     "--tracking_opt-out and C-PAC >= "
@@ -354,9 +354,11 @@ class Backend:
                 textwrap.indent(
                     tabulate(
                         table.applymap(
-                            lambda x: ("\n".join(textwrap.wrap(x, 42)))
-                            if isinstance(x, str)
-                            else x
+                            lambda x: (
+                                ("\n".join(textwrap.wrap(x, 42)))
+                                if isinstance(x, str)
+                                else x
+                            )
                         ),
                         headers="keys",
                         showindex=False,
@@ -460,7 +462,7 @@ class Backend:
                     self._bind_volume(Volume(bind_parts[0]))
                 else:
                     raise SyntaxError(
-                        "I don't know what to do with custom binding {}".format(d)
+                        f"I don't know what to do with custom binding {d}"
                     )
         for d in ["bids_dir", "output_dir"]:  # pylint: disable=invalid-name
             if d in kwargs and isinstance(kwargs[d], str) and os.path.exists(kwargs[d]):

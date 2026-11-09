@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Test bare-wrapped commands."""
 
 from subprocess import call

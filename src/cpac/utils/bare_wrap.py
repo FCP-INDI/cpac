@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Wrap another Python package without any modifications."""
 
 from argparse import _SubParsersAction, ArgumentParser, HelpFormatter, REMAINDER
@@ -193,7 +192,6 @@ class WrappedHelpFormatter(HelpFormatter):
 
     def add_arguments(self, actions):
         """Don't add arguments."""
-        pass
 
 
 def add_bare_wrapper(parser: _SubParsersAction, command: str) -> None:
@@ -238,7 +236,7 @@ def call(name: str, command: list) -> None:
         raise KeyError(f"Package {name} not defined in dependencies") from ke
     marker = getattr(package_info, "marker", None)
     if marker and marker.evaluate({"extra": name}) is False:
-        raise EnvironmentError(
+        raise OSError(
             f"Current environment does not meet requirements ({marker}) for package {name}"
         )
     try:
