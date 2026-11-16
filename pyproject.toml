@@ -1,7 +1,7 @@
 [project]
 name = "cpac"
 description = "C-PAC Python Package"
-authors = [{name = "C-PAC developers", email = "cpac@cnl.childmind.org"}]
+authors = [{ name = "C-PAC developers", email = "cpac@cnl.childmind.org" }]
 license = "MIT"
 classifiers = [
   "Development Status :: 3 - Alpha",
