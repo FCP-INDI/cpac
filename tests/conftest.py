@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """conftest.py for cpac.
 
 Read more about conftest.py under:
